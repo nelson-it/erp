@@ -1,0 +1,45 @@
+#!/bin/sh
+
+prefix=default
+typ=letter
+
+while [ $# -gt 1 ] ; do
+  case $1 in
+    -uowncompanyownprefix)  prefix=$2;  shift 2;;
+    -typ)                   typ=$2;     shift 2;;
+    -filetyp)               filetyp=$2; shift 2;;
+    *)                                  shift 1;;
+  esac
+done
+
+if [ "$prefix" = "" ]; then 
+    prefix=default
+fi
+
+case $filetyp in
+    image/png)  ftyp=png;;
+    image/jpg)  ftyp=jpg;;
+    image/jpeg)  ftyp=jpg;;
+esac
+
+if [ "$ftyp" = "" ]; then
+    echo "Datei hat falsches Format $filetyp"
+    exit 1;
+fi
+
+export PATH=/usr/bin:/opt/Tex/bin:/usr/texbin:$PATH
+
+dir=$PWD/../../customer/tex/$prefix/allg/reportheader
+file=$typ""head
+
+mkdir -p "$dir"
+rm -f "$dir/$file.*" 2>/dev/null > /dev/null
+
+cp "$1" "$dir/$file.$ftyp"
+if [ $? != 0 ]; then
+    exit 1
+fi
+
+ebb -O "$dir/$file.$ftyp" | awk '/\%\%BoundingBox:/ { printf("\\def\\'$file'pic{'$file.$ftyp'}\n\\def\\'$file'left{%s}\n\\def\\'$file'top{%s}\n\\def\\'$file'width{%s}\n\\def\\'$file'height{%s}\n", $2, $3, $4, $5); }' > "$dir/$file""bb.sty"
+
+exit 0

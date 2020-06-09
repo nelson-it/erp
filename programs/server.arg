@@ -1,0 +1,26 @@
+debug:   0
+
+projectroot:          /home/manny/projects
+project: appnew
+port: 8025
+
+DbHttpTimeout: 1200
+
+DbDatabase: newappdb
+
+ImapScanDisable: 1
+
+DbTrustCheckUserip: 10.0.0.0/8,192.168.0.0/16,127.0.0.1/32
+HttpSysexecUserip: 127.0.0.1/32,10.0.0.0/8,172.16.0.0/16,192.168.0.0/16,fd01:23a5::/32
+
+PhpPath: /usr/bin/php-cgi -d include_path=.:/home/manny/projects/web/allg/php:/usr/share/php:/usr/share/pear
+
+
+EmbedwebHttpNocache: 1
+
+EmbedwebHttpIndex:      erp
+EmbedwebHttpServerpath: appnew/web:webnew/app:webnew/extern
+EmbedwebHttpDataroot:   data
+EmbedwebHttpDatapath:   repository@/home/manny/projects/data/repository
+RepRoot:                tex/report
+

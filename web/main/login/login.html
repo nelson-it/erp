@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="de-DE">
+<head>
+
+<base href="#mne_base#">
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<title>Newapp - Nelson technische Informatik</title>
+<link rel="shortcut icon" href="main/login/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="main/login/main.css" media="screen">
+
+<script type="module" src="main/login/winload.js"></script>
+
+<body>
+<div id="logo"></div>
+<div id='content'>
+<div id="title">
+      <table><tr><td style="text-align: left"><div id="schrift">Newapp</div>
+      <div> Nelson - technische Informatik</div>
+      </td></tr>
+      </table>
+</div>
+
+<div id="supported">#mne_lang#Ihr Browser wird nicht komplett unterstützt#</div>
+<div id="form">
+  <form method="post" >
+    <input type="hidden" id="location" name="location" value= />
+    <table>
+      <tr><td align="right" colspan="2" id="error"></td></tr>
+      <tr><td>#mne_lang#Benutzer#: </td><td><input type="text"     name="mneuserloginname"  id="user" value="admindb" autocapitalize="off" /></td></tr>
+      <tr><td>#mne_lang#Password#: </td><td><input type="password" name="mneuserpasswd" value="!!Admindb" autocapitalize="off"/></td></tr>
+      <tr><td align="right" colspan="2"><input type="submit" value="login" ></td></tr>
+    </table>
+  </form>
+  <div id="browser">
+    <div><div>Navigator:</div><div id="browsernavigator"></div></div>
+    <div><div>Version:</div><div id="browserversion"></div></div>
+    <div><div>OS:</div><div id="browseros"></div></div>
+    <div><div>PdfPlugin:</div><div id="browserplugin"></div></div>
+  </div>
+</div>
+</div>
+</body>
+</html>

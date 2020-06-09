@@ -1,0 +1,34 @@
+#!/bin/sh
+
+prefix=default
+while [ $# -gt 1 ] ; do
+  case $1 in
+    -uowncompanyownprefix)  prefix=$2; shift 2;;
+     *)                                shift 1;;
+  esac
+done
+
+if [ "$prefix" = "" ]; then 
+    prefix=default
+fi
+
+export TEXINPUTS=.:$PWD/../../customer/tex/$prefix////:$PWD/../../customer/tex/default////:$PWD/../../tex///:
+export TEXMFVAR=$PWD/.texmf-var
+export PATH=/opt/Tex/bin:/usr/texbin:/usr/bin:$PATH
+
+pid=$$
+cp $1 /tmp/$pid.tex
+cp $1 /tmp/debug.tex
+
+latex -output-directory=/tmp --output-format=dvi /tmp/$pid.tex
+latex -output-directory=/tmp --output-format=dvi /tmp/$pid.tex
+dvipdfm -o $1 /tmp/$pid.dvi
+
+cp /tmp/$pid.log /tmp/debug.log
+rm /tmp/$pid.tex
+rm /tmp/$pid.out
+rm /tmp/$pid.dvi
+rm /tmp/$pid.log
+rm /tmp/$pid.aux
+
+exit 0
