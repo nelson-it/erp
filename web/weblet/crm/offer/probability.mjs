@@ -15,27 +15,23 @@ import MneRequest  from '/js/basic/request.mjs'
 import MneElement from '/weblet/basic/element.mjs'
 import MneDbView  from '/weblet/db/view.mjs'
 
-class MneErpPersonalProductTime extends MneDbView
+class MneErpCrmOfferProbability extends MneDbView
 {
   constructor(parent, frame, id, initpar = {}, config = {} )
   {
     var ivalues = 
     {
-      schema        : 'mne_personnal',
-      query         : 'producttime',
-      showids       : ['producttimeid'],
+      schema        : 'mne_crm',
+      query         : 'offerprobability',
+      table         : 'offerprobability',
+      showids       : ['offernumber'],
+      delconfirmids : [ 'offernumber'],
       
-      defalias : { productid : 'productid' },
+      selectlists : { probability :  'offerprobability'},
 
-      okfunction  : 'producttime_ok',
-      okcols  : ['producttimeid','productid','skillid','duration','step','description','longdesc'],
-      oktyps  : { duration : 'long',  step : 'long' },
-
-      delfunction   : 'producttime_del',
-      delcols       : [ 'producttimeid' ],
-      deltyps       : [],
-      delconfirmids : [ 'description'],
-
+      defvalues : { probability : 10 },
+      defalias : { offernumber : 'offernumber' },
+      
       hinput : false
     };
 
@@ -43,8 +39,20 @@ class MneErpPersonalProductTime extends MneDbView
   }
 
   getViewPath() { return this.getView(import.meta.url) }
-  //getCssPath()  { return (( super.getCssPath() ) ?  super.getCssPath() + ',' : '') + this.getCss(import.meta.url); }
 
+  async values()
+  {
+    await super.values();
+    
+    if ( ! this.config.dependweblet.obj.run.values.refid )
+    {
+      this.obj.outputs.offernumber.setValue('');
+      this.enable('', false);
+    }
+    
+    if ( this.obj.inputs.probability.getValue(false) == 0 || this.obj.inputs.probability.getValue(false) == 100 )
+      this.enable('', false);
+  }
 }
 
-export default MneErpPersonalProductTime;
+export default MneErpCrmOfferProbability;

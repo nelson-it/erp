@@ -27,7 +27,7 @@ class MneErpWarehouseProductPart extends MneDbView
       query     : 'productpart',
       showids   : ['productpartid'],
       
-      defalias  : ['productid'],
+      defalias  : { productid : 'productid' },
 
       okfunction  : 'productpart_ok',
       okcols  : ['productpartid','productid','count','partgroup','partdescription','partcost','partid','fixturetypeid','unit'],

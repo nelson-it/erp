@@ -33,16 +33,15 @@ class MneErpWarehouseProductPartlist extends MneTableWeblet
           modcols : [ 'productpartid', 'count', 'partcost' ],
           modtyps : { count : 'long', partcost : 'double' },
 
-      adddetail : true,
-      detailweblet : 'partmanagementedit',
+          adddetail : true,
+       detailweblet : 'partmanagementedit',
+      delconfirmids : ['partdescription'],
+      
       savedependvalues : true
     };
     
     super(parent, frame, id, Object.assign(ivalues, initpar), config );
   }
-  
-  getCssPath()  { return (( super.getCssPath() ) ?  super.getCssPath() + ',' : '') + this.getCss(import.meta.url); }
-
 }
 
 export default MneErpWarehouseProductPartlist;

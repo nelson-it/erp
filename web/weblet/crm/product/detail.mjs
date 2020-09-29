@@ -15,7 +15,7 @@ import MneRequest  from '/js/basic/request.mjs'
 import MneElement from '/weblet/basic/element.mjs'
 import MneDbView  from '/weblet/db/view.mjs'
 
-class MneTemplate extends MneDbView
+class MneErpCrmProductDetail extends MneDbView
 {
   constructor(parent, frame, id, initpar = {}, config = {} )
   {
@@ -92,4 +92,4 @@ class MneTemplate extends MneDbView
   
 }
 
-export default MneTemplate;
+export default MneErpCrmProductDetail;
