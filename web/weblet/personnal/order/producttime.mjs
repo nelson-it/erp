@@ -15,30 +15,30 @@ import MneRequest  from '/js/basic/request.mjs'
 import MneElement from '/weblet/basic/element.mjs'
 import MneDbView  from '/weblet/db/view.mjs'
 
-class MneErpPersonnalOfferproductTime extends MneDbView
+class MneErpPersonnalProucttime extends MneDbView
 {
   constructor(parent, frame, id, initpar = {}, config = {} )
   {
     var ivalues = 
     {
         schema    : 'mne_personnal',
-        query     : 'offerproducttime',
-      showids     : ['offerproducttimeid'],
+        query     : 'orderproducttime',
+        table     : 'orderproducttime',
+        showids   : [ 'orderproducttimeid'],
 
-      okfunction  : 'offerproducttime_ok',
-      okcols      : [ 'offerproducttimeid','offerproductid','skillid','setduration','step','description','longdesc' ],
-      oktyps      : { 'setduration' : 'long', 'step' : 'long' },
+        okschema   : 'mne_personnal',
+        okfunction : 'orderproducttime_ok',
+        okcols     : [ 'orderproducttimeid', 'orderproductid', 'skillid', 'setduration', 'step', 'description', 'longdesc', 'ready'] ,
+        oktyps     : { setduration : "long", step : "long", checked : "bool" },
 
-      delfunction   : 'offerproducttime_del',
-      delcols       : [ 'offerproducttimeid' ],
-      deltyps       : {},
-      delconfirmids : [ 'description'],
-      
-      defalias      : { offerid : 'offerid', offerproductid : 'offerproductid', productname : 'productname', productoptid : 'productoptid', count : 'count', skillid : 'skillid', setduration : 'setduration', setdurationsum : 'setdurationsum', step : 'step', description : 'description', longdesc : 'longdesc' },
+        delschema     : 'mne_personnal',
+        delfunction   : 'orderproducttime_del',
+        delcols       : [ 'orderproductid'],
+        delconfirmids : [ 'productname', 'description'],
+        
+        defalias      : { orderid : 'orderid', orderproductid : 'orderproductid', productname : 'productname', productoptid : 'productoptid', count : 'count'  },
+        regexp        : { setdurationsum : 'time' },
 
-      regexp        : { offerproductid : 'keyvalue', setdurationsum : 'time' },
-      checklabel    : { offerproductid : 'productname' },
-      
       hinput : false
     };
 
@@ -46,7 +46,6 @@ class MneErpPersonnalOfferproductTime extends MneDbView
   }
 
   getViewPath() { return this.getView(import.meta.url) }
-  //getCssPath()  { return (( super.getCssPath() ) ?  super.getCssPath() + ',' : '') + this.getCss(import.meta.url); }
 
   async load()
   {
@@ -64,6 +63,13 @@ class MneErpPersonnalOfferproductTime extends MneDbView
     return super.ok();
   }
 
+  async values()
+  {
+    await super.values();
+    if ( this.obj.inputs.orderid.getValue(false) == '################' )
+      this.enable('', false);
+  }
+
 }
 
-export default MneErpPersonnalOfferproductTime;
+export default MneErpPersonnalProucttime;

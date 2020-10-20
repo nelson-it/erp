@@ -28,7 +28,7 @@ class MneErpHoaiCompute extends MneDbView
         workschema  : 'mne_hoai',
         workquery   : 'workphase',
         
-        delbutton : 'add,cancel,del',
+        delbutton : 'add,del',
         defvalues : { year : '2013', law : '2013_35', zone : '3', ansatz : '1.00' },
         
         selectlists : { zone : 'hoai_zone', ansatz : 'hoai_ansatz' },
@@ -40,13 +40,12 @@ class MneErpHoaiCompute extends MneDbView
   }
 
   getViewPath() { return this.getView(import.meta.url) }
-  //getCssPath()  { return (( super.getCssPath() ) ?  super.getCssPath() + ',' : '') + this.getCss(import.meta.url); }
 
   async reset()
   {
     super.reset();
     
-    this.obj.mkbuttons.push({ id : 'compute', value : MneText.getText('#mne_lang#Berechnen')});
+    this.obj.mkbuttons.push({ id : 'compute', value : MneText.getText('#mne_lang#Berechnen'), space : 'before'});
   }
 
   async findIOParam()
@@ -57,7 +56,7 @@ class MneErpHoaiCompute extends MneDbView
     this.obj.inputs.pauschal.setTyp('bool', MneInput.checktype.ok, '');
     
     valname.forEach( (item) => { this.obj.inputs[item].noautoread = true; });
-    [ 1,2,3,4,5,6,7,8,9 ].forEach( ( item ) => this.obj.outputs[item + 'r'].noautoread = true );
+    [ 1,2,3,4,5,6,7,8,9 ].forEach( ( item ) => { this.obj.outputs[item + 'r'].noautoread = true, this.obj.inputs['l' + item].addEventListener('input', (evt) => { this.obj.buttons.ok.disabled = true; }); });
 
     await super.findIOParam();
     valname.forEach( (item) => { this.obj.inputs[item].setTyp('double', MneInput.checktype.ok, ''); });
@@ -102,6 +101,7 @@ class MneErpHoaiCompute extends MneDbView
 
         distinct : '1',
 
+        sqlstart : 1,
         sqlend : 1
     }
     this.addParam(param, "lawInput.old", this.obj.inputs.law);
@@ -118,6 +118,7 @@ class MneErpHoaiCompute extends MneDbView
         query  : this.initpar.workquery,
         cols : 'phasename1,value1,phasename2,value2,phasename3,value3,phasename4,value4,phasename5,value5,phasename6,value6,phasename7,value7,phasename8,value8,phasename9,value9',
 
+        sqlstart : 1,
         sqlend : 1
     }
     this.addParam(param, "lawInput.old", this.obj.inputs.law);
@@ -128,6 +129,7 @@ class MneErpHoaiCompute extends MneDbView
     {
       this.obj.inputs['l' + ( i + 1)].setValue(res.values[0][2 * i + 1]);
       this.obj.outputs['phasename' + (i + 1 )].setValue(res.values[0][2 * i]);
+      this.obj.outputs[(i + 1) + 'r'].setValue('');
     }
     
     this.obj.buttons.ok.disabled = true;
@@ -138,8 +140,8 @@ class MneErpHoaiCompute extends MneDbView
   {
     var i;
     var result;
+    var prozent;
     
-    this.obj.buttons.ok.disabled = false;
 
     var param = 
     {
@@ -150,6 +152,7 @@ class MneErpHoaiCompute extends MneDbView
         wcol   : 'law,cost,zone',
         scols  : '!cost',
 
+        sqlstart : "1",
         sqlend : "1"
     }
 
@@ -200,11 +203,23 @@ class MneErpHoaiCompute extends MneDbView
     this.obj.inputs.nebenkostenr.modValue( parseInt( parseInt((this.obj.inputs.neben.getValue() / 100.0 ) * ( satz + (this.obj.inputs.zuschlag.getValue() / 100.0 * satz ) + this.obj.inputs.zusatz.getValue() + this.obj.inputs.besonders.getValue() + this.obj.inputs.zeit.getValue()) * 100) / 100));
     this.obj.inputs.gesammt.modValue(parseInt(parseInt(( satz + this.obj.inputs.zuschlagr.getValue() + this.obj.inputs.zusatz.getValue() + this.obj.inputs.besonders.getValue() + this.obj.inputs.zeit.getValue() + this.obj.inputs.nebenkostenr.getValue()) * 100) / 100));
 
+    prozent = 0.0;
     [ 1,2,3,4,5,6,7,8,9 ].forEach( (item ) =>
     {
-      if ( this.obj.inputs['l' + item].value != '' ) this.obj.outputs[item + 'r'].modValue('= ' + parseInt(parseInt(( satz * parseFloat(MneInput.mkNull(this.obj.inputs['l' + item].getValue())) / 100.0 ) * 100 + 0.5) / 100));
-
+      if ( this.obj.inputs['l' + item].value != '' )
+      {
+        this.obj.outputs[item + 'r'].modValue('= ' + parseInt(parseInt(( satz * parseFloat(MneInput.mkNull(this.obj.inputs['l' + item].getValue())) / 100.0 ) * 100 + 0.5) / 100));
+        prozent += this.obj.inputs['l' + item].getValue()
+      }
     });
+   
+      [ 1,2,3,4,5,6,7,8,9 ].forEach( ( item) => { MneElement.mkClass(this.obj.outputs['phasename' + item], ( prozent != 100 ) ? 'modifywrong' : 'modifyno', true, 'modify')});
+    if ( prozent != 100 )
+      {
+      MneLog.warning(MneText.getText('#mne_lang#Prozentsumme ist ungleich 100'));
+      }
+    
+    this.obj.buttons.ok.disabled = false;
   }
   
   async enter()
@@ -216,6 +231,7 @@ class MneErpHoaiCompute extends MneDbView
   {
     var p =
     {
+      sqlstart : 1,
         schema : this.initpar.schema,
         name  : this.initpar.vokfunction,
         typ0  : "text",
@@ -313,12 +329,14 @@ class MneErpHoaiCompute extends MneDbView
   async values()
   {
     this.obj.doadd = false;
-
+    this.obj.defvalues.refid = this.config.dependweblet.obj.run.values[this.initpar.refid];
+    
     await super.values();
 
     if ( this.obj.doadd == false )
     {
       await this.change_law();
+      [ 'l1','l2','l3','l4','l5','l6','l7','l8','l9'].forEach( ( item ) => { this.obj.inputs[item].setValue(this.obj.run.values[item])});
       await this.compute();
       this.modClear();
     }

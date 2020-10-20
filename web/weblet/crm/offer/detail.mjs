@@ -40,6 +40,7 @@ class MneErpCrmOfferDetail extends MneDbView
       stdfunction : 'offerproduct_standard',
       orderfunction : 'offer_order',
 
+      links  : {},
       report : 'mne_offerdetail',
       
       hinput : false
@@ -102,6 +103,7 @@ class MneErpCrmOfferDetail extends MneDbView
         name : this.initpar.copyfunction,
         par0 : this.obj.run.values.offerid,
         typ0 : "text",
+        sqlstart : 1,
         sqlend : 1   
     }
     var res = await MneRequest.fetch('/db/utils/connect/func/execute.json', p);
@@ -146,6 +148,7 @@ class MneErpCrmOfferDetail extends MneDbView
           name : this.initpar.oaddfunction,
           par0 : this.obj.run.values.offerid,
           par1 : res.values[0][res.rids.offerid],
+        sqlstart : 1,
           sqlend : 1   
       }
       var res = await MneRequest.fetch('/db/utils/connect/func/execute.json', p);
@@ -164,6 +167,7 @@ class MneErpCrmOfferDetail extends MneDbView
         typ0 : "text",
         par1 : "null",
         typ1 : "long",
+        sqlstart : 1,
         sqlend : 1   
     }
 
@@ -182,6 +186,7 @@ class MneErpCrmOfferDetail extends MneDbView
         name : this.initpar.stdfunction,
         par0 : this.obj.run.values.offerid,
         typ0 : "text",
+        sqlstart : 1,
         sqlend : 1   
     }
 
@@ -203,6 +208,7 @@ class MneErpCrmOfferDetail extends MneDbView
         language : this.obj.inputs.language.value,
         xml0   : "lettercontent," + (( this.obj.inputs.text  ) ? this.obj.inputs.text.getValue() : this.obj.inputs.xtext.getValue()),
         macro0 : 'havelettercontent,1',
+        sqlstart : 1,
         sqlend : 1
     };
 
@@ -215,13 +221,14 @@ class MneErpCrmOfferDetail extends MneDbView
   async order()
   {
     var res;
-    var values = [];
+    var values = {};
     var p =
     {
         schema : this.initpar.schema,
         name : this.initpar.orderfunction,
         par0 : this.obj.run.values.offerid,
         typ0 : "text",
+        sqlstart : 1,
         sqlend : 1   
     }
 
@@ -235,11 +242,24 @@ class MneErpCrmOfferDetail extends MneDbView
     return false;
   }
 
+  async add()
+  {
+    this.initpar.links.refname = undefined;
+    return super.add();
+  }
 
   async ok()
   {
     if ( this.obj.inputs.text ) this.obj.inputs.xtext.modValue(this.obj.inputs.text.getValue());
     return super.ok();
+  }
+  
+  async values()
+  {
+    await super.values();
+    
+    if ( this.obj.run.values.refid && this.obj.run.values.refid != '' )
+      this.initpar.links.refname  = ( this.obj.run.values.refiscompany ) ? { name : 'crm_company', values : { companyid : 'refid' }} : { name : 'crm_person', values : { personid : 'refid' }};
   }
   
 }
