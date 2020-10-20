@@ -15,30 +15,30 @@ import MneRequest  from '/js/basic/request.mjs'
 import MneElement from '/weblet/basic/element.mjs'
 import MneDbView  from '/weblet/db/view.mjs'
 
-class MneErpOfferProduct extends MneDbView
+class MneErpOrderProduct extends MneDbView
 {
   constructor(parent, frame, id, initpar = {}, config = {} )
   {
     var ivalues = 
     {
         schema      : 'mne_crm',
-        query       : 'offerproduct',
-        table       : 'offerproduct',
+        query       : 'orderproduct',
+        table       : 'orderproduct',
 
-        typeselect  : 'offerproducttype',
+        typeselect  : 'orderproducttype',
 
-      showids       : ['offerproductid'],
+      showids       : ['orderproductid'],
 
-      okfunction : 'offerproduct_ok',
-      okcols     : [ 'offerproductid', 'offerproducttype', 'withworkingstep', 'position', 'productid', 'productoptid', 'productcurrencyid', 'productcurrencyrate', 'xproductdescription', 'productname', 'productnumber', 'count', 'productprice', 'productcost', 'productcostrecalc', 'productunit', 'productvat'],
-      oktyps     : { 'withworkingstep' : 'bool', 'position' : 'long', 'productcurrencyrate' : 'double', 'count' : 'double', 'productprice' : 'double', 'productcost' : 'double', 'productcostrecalc' : 'bool', 'productvat' : 'double' },
+      okfunction : 'orderproduct_ok',
+      okcols     : [ 'orderproductid', 'offerproductid', 'position', 'withworkingstep', 'xproductdescription', 'productcurrencyid', 'productid', 'orderproducttype', 'timeauto', 'showdeliver', 'productcostrecalc', 'productpricecalc', 'productcostcalc', 'productvat', 'ready', 'productname', 'productnumber', 'count', 'actcount', 'productunit', 'productprice', 'productcost'] , 
+      oktyps     : { position : "long", withworkingstep : "bool", timeauto : "bool", showdeliver : "bool", productcostrecalc : "bool", productpricecalc : "double", productcostcalc : "double", productvat : "double", ready : "bool", count : "double", actcount : "double", productprice : "double", productcost : "double" }, 
 
-      addfunction : 'offerproduct_add',
-      addcols     : [ 'offerid', 'offerproducttype', 'productid' ],
+      addfunction : 'orderproduct_add',
+      addcols     : [ 'orderid', 'orderproducttype', 'productid' ],
       addpopup    : 'productselect',
       
-      delfunction : 'offerproduct_del',
-      delcols : [ 'offerproductid' ],
+      delfunction : 'orderproduct_del',
+      delcols : [ 'orderproductid' ],
       deltyps : {},
 
       delconfirmids : [ 'productname'],
@@ -50,7 +50,7 @@ class MneErpOfferProduct extends MneDbView
   }
 
   getViewPath() { return this.getView(import.meta.url).replace(/\.html$/, this.obj.run.viewnum + ".html")  }
-  //getCssPath()  { return (( super.getCssPath() ) ?  super.getCssPath() + ',' : '') + this.getCss(import.meta.url); }
+  getCssPath()  { return (( super.getCssPath() ) ?  super.getCssPath() + ',' : '') + this.getCss(import.meta.url); }
 
   reset()
   {
@@ -58,6 +58,7 @@ class MneErpOfferProduct extends MneDbView
     this.obj.run.viewnum = 2;
 
     this.obj.mkbuttons.push( { id : 'calculate', value : MneText.getText("#mne_lang#Kosten berechnen"), space : 'before', show : this.initpar.calcfunction });
+    this.obj.mkbuttons.push( { id : 'calcmod',   value : MneText.getText("#mne_lang#Kal. Kosten ändern"),  });
 
     this.obj.enablebuttons.buttons.push('calculate');
     this.obj.enablebuttons.value.push('calculate');
@@ -97,17 +98,24 @@ class MneErpOfferProduct extends MneDbView
     var p =
     {
         "schema" : "mne_crm",
-        "query"  : "offercost",
-        "cols"   : "offerproductcost",
-        "offerproductidInput.old" : this.obj.run.values.offerproductid,
+        "query"  : "ordercost",
+        "cols"   : "orderproductcost",
+        "orderproductidInput.old" : this.obj.run.values.orderproductid,
         "sqlstart" : 1,
         "sqlend" : 1
     };
 
     var res = await MneRequest.fetch("/db/utils/query/data.json",  p);
-    this.obj.inputs.productcost.modValue(res.values[0][res.rids.offerproductcost]);
+    this.obj.inputs.productcost.modValue(res.values[0][res.rids.orderproductcost]);
     
     return false;
+  }
+  
+  async calcmod()
+  {
+    this.obj.inputs.productpricecalc.disabled = false;
+    this.obj.inputs.productcostcalc.disabled = false;
+    return false; 
   }
 
   async add()
@@ -123,8 +131,8 @@ class MneErpOfferProduct extends MneDbView
           sqlend : 1
       };
 
-      p = this.addParam(p, "par0", this.config.dependweblet.obj.run.values['offerid']);
-      p = this.addParam(p, "par1", this.config.dependweblet.obj.run.values['offerproducttype']);
+      p = this.addParam(p, "par0", this.config.dependweblet.obj.run.values['orderid']);
+      p = this.addParam(p, "par1", this.config.dependweblet.obj.run.values['orderproducttype']);
       p = this.addParam(p, "par2", res.values[0][res.rids.productid]);
 
       await MneRequest.fetch('/db/utils/connect/func/execute.json', p);
@@ -142,7 +150,15 @@ class MneErpOfferProduct extends MneDbView
     if ( this.obj.inputs.productdescription ) this.obj.inputs.xproductdescription.modValue(this.obj.inputs.productdescription.getValue());
     return super.ok();
   }
+  
+  async values()
+  {
+    this.obj.inputs.productpricecalc.disabled = true;
+    this.obj.inputs.productcostcalc.disabled = true;
+    
+    return super.values();
+  }
 
 }
 
-export default MneErpOfferProduct;
+export default MneErpOrderProduct;

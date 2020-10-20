@@ -27,13 +27,14 @@ class MneErpCrmReferenceSelect extends MneTableSelect
         schema : 'mne_crm',
         query  : 'reference',
         
-        cols   : 'refid,ref,companyid,personid,ownerrefid,ownerrefname,reftyp,refname',
+        cols   : 'refid,ref,companyid,personid,ownerrefid,reftyp,ownerrefname,refname',
         showcols : 'refid,refname',
         scols  : 'reftyp,refname',
 
         tablehidecols : ['refid','ref','companyid','personid','ownerrefid'],
         
         selcol : 'refname',
+        notitle : true
     };
 
     super(parent, frame, id, Object.assign(ivalues, initpar), config );
