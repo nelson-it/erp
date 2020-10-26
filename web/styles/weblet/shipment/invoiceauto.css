@@ -1,0 +1,4 @@
+div.weblet .weblet-shipment-invoiceauto .inputsingle > * {
+	flex-basis: 100% !important;
+	flex-grow: 1;
+}
