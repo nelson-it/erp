@@ -4,7 +4,7 @@
 // Die Software darf unter den Bedingungen 
 // der APGL ( Affero Gnu Public Licence ) genutzt werden
 //
-// datei: weblet/dbadmin/table/checktable.mjs
+// datei: weblet/crm/reference/selecttable.mjs
 //================================================================================
 'use strict';
 

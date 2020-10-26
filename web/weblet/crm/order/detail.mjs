@@ -4,13 +4,14 @@
 // Die Software darf unter den Bedingungen 
 // der APGL ( Affero Gnu Public Licence ) genutzt werden
 //
-// datei: weblet/templ/templ.mjs
+// datei: weblet/crm/order/detail.mjs
 //================================================================================
 'use strict';
 
 import MneText     from '/js/basic/text.mjs'
 import MneLog      from '/js/basic/log.mjs'
 import MneRequest  from '/js/basic/request.mjs'
+import MneConfig   from '/js/basic/config.mjs'
 
 import MneElement from '/weblet/basic/element.mjs'
 import MneDbView  from '/weblet/db/view.mjs'
@@ -35,9 +36,16 @@ class MneErpOrderDetail extends MneDbView
       delfunction   : 'order_del',
       delcols       : [ 'orderid'],
       delconfirmids : [ 'ordernumber', 'description'],
-      
-      report : 'mne_orderdetail',
 
+      deliverschema   : 'mne_crm',
+      deliverfunction : 'order_deliver',
+      deliverscreen   : 'shipment_deliverynote',
+
+      docschema  : 'mne_crm',
+      doctable   : 'file',
+
+      links  : {},
+      report : 'mne_orderdetail',
       
       hinput : false
     };
@@ -51,16 +59,16 @@ class MneErpOrderDetail extends MneDbView
   reset()
   {
     super.reset();
-
     this.obj.run.viewnum = 2;
     
-    /*this.obj.mkbuttons.push( { id : "version", value : MneText.getText("#mne_lang#neue Version#"), space : 'before' });
-    this.obj.mkbuttons.push( { id : "copy", value : MneText.getText("#mne_lang#Angebot kopieren#",) });
-    this.obj.mkbuttons.push( { id : "oadd", value : MneText.getText("#mne_lang#Angebot hinzufügen#") });
-    this.obj.mkbuttons.push( { id : "calculate", value : MneText.getText("#mne_lang#Kosten berechnen#") , space : 'before' });
-    this.obj.mkbuttons.push( { id : "standard", value : MneText.getText("#mne_lang#Produktstandard übernehmen#") });
-    this.obj.mkbuttons.push( { id : "order", value : MneText.getText("#mne_lang#Auftrag#"), space : 'before' });
-*/
+    this.obj.mkbuttons.push( { id : "send", value : MneText.getText("#mne_lang#Versenden#"), space : 'before' });
+    this.obj.mkbuttons.push( { id : "deliver", value : MneText.getText("#mne_lang#Ausliefern#",) });
+ 
+    this.obj.enablebuttons.buttons.push('send');
+    this.obj.enablebuttons.buttons.push('deliver');
+
+    this.obj.enablebuttons.value.push('send');
+    this.obj.enablebuttons.value.push('deliver');
   }
   
   async load()
@@ -92,6 +100,31 @@ class MneErpOrderDetail extends MneDbView
     return false;
   }
   
+  async deliver()
+  {
+    var p =
+    {
+        schema : this.initpar.deliverschema,
+        name : this.initpar.deliverfunction,
+        par0 : this.obj.inputs.orderid.getValue(),
+        typ0 : "text",
+        sqlstart : 1,
+        sqlend : 1
+    }
+    var res = await MneRequest.fetch('/db/utils/connect/func/execute.json', p);
+
+     if ( MneConfig.group.erpshipment == true )
+       this.showweblet(this.initpar.deliverscreen, { deliverynoteid : res.result })
+  }
+
+
+  async add()
+  {
+    this.initpar.links.refname = undefined;
+    this.initpar.links.contactname = undefined;
+    return super.add();
+  }
+
   async ok()
   {
     if ( this.obj.inputs.text )
@@ -100,7 +133,7 @@ class MneErpOrderDetail extends MneDbView
     return super.ok();
   }
   
-  print()
+  async print()
   {
     var p =
     {
@@ -120,8 +153,52 @@ class MneErpOrderDetail extends MneDbView
 
     return super.print({ param : p });
   }
+  
+  async send()
+  {
+    if ( this.getModify() )
+    {
+      MneLog.error('#mne_lang#Zum Versenden muss der Auftrag gespeichert sein');
+      return false;
+    }
+    
+    await this.print();
+    
+    var d = MneText.toDateTime((new Date()).getTime() / 1000);
+    var p =
+    {
+        schema : this.initpar.docschema,
+        table  : this.initpar.doctable,
 
+        fileidInput      : '################',
+        refidInput       : this.obj.inputs.refid.getValue(),
+        secondrefidInput : this.obj.inputs.orderid.getValue(),
+        typInput         : 'letter',
+        datatypeInput    : 'application/pdf',
+        authorInput      : MneConfig.username,
+        nameInput        : '#mne_lang#Auftragsbestätigung vom# ' + d,
+        descriptionInput : '#mne_lang#Auftragsbestätigung vom# ' + d,
+        uidInput         : this.obj.inputs.orderid.value,
+        dataInput        : await this.obj.weblets['show'].base64(),
 
+        sqlstart         : 1,
+        sqlend           : 1
+    };
+
+    await MneRequest.fetch("/db/utils/table/insert.xml",  p );
+    this.newselect = true;
+  }
+
+  async values()
+  {
+    await super.values();
+    
+    if ( this.obj.run.values.refid && this.obj.run.values.refid != '' )
+      this.initpar.links.refname  = ( this.obj.run.values.refiscompany ) ? { name : 'crm_company', values : { companyid : 'refid' }} : { name : 'crm_person', values : { personid : 'refid' }};
+      
+    if ( this.obj.run.values.contactid && this.obj.run.values.contactid != '' )
+      this.initpar.links.contactname  = { name : 'crm_person', values : { personid : 'contactid' }};
+  }
 }
 
 export default MneErpOrderDetail;

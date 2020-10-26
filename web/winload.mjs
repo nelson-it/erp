@@ -1,10 +1,10 @@
-// ================================================================================
+//================================================================================
 //
 // Copyright: M.Nelson - technische Informatik
-//            Die Software darf unter den Bedingungen 
-//            der APGL ( Affero Gnu Public Licence ) genutzt werden
-//            
-//    datei: winload.js
+// Die Software darf unter den Bedingungen 
+// der APGL ( Affero Gnu Public Licence ) genutzt werden
+//
+// datei: winload.mjs
 //================================================================================
 'use strict';
 import Bowser from '/js/bowser/bowser.js';

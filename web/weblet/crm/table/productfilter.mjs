@@ -4,7 +4,7 @@
 // Die Software darf unter den Bedingungen 
 // der APGL ( Affero Gnu Public Licence ) genutzt werden
 //
-// datei: weblet/allg/table/where/single.mjs
+// datei: weblet/crm/table/productfilter.mjs
 //================================================================================
 'use strict';
 

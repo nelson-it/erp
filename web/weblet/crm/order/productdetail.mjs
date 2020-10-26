@@ -4,7 +4,7 @@
 // Die Software darf unter den Bedingungen 
 // der APGL ( Affero Gnu Public Licence ) genutzt werden
 //
-// datei: weblet/templ/templ.mjs
+// datei: weblet/crm/order/productdetail.mjs
 //================================================================================
 'use strict';
 

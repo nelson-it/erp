@@ -4,7 +4,7 @@
 // Die Software darf unter den Bedingungen 
 // der APGL ( Affero Gnu Public Licence ) genutzt werden
 //
-// datei: weblet/templ/templ.mjs
+// datei: weblet/crm/offer/detail.mjs
 //================================================================================
 'use strict';
 
@@ -42,6 +42,8 @@ class MneErpCrmOfferDetail extends MneDbView
 
       links  : {},
       report : 'mne_offerdetail',
+      
+      orderscreen : 'crm_order',
       
       hinput : false
     };
@@ -120,6 +122,7 @@ class MneErpCrmOfferDetail extends MneDbView
         name : this.initpar.copyfunction,
         par0 : this.obj.run.values.offerid,
         typ0 : "text",
+        sqlstart : 1,
         rollback : true
     }
 
@@ -127,13 +130,13 @@ class MneErpCrmOfferDetail extends MneDbView
 
     this.obj.run.values.offerid = res.result;
     this.dependweblet = this;
-    await this.values();
+    await this.values({sqlstart : 0 });
     
     this.obj.inputs.description.modValue("#mne_lang#Kopie von " + this.obj.run.values.description);
     this.obj.inputs.offernumber.modValue("#mne_lang#Kopie von " + this.obj.run.values.offernumber);
     this.obj.inputs.version.modValue(1);
     
-    return this.ok();
+    return this.ok({sqlstart : 0 });
   }
   
   async oadd()
@@ -237,7 +240,7 @@ class MneErpCrmOfferDetail extends MneDbView
 
     res = await MneRequest.fetch('/db/utils/connect/func/execute.json', p);
     values['orderid'] = res.result;
-    this.showweblet(this.initpar.detailscreen, values, {});
+    this.showweblet(this.initpar.orderscreen, values, {});
 
     return false;
   }
@@ -254,9 +257,9 @@ class MneErpCrmOfferDetail extends MneDbView
     return super.ok();
   }
   
-  async values()
+  async values(param)
   {
-    await super.values();
+    await super.values(param);
     
     if ( this.obj.run.values.refid && this.obj.run.values.refid != '' )
       this.initpar.links.refname  = ( this.obj.run.values.refiscompany ) ? { name : 'crm_company', values : { companyid : 'refid' }} : { name : 'crm_person', values : { personid : 'refid' }};
