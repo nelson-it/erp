@@ -67,8 +67,8 @@ class MneErpOrderDetail extends MneDbView
     this.obj.enablebuttons.buttons.push('send');
     this.obj.enablebuttons.buttons.push('deliver');
 
-    this.obj.enablebuttons.value.push('send');
-    this.obj.enablebuttons.value.push('deliver');
+    this.obj.enablebuttons.values.push('send');
+    this.obj.enablebuttons.values.push('deliver');
   }
   
   async load()

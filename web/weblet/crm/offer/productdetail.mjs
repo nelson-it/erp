@@ -60,7 +60,7 @@ class MneErpOfferProduct extends MneDbView
     this.obj.mkbuttons.push( { id : 'calculate', value : MneText.getText("#mne_lang#Kosten berechnen"), space : 'before', show : this.initpar.calcfunction });
 
     this.obj.enablebuttons.buttons.push('calculate');
-    this.obj.enablebuttons.value.push('calculate');
+    this.obj.enablebuttons.values.push('calculate');
   }
   
   async load()

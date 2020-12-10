@@ -61,7 +61,7 @@ class MneErpOrderProduct extends MneDbView
     this.obj.mkbuttons.push( { id : 'calcmod',   value : MneText.getText("#mne_lang#Kal. Kosten ändern"),  });
 
     this.obj.enablebuttons.buttons.push('calculate');
-    this.obj.enablebuttons.value.push('calculate');
+    this.obj.enablebuttons.values.push('calculate');
   }
   
   async load()

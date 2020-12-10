@@ -1,0 +1,33 @@
+div.weblet.weblet-personnal-timemanagement-project > div#webletmain,
+div.weblet.weblet-personnal-timemanagement-project > div#webletmain #contentContainer {
+	display : block;
+}
+
+div.weblet.weblet-personnal-timemanagement-project > .webletmain #contentContainer #select #contentTable,
+div.weblet.weblet-personnal-timemanagement-project > .webletmain #contentContainer #time #contentTable {
+	overflow-x: auto;
+}
+
+div.weblet.weblet-personnal-timemanagement-project > .webletmain > #contentContainer > div {
+    padding-bottom: var(--dmargin);
+}
+
+div.weblet.weblet-personnal-timemanagement-project > .webletmain #contentContainer #select table {
+	width: 100%;
+}
+
+div.weblet.weblet-personnal-timemanagement-project > .webletmain > #contentContainer > div > div:first-child {
+	display: inline-block;
+	vertical-align: top;
+	width: 20%;
+}
+div.weblet.weblet-personnal-timemanagement-project > .webletmain > #contentContainer > div > div:last-child {
+	display: inline-block;
+	vertical-align: top;
+	width: 80%;
+}
+
+div.weblet.weblet-personnal-timemanagement-project > .webletmain #contentContainer #select table,
+div.weblet.weblet-personnal-timemanagement-project > .webletmain #contentContainer #select td {
+	border-right: 0px;
+}

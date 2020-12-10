@@ -1,0 +1,28 @@
+div.weblet .weblet-personnal-time-dayselect .inputsingle > * {
+	flex-basis: 100%;
+	border-right: var(--border);
+    padding-left: var(--dmargin);
+}
+
+div.weblet .weblet-personnal-time-dayselect .inputsingle :last-child {
+	border-right: unset;
+}
+
+div.weblet .weblet-personnal-time-dayselect #tableframe {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+div.weblet .weblet-personnal-time-dayselect .inputarea {
+	flex-grow: 1;
+}
+
+div.weblet .weblet-personnal-time-dayselect .inputgroup {
+	margin-left: var(--qmargin);
+	margin-right: var(--qmargin);
+}
+
+div.weblet .weblet-personnal-time-monthreport .sum2 #vfulldayOutput {
+	visibility: hidden;
+}

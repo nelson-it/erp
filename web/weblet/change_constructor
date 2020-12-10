@@ -1,0 +1,18 @@
+#!/bin/bash
+
+line="config.path = (new URL(import.meta.url)).pathname.replace(/\.mjs$/, '');"
+prog='BEGIN { 
+            }
+            /config.path = \(new URL/ { next; }
+               { print $0; }'
+
+find . ! -name change_datei -type f | \
+  while read file
+  do
+    egrep '^//.*datei' $file >/dev/null
+    if [ "$?" == "0" ]; then
+      name=$(echo "$file" | sed -e 's@^./@@')
+      awk "$prog" < $file > $file.new
+      mv $file.new $file
+    fi
+  done

@@ -76,10 +76,10 @@ class MneErpShipmentInvoice extends MneDbView
     this.obj.enablebuttons.buttons.push('reminder2');
     this.obj.enablebuttons.buttons.push('reminder3');
     
-    this.obj.enablebuttons.value.push('send');
-    this.obj.enablebuttons.value.push('payed');
-    this.obj.enablebuttons.value.push('reminder1');
-    this.obj.enablebuttons.value.push('reminder2');
+    this.obj.enablebuttons.values.push('send');
+    this.obj.enablebuttons.values.push('payed');
+    this.obj.enablebuttons.values.push('reminder1');
+    this.obj.enablebuttons.values.push('reminder2');
 
   }
   

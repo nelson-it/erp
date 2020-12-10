@@ -1,0 +1,16 @@
+.weblet-builddiary-dayreporttable tr.bd1 {
+	background-color: #ffffc0;
+}
+
+.weblet-builddiary-dayreporttable tr.bdp0 > td.bd span, .weblet-builddiary-dayreporttable tr.bdp0 > td.bd select {
+	color: var(--inputcolorlight);
+}
+
+.weblet-builddiary-dayreporttable tr.bdc2 {
+    background-color: #ff8080;
+}
+
+div.weblet .ownids {
+    background-color: var(--darkcolor1);
+    color: var(--rdarkcolor1)
+}

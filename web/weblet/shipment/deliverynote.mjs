@@ -69,8 +69,8 @@ class MneErpShipmentDeliverynote extends MneDbView
     this.obj.enablebuttons.buttons.push('invoice');
     this.obj.enablebuttons.buttons.push('deliver');
 
-    this.obj.enablebuttons.value.push('invoice');
-    this.obj.enablebuttons.value.push('deliver');
+    this.obj.enablebuttons.values.push('invoice');
+    this.obj.enablebuttons.values.push('deliver');
 
   }
   
