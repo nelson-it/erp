@@ -118,7 +118,7 @@ class MneErpOrderProduct extends MneDbView
     return false; 
   }
 
-  async add()
+  async add(data)
   {
     await this.openpopup(this.initpar.addpopup, {}, { noclose : true, selectok : async (res) =>
     {

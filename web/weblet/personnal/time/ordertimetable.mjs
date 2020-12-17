@@ -35,7 +35,9 @@ class MneErpPersonnalTimeOrdertimetable extends MneDbTableView
     p.wop  = where.wop;
     p.wval = where.wval;
     
-    return super.getPrintParam({report : this.initpar['report_' + ((where.obj.inputs.my.getValue() ) ? 'single' : 'all')], param : p });
+    this.obj.printparam = p;
+    this.initpar.report = this.initpar['report_' + ((where.obj.inputs.my.getValue() ) ? 'single' : 'all')];
+    return super.getPrintParam();
 
   }
 

@@ -95,10 +95,10 @@ class MneErpWarehouseOfferProductpart extends MneDbView
     
   }
   
-  async add()
+  async add(data)
   {
     this.obj.noclearadd = true;
-    await super.add();
+    await super.add(data);
     if ( this.obj.noclearadd && this.obj.inputs.offerproductpartid.getValue() != '################' )
     {
       this.obj.inputs.offerproductpartid.setValue('################');

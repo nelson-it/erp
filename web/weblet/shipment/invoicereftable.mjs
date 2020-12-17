@@ -89,7 +89,7 @@ class MneErpShipmentInvoiceRef extends MneDbTableViewWeblet
     return retval;
   }
 
-  async add()
+  async add(data)
   {
     this.unselectRows();
     

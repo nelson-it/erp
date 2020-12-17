@@ -83,9 +83,9 @@ class MneErpShipmentInvoice extends MneDbView
 
   }
   
-  async print()
+  getPrintParam()
   {
-    var p =
+    this.obj.printparam =
     {
         wval : this.obj.inputs.invoiceid.getValue(),
         wop  : "=",
@@ -111,8 +111,7 @@ class MneErpShipmentInvoice extends MneDbView
       return;
     }
 
-    this.initpar.report = this.initpar.invoicereport;
-    return super.print({ param : p });
+    return super.getPrintParam();
   }
   
   async send()
@@ -128,24 +127,33 @@ class MneErpShipmentInvoice extends MneDbView
     this.dependweblet = this;
   }
 
+  async print()
+  {
+    this.initpar.report = this.initpar.invoicereport;
+    return super.print();
+  }
+
   async reminder1()
   {
     await this.func('reminder1');
-    this.print();
+    this.initpar.report = this.initpar.reminder1report;
+    super.print();
     this.dependweblet = this;
   }
 
   async reminder2()
   {
     await this.func('reminder2');
-    this.print();
+    this.initpar.report = this.initpar.reminder2report;
+    super.print();
     this.dependweblet = this;
   }
 
   async reminder3()
   {
     await this.func('reminder3');
-    this.print();
+    this.initpar.report = this.initpar.reminder3report;
+    super.print();
     this.dependweblet = this;
   }
 

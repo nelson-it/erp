@@ -118,11 +118,11 @@ class MneErpOrderDetail extends MneDbView
   }
 
 
-  async add()
+  async add(data)
   {
     this.initpar.links.refname = undefined;
     this.initpar.links.contactname = undefined;
-    return super.add();
+    return super.add(data);
   }
 
   async ok()
@@ -133,9 +133,9 @@ class MneErpOrderDetail extends MneDbView
     return super.ok();
   }
   
-  async print()
+  getPrintParam()
   {
-    var p =
+    this.obj.printparam =
     {
         wval : this.obj.run.values.orderid,
         wop  : "=",
@@ -148,10 +148,10 @@ class MneErpOrderDetail extends MneDbView
         sqlend : 1
     };
 
-      if ( this.obj.inputs.text && this.obj.inputs.text.getModify() )
-        p.macro1 = 'watermark,' + MneText.getText('#mne_lang#Entwurf');
+    if ( this.obj.inputs.text && this.obj.inputs.text.getModify() )
+      this.obj.printparam.macro1 = 'watermark,' + MneText.getText('#mne_lang#Entwurf');
 
-    return super.print({ param : p });
+    return super.getPrintParam();
   }
   
   async send()

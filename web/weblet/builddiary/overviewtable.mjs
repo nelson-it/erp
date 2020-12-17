@@ -23,7 +23,8 @@ class MneErpBuilddiaryOverviewTable extends MneDbViewTable
   {
     var ivalues = 
     {
-        report  : 'mne_builddiary_personsum',
+        report  : 'report',
+        report1  : 'mne_builddiary_personsum',
         report2 : 'mne_builddiary_detail',
         
         singleselect : true
@@ -53,22 +54,42 @@ class MneErpBuilddiaryOverviewTable extends MneDbViewTable
   
   getPrintParam(data)
   {
-    if ( ! data.report )
-      return super.getPrintParam({ report : this.initpar.report, param : { wcol : 'orderid', wop : '=', wval : this.parent.obj.weblets.where.obj.inputs.orderid.getValue()}})
-    else if ( data.report == 2 )
-      return super.getPrintParam({ report : this.initpar.report2, param : { wcol : 'orderid,timeid', wop : '=,is not null', wval : this.parent.obj.weblets.where.obj.inputs.orderid.getValue() + ','}})
-    else
-      return super.getPrintParam({ report : this.initpar.report2, param : { wcol : 'orderid,timeid', wop : '=,=', wval : this.parent.obj.weblets.where.obj.inputs.orderid.getValue() + ',' + this.obj.outputs.timeid.getValue()}})
+    switch(this.obj.report)
+    {
+      case 1:
+        this.obj.printparam = { wcol : 'orderid', wop : '=', wval : this.parent.obj.weblets.where.obj.inputs.orderid.getValue() };
+        break;
+        
+      case 2:
+        this.obj.printparam = { wcol : 'orderid,timeid', wop : '=,is not null', wval : this.parent.obj.weblets.where.obj.inputs.orderid.getValue() + ','};
+        break;
+        
+      case 3:
+        this.obj.printparam = { wcol : 'orderid,timeid', wop : '=,=', wval : this.parent.obj.weblets.where.obj.inputs.orderid.getValue() + ',' + this.obj.outputs.timeid.getValue()};
+        break;
+    }
+    return super.getPrintParam();
   }
   
+  async print()
+  {
+      this.initpar.report = this.initpar.report1;
+      this.obj.report = 1;
+      super.print();
+  }
+
   async print2()
   {
-      super.print({ report : 2 } );
+      this.initpar.report = this.initpar.report2;
+      this.obj.report = 2;
+      super.print();
   }
 
   async print3()
   {
-      super.print({ report : 3 });
+      this.initpar.report = this.initpar.report2;
+      this.obj.report = 3;
+      super.print();
   }
   
   async selectRow(data, row, evt = {})

@@ -32,7 +32,8 @@ class MneErpPersonnalTimePersontimetable extends MneDbTableView
     p.wop  = where.wop;
     p.wval = where.wval;
     
-    return super.getPrintParam({param : p });
+    this.obj.printparam = p;
+    return super.getPrintParam();
 
   }
 

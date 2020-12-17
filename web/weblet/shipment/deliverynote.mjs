@@ -74,9 +74,9 @@ class MneErpShipmentDeliverynote extends MneDbView
 
   }
   
-  async print()
+  getPrintParam()
   {
-    var p =
+    this.obj.printparam =
     {
         wval : this.obj.inputs.deliverynoteid.getValue(),
         wop  : "=",
@@ -88,8 +88,7 @@ class MneErpShipmentDeliverynote extends MneDbView
         sqlstart : 1,
         sqlend : 1
     };
-
-    return super.print({ param : p });
+    return super.getPrintParam();
   }
 
   async deliver()
@@ -128,10 +127,10 @@ class MneErpShipmentDeliverynote extends MneDbView
   }
 
 
-  async add()
+  async add(data)
   {
     this.initpar.links.refid = undefined;
-    return super.add();
+    return super.add(data);
   }
 
   async values()

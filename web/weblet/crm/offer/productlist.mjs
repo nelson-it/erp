@@ -40,7 +40,7 @@ class MneErpOfferProductlist extends MneTableWeblet
 
           adddetail : true,
        detailweblet : 'productdetail',
-          delbutton : 'add',
+          delbutton : 'add,del',
        
        delconfirmids : [ 'productname'],
        
@@ -52,6 +52,15 @@ class MneErpOfferProductlist extends MneTableWeblet
     
     super(parent, frame, id, Object.assign(ivalues, initpar), config );
   }
+  
+  async values(param)
+  {
+    await super.values(param);
+    
+    this.obj.run.origvalues = Object.assign(this.obj.run.origvalues, { offerproducttype : this.initpar.showalias[1]() } );
+    this.obj.run.values = Object.assign({}, this.obj.run.origvalues);
+  }
+
 }
 
 export default MneErpOfferProductlist;

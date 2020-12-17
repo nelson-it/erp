@@ -200,9 +200,9 @@ class MneErpCrmOfferDetail extends MneDbView
     this.newvalues = true;
   }
   
-  print()
+  getPrintParam()
   {
-    var p =
+    this.obj.printparam =
     {
         wval : this.obj.run.values.offerid,
         wop  : "=",
@@ -216,9 +216,9 @@ class MneErpCrmOfferDetail extends MneDbView
     };
 
       if ( this.obj.inputs.text && this.obj.inputs.text.getModify() )
-        p.macro1 = 'watermark,' + MneText.getText('#mne_lang#Entwurf');
+        this.obj.printparam.macro1 = 'watermark,' + MneText.getText('#mne_lang#Entwurf');
 
-    return super.print({ param : p });
+    return super.getPrintParam();
   }
   
   async order()
@@ -245,10 +245,10 @@ class MneErpCrmOfferDetail extends MneDbView
     return false;
   }
 
-  async add()
+  async add(data)
   {
     this.initpar.links.refname = undefined;
-    return super.add();
+    return super.add(data);
   }
 
   async ok()

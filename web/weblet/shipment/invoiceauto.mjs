@@ -72,73 +72,73 @@ class MneErpShipmentInvoiceauto extends MneDbView
     this.printparam[3] = { schema : this.initpar.schema, autoreport : this.initpar.reminder3print, selwcol : "invoiceauto", selwop : "=", selwval : this.obj.inputs.invoiceauto.getValue() };
 
     this.initpar.report = 'autoreport';
-    var param = this.printparam[this.obj.run.values.ntyp];
-    return super.print({ param : param });
+    this.obj.printparam = this.printparam[this.obj.run.values.ntyp];
+    return super.print();
   }
   
   async autotext()
   {
     this.initpar.report = 'autoreport';
-    var param = { schema : this.initpar.schema, autoreport : this.initpar.invoiceopen, rowwarning : "false", rowwarningtext : '#mne_lang#Keine Rechnungen zum versenden vorhanden' };
+    this.obj.printparam = { schema : this.initpar.schema, autoreport : this.initpar.invoiceopen, rowwarning : "false", rowwarningtext : '#mne_lang#Keine Rechnungen zum versenden vorhanden' };
     
-    return super.print({ param : param });
+    return super.print();
   }
 
   async autostart()
   {
     this.initpar.report = 'autoreport';
-    var param = { schema : this.initpar.schema, autoreport : this.initpar.invoice, rowwarning : "false", rowwarningtext : '#mne_lang#Keine Rechnungen zum versenden vorhanden' };
+    this.obj.printparam = { schema : this.initpar.schema, autoreport : this.initpar.invoice, rowwarning : "false", rowwarningtext : '#mne_lang#Keine Rechnungen zum versenden vorhanden' };
     
-    return super.print({ param : param });
+    return super.print();
   }
 
 
   async reminder1open()
   {
     this.initpar.report = 'autoreport';
-    var param = { schema : this.initpar.schema, autoreport : this.initpar.reminder1open, rowwarning : "false", rowwarningtext : '#mne_lang#Keine Mahnungen zum versenden vorhanden'  };
+    this.obj.printparam = { schema : this.initpar.schema, autoreport : this.initpar.reminder1open, rowwarning : "false", rowwarningtext : '#mne_lang#Keine Mahnungen zum versenden vorhanden'  };
     
-    return super.print({ param : param });
+    return super.print();
   }
   
   async reminder2open()
   {
     this.initpar.report = 'autoreport';
-    var param = { schema : this.initpar.schema, autoreport : this.initpar.reminder2open, rowwarning : "false", rowwarningtext : '#mne_lang#Keine Mahnungen zum versenden vorhanden'  };
+    this.obj.printparam = { schema : this.initpar.schema, autoreport : this.initpar.reminder2open, rowwarning : "false", rowwarningtext : '#mne_lang#Keine Mahnungen zum versenden vorhanden'  };
     
-    return super.print({ param : param });
+    return super.print();
   }
   
   async reminder3open()
   {
     this.initpar.report = 'autoreport';
-    var param = { schema : this.initpar.schema, autoreport : this.initpar.reminder3open, rowwarning : "false", rowwarningtext : '#mne_lang#Keine Mahnungen zum versenden vorhanden'  };
+    this.obj.printparam = { schema : this.initpar.schema, autoreport : this.initpar.reminder3open, rowwarning : "false", rowwarningtext : '#mne_lang#Keine Mahnungen zum versenden vorhanden'  };
     
-    return super.print({ param : param });
+    return super.print();
   }
 
   async reminder1()
   {
     this.initpar.report = 'autoreport';
-    var param = { schema : this.initpar.schema, autoreport : this.initpar.reminder1, rowwarning : "false", rowwarningtext : '#mne_lang#Keine Mahnungen zum versenden vorhanden'  };
+    this.obj.printparam = { schema : this.initpar.schema, autoreport : this.initpar.reminder1, rowwarning : "false", rowwarningtext : '#mne_lang#Keine Mahnungen zum versenden vorhanden'  };
     
-    return super.print({ param : param });
+    return super.print();
   }
   
   async reminder2()
   {
     this.initpar.report = 'autoreport';
-    var param = { schema : this.initpar.schema, autoreport : this.initpar.reminder2, rowwarning : "false", rowwarningtext : '#mne_lang#Keine Mahnungen zum versenden vorhanden'  };
+    this.obj.printparam = { schema : this.initpar.schema, autoreport : this.initpar.reminder2, rowwarning : "false", rowwarningtext : '#mne_lang#Keine Mahnungen zum versenden vorhanden'  };
     
-    return super.print({ param : param });
+    return super.print();
   }
   
   async reminder3()
   {
     this.initpar.report = 'autoreport';
-    var param = { schema : this.initpar.schema, autoreport : this.initpar.reminder3, rowwarning : "false", rowwarningtext : '#mne_lang#Keine Mahnungen zum versenden vorhanden'  };
+    this.obj.printparam = { schema : this.initpar.schema, autoreport : this.initpar.reminder3, rowwarning : "false", rowwarningtext : '#mne_lang#Keine Mahnungen zum versenden vorhanden'  };
     
-    return super.print({ param : param });
+    return super.print();
   }
 
   async values()

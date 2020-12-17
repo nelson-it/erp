@@ -110,7 +110,7 @@ class MneErpOfferProduct extends MneDbView
     return false;
   }
 
-  async add()
+  async add(data)
   {
     await this.openpopup(this.initpar.addpopup, {}, { noclose : true, selectok : async (res) =>
     {
@@ -142,7 +142,6 @@ class MneErpOfferProduct extends MneDbView
     if ( this.obj.inputs.productdescription ) this.obj.inputs.xproductdescription.modValue(this.obj.inputs.productdescription.getValue());
     return super.ok();
   }
-
 }
 
 export default MneErpOfferProduct;
