@@ -1,0 +1,56 @@
+#!/bin/bash
+
+schemas="$cus_schemas
+mne_hoai
+mne_builddiary
+mne_system
+mne_sabredav
+mne_repository
+mne_mail
+mne_fixture
+mne_shipment
+mne_warehouse
+mne_personnal
+mne_crm
+mne_base
+mne_catalog
+mne_application"
+
+if [ "$ovschemas" != "" ]; then
+  schemas=`echo $ovschemas | sed -e 's/ /\n/g'`
+fi
+
+echo "read destination database" 1>&2
+
+echo "copy $checkhost:$checkdb"
+rm -f check.db  2> /dev/null
+for s in $schemas
+do
+    echo "copy schema $s"
+    export PGPASSWORD=$checkpass
+    echo "-- Start Schema $s" >> check.db
+    pg_dump -c -s -n $s -U $checkuser -h $checkhost -p $checkport $checkdb >> check.db
+    echo "-- End Schema $s" >> check.db
+done 
+
+echo "read source database" 1>&2
+
+rm -f orig.db 2> /dev/null
+for s in $schemas
+do
+	rschemas="$s
+$rschemas"
+done
+
+echo "copy $orighost:$origdb"
+for s in $rschemas
+do
+    echo "copy schema $s"
+    export PGPASSWORD=$origpass
+    echo "-- Start Schema $s" >> orig.db
+    pg_dump -s -n $s -U $origuser -h $orighost -p $origport $origdb >> orig.db 
+    if [ "$?" != "0" ]; then
+        exit 1
+    fi
+    echo "-- End Schema $s" >> orig.db
+done    

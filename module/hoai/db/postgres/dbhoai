@@ -1,0 +1,38 @@
+#!/bin/bash
+
+admin=admindb
+checkhost=localhost
+checkdb=erpdb
+
+while [ $# -gt 0 ] ; do
+  case $1 in
+    -ddb)     checkdb=$2; shift 2;;
+    -dhost)   checkhost=$2; shift 2;;
+    -user)    admin=$2; shift 2;;
+     *)       shift 1 ;;
+  esac
+done
+
+stty -echo
+echo -n "Bitte Password für $admin eingeben: ";
+read checkpass
+stty echo
+
+echo ""
+
+rm -f create.log
+
+export PGPASSWORD=$checkpass
+cmd='\t on \\'"select nspname from pg_catalog.pg_namespace where nspname='mne_hoai';"
+result=`echo $cmd | psql -q -h $checkhost -U $admin $checkdb`
+if [ "$result" = "" ]; then
+    echo "Create Schema"
+    psql -h $checkhost -U $admin -e $checkdb < create_user.sql   >> create.log 2>&1
+    psql -h $checkhost -U $admin -e $checkdb < create_schema.sql >> create.log 2>&1
+    psql -h $checkhost -U $admin -e $checkdb < create_menu.sql   >> create.log 2>&1
+fi
+
+psql -h $checkhost -U $admin -e $checkdb < update.sql >> create.log 2>&1
+psql -h $checkhost -U $admin -e $checkdb  < hoai.sql  >> create.log 2>&1
+
+fgrep ERROR create.log

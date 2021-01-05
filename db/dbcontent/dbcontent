@@ -1,0 +1,39 @@
+#!/bin/bash
+
+. ../dbcfg.orig
+
+if [ -f ../dbcfg ]; then
+    . ../dbcfg
+fi
+
+while [ $# -gt 0 ] ; do
+  case $1 in
+    -c)     docopy="c"; shift 1;;
+    -sdb)   origdb=$2; shift 2;;
+    -shost) orighost=$2; shift 2;;
+    -ddb)   checkdb=$2; shift 2;;
+    -dhost) checkhost=$2; shift 2;;
+     *)     shift 1 ;;
+  esac
+done
+
+export PGPASSWORD=$origpass
+
+if [ "$docopy" = "c" ]; then 
+  echo Copy $orighost':'$origdb to $checkhost':'$checkdb 1>&2
+else
+  echo Do Update $orighost':'$origdb to $checkhost':'$checkdb 1>&2
+fi
+schema='mne_application'
+schemasave=$schema""_save
+
+echo "Save custumized Data" 1>&2
+. do_contentsave > content.sql
+
+if [ "$docopy" != "c" ]; then
+   echo "Rewrite custumized Data" 1>&2
+   schema='mne_application'
+   schemasave=$schema""_save
+  . do_contentcopy >> content.sql
+fi
+

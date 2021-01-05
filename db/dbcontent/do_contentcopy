@@ -1,0 +1,142 @@
+#!/bin/bash
+
+create_insert()
+{
+  cols=`get_data "$rdcols" $1 $3 "%"`
+
+  komma=
+  echo -n "INSERT INTO $1.$3 ( "
+  for c in $cols 
+  do
+    echo -n $komma $c
+    komma=', '
+  done
+  echo -n " ) SELECT "
+  komma=
+  for c in $cols 
+  do
+    echo -n $komma $c
+    komma=', '
+  done
+  echo " FROM $2.$3;"
+}
+
+rdcols="SELECT  DISTINCT\
+           t0.column_name AS column\
+           FROM information_schema.columns t0 WHERE t0.table_schema = 'par1' AND t0.table_name = 'par2' AND t0.column_name like 'par3' ORDER BY t0.column_name";
+
+#===================================================
+# Usertables
+#===================================================
+# keine Userspezifischen Anpassungen
+
+#===================================================
+# MENU
+#===================================================
+echo "DELETE FROM $schema.menu where menuid IN ( SELECT menuid from $schemasave.menu );" 
+create_insert $schema $schemasave 'menu'
+
+#===================================================
+# HTMLCOMPOSE
+#===================================================
+
+echo "ALTER TABLE $schema.htmlcomposenames DISABLE TRIGGER ALL;" 
+echo "ALTER TABLE $schema.htmlcompose DISABLE TRIGGER ALL;" 
+echo "ALTER TABLE $schema.htmlcomposetab DISABLE TRIGGER ALL;" 
+echo "ALTER TABLE $schema.htmlcomposetabnames DISABLE TRIGGER ALL;" 
+echo "ALTER TABLE $schema.htmlcomposetabselect DISABLE TRIGGER ALL;" 
+echo "ALTER TABLE $schema.htmlcomposetabslider DISABLE TRIGGER ALL;" 
+
+echo "DELETE FROM $schema.htmlcompose WHERE htmlcomposeid IN ( SELECT htmlcomposeid from $schemasave.htmlcompose );" 
+echo "DELETE FROM $schema.htmlcomposenames WHERE htmlcomposeid IN ( SELECT htmlcomposeid from $schemasave.htmlcomposenames );" 
+echo "DELETE FROM $schema.htmlcomposetab t WHERE EXISTS ( SELECT 1 FROM mne_application_save.htmlcomposetab s WHERE t.htmlcomposetabid = s.htmlcomposetabid );" 
+echo "DELETE FROM $schema.htmlcomposetabnames t WHERE EXISTS ( SELECT 1 FROM mne_application_save.htmlcomposetabnames s WHERE t.htmlcomposetabid = s.htmlcomposetabid );" 
+echo "DELETE FROM $schema.htmlcomposetabselect t WHERE EXISTS ( SELECT 1 FROM mne_application_save.htmlcomposetabselect s WHERE  t.htmlcomposetabselectid = s.htmlcomposetabselectid);"
+echo "DELETE FROM $schema.htmlcomposetabslider t WHERE EXISTS ( SELECT 1 FROM mne_application_save.htmlcomposetabslider s WHERE t.htmlcomposeid = s.htmlcomposeid AND t.slidername = s.slidername);"
+
+create_insert $schema $schemasave 'htmlcompose'
+create_insert $schema $schemasave 'htmlcomposenames'
+create_insert $schema $schemasave 'htmlcomposetab'
+create_insert $schema $schemasave 'htmlcomposetabnames'
+create_insert $schema $schemasave 'htmlcomposetabselect'
+create_insert $schema $schemasave 'htmlcomposetabslider'
+
+echo "ALTER TABLE $schema.htmlcomposenames ENABLE TRIGGER ALL;" 
+echo "ALTER TABLE $schema.htmlcompose ENABLE TRIGGER ALL;" 
+echo "ALTER TABLE $schema.htmlcomposetab ENABLE TRIGGER ALL;" 
+echo "ALTER TABLE $schema.htmlcomposetabnames ENABLE TRIGGER ALL;" 
+echo "ALTER TABLE $schema.htmlcomposetabselect ENABLE TRIGGER ALL;" 
+echo "ALTER TABLE $schema.htmlcomposetabslider ENABLE TRIGGER ALL;" 
+
+#===================================================
+# JOINS
+#===================================================
+echo "DELETE FROM $schemasave.joindef WHERE joindefid in ( SELECT joindefid FROM $schema.joindef);"
+echo "DELETE FROM $schemasave.joindef WHERE joindefid in ( SELECT t0.joindefid FROM mne_application_save.joindef t0 LEFT JOIN mne_application.joindef t1 ON ( t0.fschema = t1.fschema AND t0.ftab = t1.ftab AND t0.fcols = t1.fcols AND t0.tschema = t1.tschema AND t0.ttab = t1.ttab AND t0.tcols = t1.tcols AND t0.op = t1.op AND t0.typ = t1.typ ) WHERE t1.joindefid IS NOT NULL );"
+create_insert $schema $schemasave 'joindef'
+
+#===================================================
+# QUERYS
+#===================================================
+echo "DELETE FROM $schema.querywheres WHERE queryid IN ( SELECT queryid from $schemasave.querywheres );" 
+echo "DELETE FROM $schema.querycolnames WHERE ( NOT \"schema\" like 'mne_%' AND NOT \"schema\" like 'ext_%' );"
+echo "DELETE FROM $schema.querycolumns WHERE queryid IN ( SELECT queryid from $schemasave.querycolumns );" 
+echo "DELETE FROM $schema.querytables WHERE queryid IN ( SELECT queryid from $schemasave.querytables );" 
+echo "DELETE FROM $schema.queryname WHERE queryid IN ( SELECT queryid from $schemasave.queryname );" 
+
+create_insert $schema $schemasave 'queryname'
+create_insert $schema $schemasave 'querytables'
+create_insert $schema $schemasave 'querycolumns'
+create_insert $schema $schemasave 'querycolnames'
+create_insert $schema $schemasave 'querywheres'
+
+#===================================================
+# REPORTS
+#===================================================
+echo "DELETE FROM $schema.reports WHERE name in ( SELECT name FROM $schemasave.reports);"
+echo "DELETE FROM $schema.reportsauto WHERE \"schema\" in ( SELECT \"schema\" FROM $schemasave.reportsauto);"
+echo "DELETE FROM $schema.reportscache WHERE \"reportscacheid\" in ( SELECT \"reportscacheid\" FROM $schemasave.reportscache);"
+
+create_insert $schema $schemasave 'reports'
+create_insert $schema $schemasave 'reportsauto'
+create_insert $schema $schemasave 'reportscache'
+
+#===================================================
+# SELECTLIST
+#===================================================
+echo "DELETE FROM $schema.selectlist WHERE name in ( SELECT DISTINCT name FROM $schemasave.selectlist);"
+create_insert $schema $schemasave 'selectlist'
+
+#===================================================
+# TABLE
+#===================================================
+echo "DELETE FROM $schema.tablecolnames t WHERE EXISTS ( SELECT 1 FROM $schemasave.tablecolnames s WHERE t.\"schema\" = s.\"schema\" AND t.tab = s.tab AND t.colname = s.colname);"
+create_insert $schema $schemasave 'tablecolnames'
+
+#===================================================
+# CONSTRAINT
+#===================================================
+echo "DELETE FROM $schema.tableconstraintmessages t WHERE EXISTS ( SELECT 1 FROM $schemasave.tableconstraintmessages s WHERE t.tableconstraintmessagesid = s.tableconstraintmessagesid);"
+create_insert $schema $schemasave 'tableconstraintmessages'
+
+#===================================================
+# TRANSLATE
+#===================================================
+echo "DELETE FROM $schema.translate t WHERE EXISTS ( SELECT 1 FROM $schemasave.translate s WHERE t.id = s.id AND t.text_en = '' AND t.text_de = '' );"
+echo "DELETE FROM $schemasave.translate WHERE id in ( SELECT id FROM $schema.translate );"
+
+create_insert $schema $schemasave 'translate'
+
+#===================================================
+# TRUSTREQUEST
+#===================================================
+echo "DELETE FROM $schema.trustrequest where trustrequestid IN ( SELECT trustrequestid from $schemasave.trustrequest );" 
+create_insert $schema $schemasave 'trustrequest'
+
+#===================================================
+# SYSTEM ACCESS
+#===================================================
+echo "DELETE FROM mne_system.access where accessid IN ( SELECT accessid from mne_systemsave.access );" 
+create_insert mne_system mne_systemsave 'access'
+
+

@@ -1,0 +1,123 @@
+#!/bin/bash 
+
+. dbcfg.orig
+if [ -f dbcfg ]; then
+    . dbcfg
+fi
+
+NOASK=
+NOSECOND=
+
+while [ $# -gt 0 ] ; do
+  case $1 in
+  --nosecond) NOSECOND=1; shift 1;;
+     --noask) NOASK=1; shift 1;;
+       --sdb) origdb=$2; shift 2;;
+     --shost) orighost=$2; shift 2;;
+       --ddb) checkdb=$2; shift 2;;
+     --dhost) checkhost=$2; shift 2;;
+     --force) forceupdate=1; shift 1;;
+     *)       shift 1 ;;
+  esac
+done
+
+if [ "$(id -u)" = "0" ]; then
+    ifconfig lo:mneconfig 127.0.156.1 netmask 255.255.255.0 up
+fi
+
+while [ "$PGPASSWORD" = "" ]; do
+
+    echo "For updating the database please give the password of the user admindb"
+    echo -n "Password for admindb: "
+    stty -echo < /dev/tty
+    read pass
+    stty echo < /dev/tty
+    echo
+
+    if [ "$pass" != "" ]; then
+        export origpass=$pass;
+        export checkpass=$pass;
+    fi
+
+    export PGPASSWORD=$origpass;
+    echo "" | psql --set ON_ERROR_STOP=on -U admindb -h $orighost $origdb
+    if [ $? != 0 ]; then
+        echo "can't connect to orig $origdb" 1>&2
+        export PGPASSWORD=
+    fi
+
+    if [ ! "$PGPASSWORD" = "" ]; then
+        export PGPASSWORD=$checkpass;
+        echo "" | psql --set ON_ERROR_STOP=on -U admindb -h $checkhost $checkdb
+        if [ $? != 0 ]; then
+            echo "can't connect to check $checkdb" 1>&2
+            export PGPASSWORD=
+        fi
+    fi
+    
+done
+
+checkversion=$(echo "select version from mne_application.update\g" | psql --tuples-only --no-align  -U admindb -h $checkhost -e $checkdb)
+origversion=$(echo "select version from mne_application.update\g" | psql --tuples-only --no-align  -U admindb -h $orighost -e $origdb)
+
+if [ ! "$forceupdate" = "1" ] && [ "$checkversion" = "$origversion" ]; then
+    echo "Database Version equal - no update"
+    exit 0;
+fi
+
+( cd dbcheck; ./dbcheck -shost $checkhost -dhost $orighost -sdb $origdb -ddb $checkdb )
+( cd dbcheck; export PGPASSWORD=$checkpass; psql -U admindb -h $checkhost -e $checkdb < modify.sql > modify.log 2>&1; )
+
+if [ "$NOSECOND" = "" ]; then
+    error_found=0
+    fgrep ERROR dbcheck/modify.log 2>&1 > /dev/null
+    error_found=$?
+    
+    if [ "$error_found" != "0" ]; then
+        fgrep FEHLER dbcheck/modify.log 2>&1 > /dev/null
+        error_found=$?
+    fi
+
+    if [ "$error_found" = "0" ]; then
+        ( cd dbcheck; ./dbcheck -shost $checkhost -dhost $orighost -sdb $origdb -ddb $checkdb )
+        ( cd dbcheck; export PGPASSWORD=$checkpass; psql -U admindb -h $checkhost -e $checkdb < modify.sql > modify.log 2>&1; )
+    fi
+fi
+
+error_found=0
+fgrep ERROR dbcheck/modify.log 1>&2 
+error_found=$?
+    
+if [ "$error_found" != "0" ]; then
+  fgrep FEHLER dbcheck/modify.log 1>&2 
+  error_found=$?
+fi
+
+if [ "$error_found" != "1" ]; then
+    if [ "$NOASK" = "" ]; then
+    ok=
+      while [ ! "$ok" = "y" ] &&[ ! "$ok" = "Y" ] &&[ ! "$ok" = "n" ] &&   [ ! "$ok" = "N" ] 
+      do
+          echo -n "error found - continue ?  (Y/N)"
+          read ok
+      done
+    else
+      ok=n
+    fi
+    
+    if [ "$ok" = "n" ] || [ "$ok" = "N" ]; then
+        echo "error found during updating database - please run it manual" 1>&2
+        exit 1
+    fi
+fi
+
+( cd dbcontent; ./dbcontent -shost $checkhost -dhost $orighost -sdb $origdb -ddb $checkdb )
+( cd dbcontent; export PGPASSWORD=$checkpass; psql -U admindb -h $checkhost -e $checkdb < content.sql > content.log 2>&1 )
+if [ -d dbadd ]; then
+  ( cd dbadd;
+    for file in *.sql
+    do
+      psql -U admindb -h $checkhost -e $checkdb < $file >> add.log 2>&1 
+    done
+  )
+fi

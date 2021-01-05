@@ -1,0 +1,97 @@
+#!/bin/bash
+
+. ../dbcfg.orig
+
+origdb=erpdb
+orighost=localhost
+origuser=admindb
+
+checkdb=emptydb
+allschemas=0
+output=erp.sql
+napp=0
+
+hoaioutput=../../module/hoai/db/postgres/hoai.sql
+
+echo -n "Password for admindb: "
+stty -echo < /dev/tty
+read origpass
+stty echo < /dev/tty
+echo
+
+while [ $# -gt 0 ] ; do
+  case $1 in
+    -sdb)   origdb=$2; shift 2;;              # source db       - nicht verwendet
+    -shost) orighost=$2; shift 2;;            # source host     - nicht verwendet
+    -spass) origpass=$2; shift 2;;            # source password - nicht verwendet
+    -ddb)   checkdb=$2; shift 2;;             # dest db
+    -dhost) checkhost=$2; shift 2;;           # dest host
+    -dpass) checkpass=$2; shift 2;;           # dest passwd
+    -all)   allschema=1; shift 1;;            # nur datenbank leeren keine schemas droppen
+    -o)     output=$2; shift 2;;              # augabe datei
+    -ho)    hoaioutput=$2; shift 2;;          # augabe datei hoai
+    -napp)  output=new.sql; checkdb=newdb; napp=1; shift 1;; # neue application erstellen
+     *)     shift 1 ;;
+  esac
+done
+
+rm -f $output
+
+export PGPASSWORD=$origpass
+psql --username=$origuser --host=$orighost $origdb << EOF
+    DROP DATABASE $checkdb;
+EOF
+
+psql --username=$origuser --host=$orighost --set ON_ERROR_STOP=on $origdb << EOF
+    CREATE DATABASE $checkdb 
+        WITH OWNER = admindb 
+        ENCODING = 'UTF8' 
+        TABLESPACE = pg_default 
+        TEMPLATE = template0 
+        LC_COLLATE = 'C' 
+        LC_CTYPE = 'C' 
+        CONNECTION LIMIT = -1; 
+EOF
+
+if [ $? != 0 ]; then
+    exit 1
+fi
+
+rm -f origdb.sql
+pg_dump    --username=$origuser --host=$orighost --disable-triggers --format=c $origdb > origdb.sql
+pg_restore --username=$origuser --host=$orighost --disable-triggers --schema-only --dbname=$checkdb < origdb.sql
+pg_restore --username=$origuser --host=$orighost --disable-triggers --data-only   --dbname=$checkdb < origdb.sql
+rm origdb.sql
+
+psql --username=$origuser --host=$orighost $checkdb <<EOF >/dev/null 2>&1
+DROP SCHEMA mne_application_save CASCADE;
+EOF
+
+all=
+if [ "$allschemas" != "1" ]; then
+  psql --username=$origuser --host=$orighost $checkdb <<EOF >/dev/null 2>&1
+    DROP SCHEMA ext_sogo CASCADE;
+EOF
+else
+    all="-all"
+fi
+
+rm -f empty.sql
+./dbempty -dhost $orighost -spass $origpass -dpass $origpass -ddb $checkdb $all -napp $napp > empty.sql
+psql --username=$origuser --host=$orighost $checkdb < empty.sql > /dev/null
+rm empty.sql
+ 
+version=`cat ../../../installer/erp/dist/version`
+echo "-- Database Version: $version" > $output
+pg_dump --username=$origuser --host=$orighost $checkdb | sed -e "/CREATE EXTENSION.*plpgsql/d" -e "/COMMENT ON EXTENSION plpgsql/d" >> $output
+
+pg_dump --username=$origuser --host=$orighost --format plain --data-only --disable-triggers --column-inserts --table=mne_crm.product $checkdb  > $hoaioutput
+pg_dump --username=$origuser --host=$orighost --format plain --data-only --disable-triggers --column-inserts --table=mne_crm.producttree $checkdb >> $hoaioutput
+pg_dump --username=$origuser --host=$orighost --format plain --data-only --disable-triggers --column-inserts --table=mne_crm.productprice $checkdb >> $hoaioutput
+pg_dump --username=$origuser --host=$orighost --format plain --data-only --disable-triggers --column-inserts --table=mne_warehouse.productpart $checkdb >> $hoaioutput
+pg_dump --username=$origuser --host=$orighost --format plain --data-only --disable-triggers --column-inserts --table=mne_personnal.skill $checkdb >> $hoaioutput
+pg_dump --username=$origuser --host=$orighost --format plain --data-only --disable-triggers --column-inserts --table=mne_personnal.producttime $checkdb >> $hoaioutput
+pg_dump --username=$origuser --host=$orighost --format plain --data-only --disable-triggers --column-inserts --table=mne_personnal.producttimeopt $checkdb >> $hoaioutput
+
+pg_dump --username=$origuser --host=$orighost --format plain --data-only --disable-triggers --column-inserts --schema=mne_hoai $checkdb >> $hoaioutput
+

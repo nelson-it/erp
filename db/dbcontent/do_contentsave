@@ -1,0 +1,127 @@
+#!/bin/bash
+
+read_table()
+{
+  pg_dump  --host $orighost --port $origport  --username $origuser --format plain --data-only --disable-triggers --column-inserts --table $1.$2 $origdb 2> /dev/null | \
+    awk 'BEGIN { stopprint=0; }
+         /ALTER TABLE.*DISABLE/              { print $0; print "DELETE FROM " $3 ";" ; next; }
+          { print $0; }
+    '
+    if [ "${PIPESTATUS[0]}" != "0" ]; then
+       echo "error during reading table <$schema.$2>" 1>&2
+    fi
+}
+
+echo "SET SESSION AUTHORIZATION admindb;"
+echo "DROP SCHEMA IF EXISTS $schemasave CASCADE;"
+echo "DROP SCHEMA IF EXISTS mne_systemsave CASCADE;"
+echo "CREATE SCHEMA $schemasave;"
+echo "CREATE SCHEMA mne_systemsave;"
+
+#===================================================
+# Usertables
+#===================================================
+echo "CREATE TABLE $schemasave.usertables AS SELECT * from $schema.usertables;"
+read_table $schema usertables
+
+#===================================================
+# MENU
+#===================================================
+echo "CREATE TABLE $schemasave.menu AS SELECT * from $schema.menu WHERE custom=true;"
+read_table $schema menu
+
+#===================================================
+# HTMLCOMPOSE
+#===================================================
+echo "CREATE TABLE $schemasave.htmlcompose AS SELECT * from $schema.htmlcompose WHERE custom=true;"
+echo "CREATE TABLE $schemasave.htmlcomposenames AS SELECT * from $schema.htmlcomposenames WHERE htmlcomposeid IN ( SELECT htmlcomposeid from $schema.htmlcompose WHERE custom=true);"
+echo "CREATE TABLE $schemasave.htmlcomposetab AS SELECT * from $schema.htmlcomposetab WHERE custom=true;"
+echo "CREATE TABLE $schemasave.htmlcomposetabnames AS SELECT * from $schema.htmlcomposetabnames WHERE custom=true;"
+echo "CREATE TABLE $schemasave.htmlcomposetabselect AS SELECT * from $schema.htmlcomposetabselect WHERE custom=true;"
+echo "CREATE TABLE $schemasave.htmlcomposetabslider AS SELECT * from $schema.htmlcomposetabslider WHERE custom=true;"
+
+read_table $schema htmlcompose
+read_table $schema htmlcomposenames
+read_table $schema htmlcomposetab
+read_table $schema htmlcomposetabnames
+read_table $schema htmlcomposetabselect
+read_table $schema htmlcomposetabslider
+
+#===================================================
+# JOINS
+#===================================================
+echo "CREATE TABLE $schemasave.joindef AS SELECT * from $schema.joindef;"
+read_table $schema joindef
+
+#===================================================
+# QUERYS
+#===================================================
+echo "CREATE TABLE $schemasave.queryname     AS SELECT * from $schema.queryname     WHERE ( NOT \"schema\" like 'mne_%' AND NOT \"schema\" like 'ext_%' );"
+echo "CREATE TABLE $schemasave.querytables   AS SELECT * from $schema.querytables   WHERE queryid in ( SELECT queryid from $schemasave.queryname);"
+echo "CREATE TABLE $schemasave.querycolumns  AS SELECT * from $schema.querycolumns  WHERE queryid in ( SELECT queryid from $schemasave.queryname);"
+echo "CREATE TABLE $schemasave.querycolnames AS SELECT * from $schema.querycolnames WHERE ( NOT \"schema\" like 'mne_%' AND NOT \"schema\" like 'ext_%' );"
+echo "CREATE TABLE $schemasave.querywheres   AS SELECT * from $schema.querywheres   WHERE queryid in ( SELECT queryid from $schemasave.queryname);"
+
+read_table $schema queryname
+read_table $schema querytables
+read_table $schema querycolumns
+read_table $schema querycolnames
+read_table $schema querywheres
+
+#===================================================
+# REPORTS
+#===================================================
+echo "CREATE TABLE $schemasave.reports      AS SELECT * from $schema.reports      WHERE NOT \"name\" like 'mne_%';"
+echo "CREATE TABLE $schemasave.reportsauto  AS SELECT * from $schema.reportsauto  WHERE NOT \"schema\" like 'mne_%';"
+echo "CREATE TABLE $schemasave.reportscache AS SELECT * from $schema.reportscache WHERE NOT \"reportscacheid\" like 'mne_%';"
+
+read_table $schema reports
+read_table $schema reportsauto
+read_table $schema reportscache
+
+#===================================================
+# SELECTLIST
+#===================================================
+echo "CREATE TABLE $schemasave.selectlist AS SELECT * from $schema.selectlist WHERE name IN ( select distinct name from $schema.selectlist WHERE custom=true);"
+read_table $schema selectlist
+
+#===================================================
+# TABLECOLNAMES
+#===================================================
+echo "CREATE TABLE $schemasave.tablecolnames  AS SELECT * from $schema.tablecolnames  WHERE \"schema\" like 'cus_%' OR custom=true;"
+read_table $schema tablecolnames
+
+#===================================================
+# CONSTRAINTSMELDUNGEN
+#===================================================
+echo "CREATE TABLE $schemasave.tableconstraintmessages  AS SELECT * from $schema.tableconstraintmessages  WHERE custom=true;"
+read_table $schema tableconstraintmessages
+
+#===================================================
+# TRANSLATE
+#===================================================
+echo "CREATE TABLE $schemasave.translate  AS SELECT * from $schema.translate;"
+read_table $schema translate
+
+#===================================================
+# TABLEREGEXP
+#===================================================
+echo "CREATE TABLE $schemasave.tableregexp  AS SELECT * from $schema.tableregexp;"
+read_table $schema tableregexp
+
+#===================================================
+# TRUSTREQUEST
+#===================================================
+echo "CREATE TABLE $schemasave.trustrequest  AS SELECT * from $schema.trustrequest WHERE custom=true;"
+read_table $schema trustrequest
+
+#===================================================
+# VERSION
+#===================================================
+read_table $schema update
+
+#===================================================
+# SYSTEM ACCESS
+#===================================================
+echo "CREATE TABLE $mne_systemsave.\"access\"  AS SELECT * from mne_system.\"access\" WHERE custom=true;"
+read_table mne_system access 
