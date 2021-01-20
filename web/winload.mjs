@@ -8,7 +8,7 @@
 //================================================================================
 'use strict';
 import Bowser from '/js/bowser/bowser.js';
-import MneMainWeblet from '/weblet/basic/main.mjs'
+import MneMainWeblet from '/weblet/main/main.mjs'
 
 window.addEventListener('load', function(evt)
 {
@@ -16,6 +16,6 @@ window.addEventListener('load', function(evt)
     document.body.setAttribute("aria-view-mode",browser.parsedResult.platform.type);
     document.body.setAttribute("aria-view-engine",browser.parsedResult.engine.name.toLowerCase());
     
-    const main_weblet = new MneMainWeblet(document.body.firstChild, window.mne_application, window.mne_application == 'erp');
+    const main_weblet = new MneMainWeblet(document.body.firstChild, window.mne_application);
     main_weblet.show();
 });

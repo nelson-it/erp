@@ -31,11 +31,11 @@ class MneErpWarehousePart extends MneDbView
       
       addschema     : 'mne_warehouse',
       addfunction   : 'part_add',
-      addcols       : [ 'part', 'parttype', 'treeparentid' ],
+      addcols       : [ 'part', 'parttype', 'partdescription', 'treeparentid' ],
 
       modschema     : 'mne_warehouse',
       modfunction   : 'part_mod',
-      modcols       : [ 'partid', 'part', 'parttype', 'treeparentid', 'treeid' ],
+      modcols       : [ 'partid', 'part', 'parttype', 'partdescription', 'treeparentid', 'treeid' ],
 
       delschema     : 'mne_warehouse',
       delfunction   : 'part_del',

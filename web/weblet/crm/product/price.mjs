@@ -11,6 +11,7 @@
 import MneText     from '/js/basic/text.mjs'
 import MneLog      from '/js/basic/log.mjs'
 import MneRequest  from '/js/basic/request.mjs'
+import MneConfig   from '/js/basic/config.mjs'
 
 import MneElement from '/weblet/basic/element.mjs'
 import MneDbView  from '/weblet/db/view.mjs'
@@ -24,7 +25,7 @@ class MneCrmProuctPrice extends MneDbView
         schema    : 'mne_crm',
         query     : 'productprice',
 
-        showids   : [ 'productid'],
+        showids   : [ 'productpriceid'],
         
         okfunction : 'productprice_ok',
         okcols     : ['productid', 'unitcost', 'unitprice', 'unit', 'vat', 'currencyid'],
@@ -34,8 +35,13 @@ class MneCrmProuctPrice extends MneDbView
         delcols     : [ 'productid'],
         deltyps     : {},
         
+        calcfunction : 'productcost',
+        calccols     : [ 'productid'],
+        
       delconfirmids : [ 'unitprice'],
-
+      
+      defvalues : { unitcost : 0, currencyid : MneConfig.uowncurrencyid, currency : MneConfig.uowncurrency },
+      defalias  : { productid : 'productid' },
       hinput : false
     };
 
@@ -48,9 +54,13 @@ class MneCrmProuctPrice extends MneDbView
   reset()
   {
     super.reset();
-    
-    this.obj.mkbuttons.push( { id : 'calculate',  value : MneText.getText('#mne_lang#Berechne Kosten'), behind : 'del', space : 'before' },
-)
+    this.obj.mkbuttons.push( { id : 'calculate',  value : MneText.getText('#mne_lang#Berechne Kosten'), behind : 'del', space : 'before' });
+  }
+  
+  async calculate()
+  {
+    var res = this.func('calc');
+    console.log(res);
   }
 }
 

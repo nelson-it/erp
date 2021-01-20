@@ -3,7 +3,6 @@
 schemas="$cus_schemas
 mne_hoai
 mne_builddiary
-mne_system
 mne_sabredav
 mne_repository
 mne_mail

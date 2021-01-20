@@ -25,7 +25,7 @@ class MneErpPersonalProductTime extends MneDbView
       query         : 'producttime',
       showids       : ['producttimeid'],
       
-      defalias : { productid : 'productid' },
+      defalias : { productid : 'productid', name : 'name' },
 
       okfunction  : 'producttime_ok',
       okcols  : ['producttimeid','productid','skillid','duration','step','description','longdesc'],
@@ -44,6 +44,12 @@ class MneErpPersonalProductTime extends MneDbView
 
   getViewPath() { return this.getView(import.meta.url) }
   //getCssPath()  { return (( super.getCssPath() ) ?  super.getCssPath() + ',' : '') + this.getCss(import.meta.url); }
+  
+  async values()
+  {
+    console.log(this.config.dependweblet.obj.run.values);
+    return super.values();
+  }
 
 }
 

@@ -1,0 +1,12 @@
+
+      WITH_SHARED_LIBS := FALSE
+         WITH_PTHREADS := TRUE
+
+   TARGETS  := $(SHLIB_PRE)mnebase.$(SHLIB) $(SHLIB_PRE)mnemail.$(SHLIB)  $(SHLIB_PRE)mnexml.$(SHLIB) $(SHLIB_PRE)mnehttp.$(SHLIB) \
+               $(SHLIB_PRE)mnehttpxml.$(SHLIB) $(SHLIB_PRE)mnedb.$(SHLIB) $(SHLIB_PRE)mnedbhttp.$(SHLIB) $(SHLIB_PRE)mnedbhttpmail.$(SHLIB)\
+               server
+               
+server.WITH_GD       := FALSE
+server.WITH_POSTGRES := TRUE
+server.LIBS          := mnebase mnexml mnemail mnehttp mnehttpxml mnedb mnedbhttp mnedbhttpmail
+server.SOURCES       := ../server.cpp

@@ -38,14 +38,13 @@ class MneErpWarehouseProductPart extends MneDbView
       deltyps       : {},
       delconfirmids : [ 'partdescription'],
 
-      hinput : true
+      hinput : false
     };
 
     super(parent, frame, id, Object.assign(ivalues, initpar), config );
   }
 
   getViewPath() { return this.getView(import.meta.url) }
-  //getCssPath()  { return (( super.getCssPath() ) ?  super.getCssPath() + ',' : '') + this.getCss(import.meta.url); }
 
   reset()
   {
@@ -85,10 +84,10 @@ class MneErpWarehouseProductPart extends MneDbView
 
   async values()
   {
-    await super.values();
-
     this.obj.outputs.partname.regexp = MneInput.checktype.ok;
     this.obj.outputs.fixturetype.regexp = MneInput.checktype.ok;
+
+    await super.values();
   }
 }
 

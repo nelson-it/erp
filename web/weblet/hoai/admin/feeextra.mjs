@@ -17,7 +17,7 @@ import MneRequest  from '/js/basic/request.mjs'
 import MneElement from '/weblet/basic/element.mjs'
 import MneDbView  from '/weblet/db/view.mjs'
 
-class MneTemplate extends MneDbView
+class MneErpHoaiFeeExtra extends MneDbView
 {
   constructor(parent, frame, id, initpar = {}, config = {} )
   {
@@ -35,37 +35,8 @@ class MneTemplate extends MneDbView
       
       selectlists : { name : 'hoia_extrafee'},
       regexp      : { productnumber : 'ok'},
-      //okids  : [''],
 
-      //okschema    : '',
-      //oktable     : '',
-
-      //addschema   : '',
-      //addtable    : '',
-
-      //modschema   : '',
-      //modtable    : '',
-
-      //delschema   : '',
-      //deltable    : '',
-
-      //okfunction  : '',
-      //okcols  : [''],
-      //oktyps  : { '' : '' },
-
-      //addfunction : '',
-      //addcols : [''],
-      //addtyps : { '' : '' },
-
-      //modfunction : '',
-      //modcols : [''],
-      //modtyps : { '' : '' },
-
-      //delfunction : '',
-      //delcols : [ '' ],
-      //deltyps : {},
-
-      hinput : true
+      hinput : false
     };
 
     super(parent, frame, id, Object.assign(ivalues, initpar), config );
@@ -81,4 +52,4 @@ class MneTemplate extends MneDbView
   }
 }
 
-export default MneTemplate;
+export default MneErpHoaiFeeExtra;

@@ -1,26 +1,27 @@
 debug:   0
-
-projectroot:          /home/manny/projects
-project: appnew
-port: 8025
+project: erp
 
 DbHttpTimeout: 1200
 
-DbDatabase: newappdb
+DbDatabase: erpdb
+DbDatabase@lmars: erpdb@localhost
 
-ImapScanDisable: 1
+#ImapScan: 1
 
-DbTrustCheckUserip: 10.0.0.0/8,192.168.0.0/16,127.0.0.1/32
-HttpSysexecUserip: 127.0.0.1/32,10.0.0.0/8,172.16.0.0/16,192.168.0.0/16,fd01:23a5::/32
+DbTrustCheckUserip: 127.0.0.1/32,10.0.0.0/8,172.16.0.0/16,192.168.0.0/16,fd01::/16,fe80::/16
+HttpSysexecUserip:  127.0.0.1/32,10.0.0.0/8,172.16.0.0/16,192.168.0.0/16,fd01::/16,fe80::/16
 
 PhpPath: /usr/bin/php-cgi -d include_path=.:/home/manny/projects/web/allg/php:/usr/share/php:/usr/share/pear
 
+projectroot:          /home/manny/projects
+projectroot@IE10Win7: C:/Users/IEUser/Documents/projects
+projectroot@umbriel:  /home/manny/projects
+projectroot@uranus:  C:/Users/manny/projects
+projectroot@lmars:     /Users/manny/projects
 
 EmbedwebHttpNocache: 1
 
-EmbedwebHttpIndex:      erp
-EmbedwebHttpServerpath: appnew/web:webnew/app:webnew/extern
+EmbedwebHttpIndex: erp
+EmbedwebHttpServerpath: erp/web:web/allg:/web/extern
 EmbedwebHttpDataroot:   data
-EmbedwebHttpDatapath:   repository@/home/manny/projects/data/repository
 RepRoot:                tex/report
-

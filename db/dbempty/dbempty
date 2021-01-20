@@ -125,8 +125,6 @@ else
 	            mne_personnal.producttime );;
 	            mne_personnal.producttimeopt );;
 	            
-	            mne_system.access ) echo "delete from mne_system.access where custom = true;";;
-	            
 	            *) echo 'TRUNCATE TABLE ' $s.$t ' CASCADE;'; ;;
 	        esac;
 	            
@@ -146,7 +144,6 @@ echo "update mne_application.customerfunctions set funcschema = '', func = '';"
 echo "update mne_application.year set yearmax = "$yend", yearmin = "$ystart";"
 echo 'delete from mne_application.yearday;'
 echo 'insert into mne_application.yearday select * from mne_catalog.yearday();'
-echo "REVOKE ALL ON TABLE mne_system.mailaliaspublic FROM sogo$(hostname);"
 
 if [ "$napp" = "1" ]; then
     echo "delete from mne_application.customerfunctions;"

@@ -133,10 +133,3 @@ create_insert $schema $schemasave 'translate'
 echo "DELETE FROM $schema.trustrequest where trustrequestid IN ( SELECT trustrequestid from $schemasave.trustrequest );" 
 create_insert $schema $schemasave 'trustrequest'
 
-#===================================================
-# SYSTEM ACCESS
-#===================================================
-echo "DELETE FROM mne_system.access where accessid IN ( SELECT accessid from mne_systemsave.access );" 
-create_insert mne_system mne_systemsave 'access'
-
-

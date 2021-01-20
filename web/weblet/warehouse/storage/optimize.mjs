@@ -34,7 +34,8 @@ class MneErpWarehouseStorageOptimize extends MneDbView
 
       defalias   : { storageid : 'storageid' },
       delbutton  : [ 'add' ],
-      hinput : true
+
+      hinput     : false
     };
 
     super(parent, frame, id, Object.assign(ivalues, initpar), config );

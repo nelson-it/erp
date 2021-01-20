@@ -25,10 +25,11 @@ class MneErpWarehousePartCost extends MneDbView
     {
       schema    : 'mne_warehouse',
       query     : 'partcost',
-      showids   : [ 'partcostid' ],
+      showids   : [ 'partid' ],
       
       okfunction  : 'partcost_ok',
       okcols      : [ 'partcostid', 'partid', 'unitcost', 'unit' ],
+      okids       : ['partcostid'],
       oktyps      : { unicost : 'double' },
 
       delfunction : 'partcost_del',
@@ -53,7 +54,6 @@ class MneErpWarehousePartCost extends MneDbView
     await super.values();
     if ( ! this.config.dependweblet.obj.run.values.partid || this.config.dependweblet.obj.run.values.partid == '################')
       this.enable ('', false );
-    
   }
 }
 

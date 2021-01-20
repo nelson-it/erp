@@ -16,7 +16,7 @@ class MneErpOfferProductlist extends MneTableWeblet
   {
     var ivalues = 
     {
-        tableweblet : (new URL(import.meta.url)).pathname.replace(/\/[^\/]+\.mjs$/, '/productlisttable'),
+        tableweblet : '/weblet/crm/offer/productlisttable',
         
         schema : 'mne_crm',
         query : 'offerproduct_list', 

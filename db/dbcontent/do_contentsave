@@ -14,9 +14,7 @@ read_table()
 
 echo "SET SESSION AUTHORIZATION admindb;"
 echo "DROP SCHEMA IF EXISTS $schemasave CASCADE;"
-echo "DROP SCHEMA IF EXISTS mne_systemsave CASCADE;"
 echo "CREATE SCHEMA $schemasave;"
-echo "CREATE SCHEMA mne_systemsave;"
 
 #===================================================
 # Usertables
@@ -120,8 +118,3 @@ read_table $schema trustrequest
 #===================================================
 read_table $schema update
 
-#===================================================
-# SYSTEM ACCESS
-#===================================================
-echo "CREATE TABLE $mne_systemsave.\"access\"  AS SELECT * from mne_system.\"access\" WHERE custom=true;"
-read_table mne_system access 

@@ -27,6 +27,8 @@ class MneCrmAddressCity extends MneDbView
         showids   : ['cityid'],
         delconfirmids : [ 'name'],
  
+        defvalues : { countryid : '0000000000000000' },
+
         hinput : false
       };
            
