@@ -3,10 +3,11 @@
 . ../dbcfg.orig
 
 origdb=erpdb
-orighost=localhost
+orighost=$develophost
 origuser=admindb
 
 checkdb=emptydb
+checkhost=$develophost
 allschemas=0
 output=erp.sql
 napp=0
@@ -21,9 +22,9 @@ echo
 
 while [ $# -gt 0 ] ; do
   case $1 in
-    -sdb)   origdb=$2; shift 2;;              # source db       - nicht verwendet
-    -shost) orighost=$2; shift 2;;            # source host     - nicht verwendet
-    -spass) origpass=$2; shift 2;;            # source password - nicht verwendet
+    -sdb)   origdb=$2; shift 2;;              # source db
+    -shost) orighost=$2; shift 2;;            # source host
+    -spass) origpass=$2; shift 2;;            # source password
     -ddb)   checkdb=$2; shift 2;;             # dest db
     -dhost) checkhost=$2; shift 2;;           # dest host
     -dpass) checkpass=$2; shift 2;;           # dest passwd

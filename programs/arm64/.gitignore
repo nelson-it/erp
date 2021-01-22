@@ -1,0 +1,10 @@
+/Makefile.dep
+/*.dll
+/server.exe
+/server.inc
+/winservice.exe
+/winservice.inc
+/server
+/HttpReport*
+/xml.inc
+/xml
