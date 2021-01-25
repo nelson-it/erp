@@ -26,7 +26,6 @@
 
 #include <embedweb/http_utils.h>
 #include <embedweb/http_filesystem.h>
-#include <embedweb/http_sysexec.h>
 #include <embedweb/ws_analyse.h>
 #include <xml/http_xmltext.h>
 
@@ -143,7 +142,6 @@ int main(int argc, char **argv)
 
 		new HttpUtils (http);
 		new HttpFilesystem (http);
-		new HttpSysexec (http);
 
 		new HttpXmlText(http);
 
