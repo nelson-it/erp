@@ -4,8 +4,8 @@ project: erp
 DbHttpTimeout: 1200
 DbDatabase:    erpdb@localhost
 
-DbTrustCheckUserip: 127.0.0.1/32,10.0.0.0/8,172.16.0.0/16,192.168.0.0/16,fd01::/16,fe80::/16
-HttpSysexecUserip:  127.0.0.1/32,10.0.0.0/8,172.16.0.0/16,192.168.0.0/16,fd01::/16,fe80::/16
+DbTrustCheckUserip: 127.0.0.1/32,10.0.0.0/8,172.16.0.0/16,192.168.0.0/16,fc00::/7,fe80::/16
+HttpSysexecUserip:  127.0.0.1/32,10.0.0.0/8,172.16.0.0/16,192.168.0.0/16,fc00::/7,fe80::/16
 
 PhpPath: /usr/bin/php-cgi -d include_path=.:/home/manny/projects/web/allg/php:/usr/share/php:/usr/share/pear
 
@@ -14,4 +14,5 @@ PhpPath: /usr/bin/php-cgi -d include_path=.:/home/manny/projects/web/allg/php:/u
 EmbedwebHttpIndex:      erp
 EmbedwebHttpServerpath: erp/web:web/app:web/extern
 EmbedwebHttpDataroot:   data
+EmbedwebHttpDatapath:   repository@data/repository
 RepRoot:                tex/report

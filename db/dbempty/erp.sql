@@ -1,10 +1,10 @@
--- Database Version: 8.0.1
+-- Database Version: 10.0.0
 --
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 12.5 (Ubuntu 12.5-0ubuntu0.20.04.1)
--- Dumped by pg_dump version 12.5 (Ubuntu 12.5-0ubuntu0.20.04.1)
+-- Dumped from database version 12.6 (Ubuntu 12.6-0ubuntu0.20.04.1)
+-- Dumped by pg_dump version 12.6 (Ubuntu 12.6-0ubuntu0.20.04.1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -629,7 +629,7 @@ CREATE FUNCTION mne_builddiary.time_mod(p_presentid character varying, p_timeid 
  BEGIN
 
     SELECT INTO r_timeid mne_personnal.time_mod(p_timeid, p_orderproducttimeid , p_userid, p_start, p_duration, p_comment);
-    IF mne_catalog.check_group(NULL, 'adminbuilddiary') = FALSE THEN
+    IF mne_catalog.check_group(NULL, 'admerpbuilddiary') = FALSE THEN
         return r_timeid;
     END IF;
     
@@ -1164,25 +1164,6 @@ END;
 
 
 ALTER FUNCTION mne_catalog.epoch_year(timevalue integer) OWNER TO admindb;
-
---
--- Name: folder_del(character varying); Type: FUNCTION; Schema: mne_catalog; Owner: admindb
---
-
-CREATE FUNCTION mne_catalog.folder_del(p_folderid character varying) RETURNS character varying
-    LANGUAGE plpgsql
-    AS $$ BEGIN
-    
-    DELETE FROM mne_system.shares WHERE folderid = p_folderid;
-    DELETE FROM mne_application.folder WHERE folderid = p_folderid;
-
-    return'ok';
-    
-END;
- $$;
-
-
-ALTER FUNCTION mne_catalog.folder_del(p_folderid character varying) OWNER TO admindb;
 
 --
 -- Name: history_check(character varying, character varying); Type: FUNCTION; Schema: mne_catalog; Owner: admindb
@@ -2368,7 +2349,7 @@ BEGIN
   PERFORM DISTINCT t0."rolname" AS rolname
   FROM (((pg_catalog.pg_roles t0 LEFT JOIN pg_catalog.pg_roles t1 ON ( t0.rolcanlogin = true AND ( t1.rolcanlogin = false OR t1.rolname = 'admindb' ) AND substring(t1.rolname FROM 1 FOR 5 ) != 'login' ) )
          INNER JOIN pg_catalog.pg_auth_members t2 ON ( t1.oid = t2.roleid AND t0.oid = t2.member ) ))
-  WHERE t0.rolname = session_user  AND ( t1.rolname = 'adminpersonnal' OR t1.rolname = 'adminsystem' );
+  WHERE t0.rolname = session_user  AND ( t1.rolname = 'admerppersonnal' );
 
   IF FOUND OR p_username = session_user OR 'admindb' = session_user THEN
     stm = 'ALTER USER ' || p_username || ' WITH PASSWORD ''' || p_passwd || '''';
@@ -8316,30 +8297,6 @@ END
 ALTER FUNCTION mne_personnal.producttimeopt_update(p_producttimeid character varying, p_setduration integer, p_step integer) OWNER TO admindb;
 
 --
--- Name: sharepasswd(character varying, character varying, character varying, integer); Type: FUNCTION; Schema: mne_personnal; Owner: admindb
---
-
-CREATE FUNCTION mne_personnal.sharepasswd(p_personid character varying, p_username character varying, p_passwd character varying, p_valid integer) RETURNS character varying
-    LANGUAGE plpgsql SECURITY DEFINER
-    AS $$ DECLARE
-  acttime INTEGER;
-  r_passwd VARCHAR;
-BEGIN
-  SELECT INTO acttime
-      CAST(FLOOR(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP)) AS INTEGER);
-
-  PERFORM personid from mne_personnal.personowndata WHERE personid = p_personid;
-  IF FOUND THEN
-    RAISE EXCEPTION '#mne_lang#Passwort bitte in der Mitarbeitermaske ändern#';
-  END IF;
-  
-  return mne_system.sharepasswd(p_personid, p_username, p_passwd, p_valid);
-END; $$;
-
-
-ALTER FUNCTION mne_personnal.sharepasswd(p_personid character varying, p_username character varying, p_passwd character varying, p_valid integer) OWNER TO admindb;
-
---
 -- Name: skill_update(character varying); Type: FUNCTION; Schema: mne_personnal; Owner: admindb
 --
 
@@ -8487,7 +8444,7 @@ CREATE FUNCTION mne_personnal.time_mod(pi_timeid character varying, pi_orderprod
     
     FOUND := false;
     PERFORM g.rolname as group from pg_catalog.pg_auth_members m, pg_catalog.pg_authid g, pg_catalog.pg_authid u
-    WHERE m.roleid = g.oid AND m.member = u.oid AND g.rolname = 'adminpersonnaltime' AND u.rolname = session_user;
+    WHERE m.roleid = g.oid AND m.member = u.oid AND g.rolname = 'admerppersonnaltime' AND u.rolname = session_user;
     
     IF NOT FOUND THEN
       FOUND := false;
@@ -13254,25 +13211,6 @@ CREATE TABLE mne_application.customerfunctions (
 ALTER TABLE mne_application.customerfunctions OWNER TO admindb;
 
 --
--- Name: folder; Type: TABLE; Schema: mne_application; Owner: admindb
---
-
-CREATE TABLE mne_application.folder (
-    createdate integer NOT NULL,
-    createuser character varying(32) NOT NULL,
-    modifydate integer NOT NULL,
-    modifyuser character varying(32) NOT NULL,
-    folderid character varying(32) NOT NULL,
-    location character varying NOT NULL,
-    name character varying NOT NULL,
-    description character varying NOT NULL,
-    hostname character varying NOT NULL
-);
-
-
-ALTER TABLE mne_application.folder OWNER TO admindb;
-
---
 -- Name: htmlcompose; Type: TABLE; Schema: mne_application; Owner: admindb
 --
 
@@ -13681,22 +13619,6 @@ CREATE TABLE mne_application.selectlist (
 
 
 ALTER TABLE mne_application.selectlist OWNER TO admindb;
-
---
--- Name: server; Type: TABLE; Schema: mne_application; Owner: admindb
---
-
-CREATE TABLE mne_application.server (
-    createdate integer NOT NULL,
-    createuser character varying(32) NOT NULL,
-    modifydate integer NOT NULL,
-    modifyuser character varying(32) NOT NULL,
-    serverid character varying(32) NOT NULL,
-    pwd character varying NOT NULL
-);
-
-
-ALTER TABLE mne_application.server OWNER TO admindb;
 
 --
 -- Name: tablecolnames; Type: TABLE; Schema: mne_application; Owner: admindb
@@ -17399,27 +17321,11 @@ COPY mne_application.customerfunctions (customerfunction, func, funcschema, crea
 
 
 --
--- Data for Name: folder; Type: TABLE DATA; Schema: mne_application; Owner: admindb
---
-
-COPY mne_application.folder (createdate, createuser, modifydate, modifyuser, folderid, location, name, description, hostname) FROM stdin;
-\.
-
-
---
 -- Data for Name: htmlcompose; Type: TABLE DATA; Schema: mne_application; Owner: admindb
 --
 
 COPY mne_application.htmlcompose (createdate, createuser, modifydate, modifyuser, name, template, custom, htmlcomposeid) FROM stdin;
-1472115002	admindb	1472115002	admindb	sysadmin_person	/templ/allg/t_ht	f	57beb13a0000
-1432824331	admindb	1432824331	admindb	sysadmin_zpush	/templ/allg/h	f	575e9c458014
-1433322446	admindb	1434350335	admindb	sysadmin_network	/templ/allg/hht	f	575e9c458036
-1434350540	admindb	1434350540	admindb	sysadmin_netact	/templ/allg/vv	f	575e9c458037
-1453298759	admindb	1453805056	admindb	sysadmin_apache	/templ/allg/ht	f	575e9c458038
-1459247285	admindb	1459754201	admindb	sysadmin_cert	/templ/allg/ht	f	575e9c458039
-1426176094	admindb	1475158412	admindb	sysadmin_share	/templ/allg/t_ht	f	575e9c458024
 1427952853	admindb	1427952853	admindb	main	main	f	575e9c458013
-1471854098	admindb	1471857569	admindb	sysadmin_domain	ht	f	57bab6120000
 1226308048	admindb	1434349688	admindb	user_settings	hh	f	575e9c458034
 1220555700	admindb	1516288977	admindb	dbadmin_table	t_hh	f	575e9c45800d
 1206446471	admindb	1434349317	admindb	dbadmin_weblet	t_hh	f	575e9c45801d
@@ -17467,18 +17373,10 @@ COPY mne_application.htmlcompose (createdate, createuser, modifydate, modifyuser
 --
 
 COPY mne_application.htmlcomposenames (createdate, createuser, modifydate, modifyuser, label_de, label_en, htmlcomposeid) FROM stdin;
-1471854098	admindb	1471857569	admindb	Domain	domain	57bab6120000
-1472115003	admindb	1472115003	admindb	Benutzer	user	57beb13a0000
 1220555700	admindb	1516288977	admindb	Tabellen	tables	575e9c45800d
-1426176094	admindb	1475158412	admindb	Freigaben	shares	575e9c458024
 1427952853	admindb	1427952853	admindb	ERP - Nelson technische Informatik	ERP - Nelson technische Informatik	575e9c458013
-1432824331	admindb	1432824331	admindb	Active Sync	active sync	575e9c458014
 1220608949	admindb	1434349317	admindb	Weblets	weblets	575e9c45801d
 1226308048	admindb	1434349688	admindb	Benutzer Einstellungen	user settings	575e9c458034
-1433322446	admindb	1434350335	admindb	Netzwerk	network	575e9c458036
-1434350540	admindb	1434350540	admindb	Aktuelle Werte	actual values	575e9c458037
-1453298759	admindb	1453805056	admindb	Webserver Apache	webserver apache	575e9c458038
-1459247285	admindb	1459754201	admindb	Zertifikate	certificates	575e9c458039
 1269940938	admindb	1607597896	admindb	Bestellungen	purchase order	575e9c458032
 1206446471	admindb	1589787699	admindb	Abfragen	querys	575e9c458001
 1220256846	admindb	1590668442	admindb	Joins	joins	575e9c458002
@@ -17524,6 +17422,7 @@ COPY mne_application.htmlcomposenames (createdate, createuser, modifydate, modif
 
 COPY mne_application.htmlcomposetab (createuser, modifydate, modifyuser, path, id, subposition, "position", initpar, depend, loadpos, ugroup, custom, htmlcomposetabid, htmlcomposeid, createdate) FROM stdin;
 admindb	1607497742	admindb	/weblet/personnal/timemanagement/edit	edit	0	popup			0		f	5fcf20768000	5fb3cb908000	1607409782
+admindb	1607947896	admindb	/weblet/warehouse/part/vendor	vendordetail	0	popup			0		f	575ea2058148	575e9c458025	1257430996
 admindb	1359387171	admindb	/weblet/allg/user/settings	detail	0	detail	showtitle : true	bottom	0		f	575ea205804c	575e9c458034	1226313601
 admindb	1591781813	admindb	/weblet/allg/menu/fix	all	10	selection	    schema : 'mne_crm',\n     query : 'city',\n      cols : 'startletter,name',\n  showcols : 'cityid',\n  distinct : true,\nloaddirect : 1\n\n	detail	0		f	5ee0a8f78000	575e9c458003	1591781623
 admindb	1585905837	admindb	/weblet/basic/framebutton	menubutton	0	menubutton	frame : this.obj.slider.s1.frame		0		f	575e9c458016	575e9c458013	1585905837
@@ -17537,8 +17436,6 @@ admindb	1605276348	admindb	/weblet/crm/address/country	detail_cityselectdetail_c
 admindb	1600335206	admindb	/weblet/allg/table/fix	timemanagement	40	bottom	   schema : 'mne_personnal',\n    query : 'producttime_list', \n     cols : 'sorting,producttimeid,step,skilltext,description,duration,cost,currency', \n    scols : 'sorting,step,description',\n  showids : ['productid'],\nprimarykey : [ 'producttimeid'],\n\n   tablehidecols : ['sorting', 'producttimeid'], \n   tablerowstyle : ['sum'],\ntablerowstylecol : ['sorting'],\n    tablecoltype : { step : 'text', duration : 'text' },\n\nmodfunction : 'producttime_update',\nmodcols : ['producttimeid', 'duration', 'step' ],\nmodtyps : { duration : 'long', step : 'long'},\n\n   adddetail : true,\ndetailweblet : 'timemanagementedit',\ndelconfirmids : [ 'description'],\n\nsavedependvalues : true\n\n	price	0		f	575ea205817a	575e9c458019	1250839759
 admindb	1600077810	admindb	/weblet/warehouse/product/part	partmanagementedit	0	popup			0		f	575ea205803e	575e9c458019	1263480675
 admindb	1591697436	admindb	/weblet/allg/menu/fix	mycategorie	20	selection	  schema : 'mne_crm',\n   query : 'company',\n    cols : 'categorie_text,company',\nshowcols : 'companyid',\ndistinct : 1,\n  'wcol' : 'owner',\n   'wop' : '=',\n  'wval' : 'current_user'	detail	0		f	575ea205806c	575e9c45802d	1264448838
-admindb	1603959710	admindb	/weblet/crm/company/contact	person	0	bottom	loaddirect : true		0		f	575ea2058020	575e9c45802d	1226958640
-admindb	1554105794	admindb	weblet/sysadmin/cert/csr/add	csradd	0	popup			0		f	5ca1c5c20000	575e9c458039	1554105794
 admindb	1601477252	admindb	/weblet/allg/table/select	timesedit_stepselect	0	popup	schema : 'mne_personnal',\n query : 'producttimeopt',\nshowids : ['productid'],\nshowalias : [ '() => { return dw().config.dependweblet.obj.inputs.productoptid.getValue(); }' ],\n\n    cols : 'step,description',\nshowcols : 'step,skillid,duration,description,longdesc',\n   scols : 'step,description',\n\nnotitle : true\n\n\n		0		f	5f6c84bd8000	575e9c458017	1600947389
 admindb	1603719661	admindb	/weblet/personnal/time/dayselect	top	0	top		detail	0		f	5f967c998000	575e9c45800f	1603697817
 admindb	1608101310	admindb	/weblet/warehouse/storage/relocate	relocationdetail	0	popup		#detail	0		f	5fd9a6b78000	575e9c458031	1608099511
@@ -17570,8 +17467,8 @@ admindb	1607508101	admindb	/weblet/allg/table/filter	ordertime	0	ordertime	table
 admindb	1608126040	admindb	/weblet/allg/menu/fix	all	30	selection	schema   : 'mne_warehouse',\nquery    : 'partoutgoing',\ncols     : 'partname,requestdate',\nshowcols : 'partoutgoingid'\n	detail	0		f	5fda09f78000	575e9c45802c	1608124919
 admindb	1608126068	admindb	/weblet/allg/menu/fix	fetch	20	selection	schema   : 'mne_warehouse',\nquery    : 'partoutgoing',\ncols     : 'partname,fetchdate',\nshowcols : 'partoutgoingid',\nwcol     : 'fetched',\nwop      : '=',\nwval     : 'true',	detail	0		f	5fda0de98000	575e9c45802c	1608125929
 admindb	1603455107	admindb	/weblet/allg/menu/fix	all	100	selection	schema   : 'mne_shipment',\nquery    : 'invoicemanagement_auto',\ncols     : 'typ,invoiceauto',\nshowcols : 'ntyp,invoiceauto',\n\nwcol : 'invoiceauto',\nwop  : 'is not',\nwval : 'null',\n\nloaddirect : 1	detail	0		f	575ea2058061	575e9c45802b	1245319760
+admindb	1589975191	admindb	/weblet/dbadmin/query/where	where	20	bottom	\n		0		f	575ea2058043	575e9c458001	1210872313
 admindb	1608126124	admindb	/weblet/allg/menu/fix	bycustomer	200	selection	schema   : 'mne_warehouse',\nquery    : 'partoutgoing',\ncols     : 'customer,ordernumber,partname',\nshowcols : 'partoutgoingid',\n\nwcol     : 'customer',\nwop      : 'IS NOT NULL',\nwval     : 'x'	detail	0		f	575ea2058046	575e9c45802c	1267452238
-admindb	1603107428	admindb	/weblet/allg/table/filter	projecttime	190	bottom	schema : 'mne_personnal', query : 'timeorder',\n  cols : 'sortcol,orderid,ordernumber,orderdescription,companyid,reffirstname,reflastname,fullname,productname,duration',\n scols : 'sortcol,fullname',\n\nshowids  : [ 'orderid'],\nprimarykey : ['fullname','productname'],\ndistinct : true,\n\n    tablehidecols: ['sortcol', 'orderid', 'ordernumber', 'orderdescription', 'companyid', 'reffirstname', 'reflastname'],\n    tablerowstyle: [ 'sum' ],\ntablerowstylecol : [ 'sortcol']\n\n		0	adminpersonnal	f	575ea2058000	575e9c458018	1299074563
 admindb	1608193758	admindb	/weblet/allg/table/fix	opendelivery	5	bottom	tableweblet : '/weblet/warehouse/purchase/invoicedeliverytable',\n\nschema     : 'mne_warehouse',\nquery      : 'purchasedelivery_invoice',\ntable      : 'purchaseinvoicedelivery',\ncols       : 'purchasedeliveryid,purchaseinvoicedeliveryid,haveinvoice,part,deliverynotenumber,ordernumber,orderdate,crmordernumber,crmorder',\nscols      : 'haveinvoice,deliverynotenumber,part',\nshowids    : ['companyid', 'purchaseinvoiceid'],\nshowops    : { purchaseinvoiceid : "o=" },\nprimarykey : [ 'purchasedeliveryid' ],\n\nwcol    : 'purchaseinvoiceid',\nwop     : 'isnull',\nwval    : 'isnull',\n\ntablehidecols    : ['purchasedeliveryid','purchaseinvoicedeliveryid','haveinvoice'],\ntablerowstyle    : ['haveinvoice'],\ntablerowstylecol : ['haveinvoice'],\n\nokids         : ['purchaseinvoicedeliveryid'],\nokcols        : [ 'purchaseinvoicedeliveryid', 'purchasedeliveryid', 'purchaseinvoiceid'],\ndelconfirmids : ['deliverynotenumber'],\n\nloaddirect : true	#deliverynotes	0		f	575ea20581d6	575e9c458026	1322741643
 admindb	1605261099	admindb	/weblet/allg/table/fix	bdiarypresentlist	316	bottom	whereweblet : '/weblet/builddiary/orderpresentfilter',\ntableweblet : 'builddiary/presenttable',\n\nwhereinit   : { showalias : ['orderid', 'bdtimeid', '#true'] },\n\nschema : 'mne_builddiary',\nquery : 'present',\n\ncols : 'orderid,timeid,presentid,personid,typ,role,company,present,fullname,selfpresent,count,comment,important',\nscols : 'role,company,fullname',\n\ndistinct : true,\nprimarykey : [ 'personid' ],\n\ntablehidecols : ['orderid','timeid','presentid','personid'],\ntablecoltype : { typ : 'selection', role : 'text', present : 'bool', selfpresent : 'bool', count : 'text', comment : 'edit', important : 'bool' },\n\nokfunction : 'present_mod',\nokcols : [ 'presentid','personid','timeid','present','selfpresent','typ','count','role','comment','important'],\nokids : [ 'presentid' ],\noktyps : { present : 'bool', selfpresent : 'bool', typ : 'long', count : 'long',important : 'bool'},\n\ndefvalues   : { personid : '', fullname : '', typ : 0 },\nselectlists : { typ : 'builddiary_presenttype' },\n\n\n\n\n\n\n\n\n\n	#detail	0	erpbuilddiary	f	575ea205819f	575e9c45800f	1381553078
 admindb	1605276225	admindb	/weblet/crm/address/city	detail_cityselectdetail	0	popup			0		f	5fae92418000	575e9c458020	1605276225
@@ -17595,6 +17492,7 @@ admindb	1324396379	admindb	/weblet/allg/menu/fix	mybycompany	10	selection	schema
 admindb	1591609080	admindb	/weblet/allg/menu/fix	selection	0	selection	schema : 'mne_application', table : 'selectlist',\n\n   cols  : 'name',\n   scols : 'name',\nshowcols : 'name',\n\ndistinct : true,\nloaddirect : true,\n\n	detail	0	admindb	f	575ea2058074	575e9c458028	1289984584
 admindb	1600334906	admindb	/weblet/allg/table/fix	companyref	50	bottom	 schema : 'mne_crm',\n  query : 'company_contact',\n   cols : 'companyid,company,description',\n  scols : 'company',\nshowids : [ 'personid' ],\n\nwcol : 'companypersonid',\nwop  : 'is not null',\nwval : '',\n\ntablehidecols : [ 'companyid' ]\n\n\n		0	erpcrm	f	575ea2058163	575e9c45802e	1333620418
 admindb	1603445029	admindb	/weblet/allg/menu/fix	selection	0	selection	schema : 'mne_shipment', table : 'invoicecond', cols : 'category,description', showcols : 'invoicecondid',\nloaddirect : 1	detail	0		f	575ea20580c2	575e9c458005	1237819787
+admindb	1603959710	admindb	/weblet/crm/company/contact	person	0	bottom	loaddirect : true		0		f	575ea2058020	575e9c45802d	1226958640
 admindb	1591697556	admindb	/weblet/allg/menu/fix	categorie	110	selection	  schema : 'mne_crm',\n   query : 'company',\n    cols : 'categorie_text,company',\nshowcols : 'companyid',\ndistinct : 1	detail	0		f	575ea205805a	575e9c45802d	1264448771
 admindb	1591697523	admindb	/weblet/allg/menu/fix	all	100	selection	  schema : 'mne_crm',\n   query : 'company',\n    cols : 'lettercompany,company',\nshowcols : 'companyid',\ndistinct : 1	detail	0		f	575ea205808e	575e9c45802d	1226907711
 admindb	1237803926	admindb	/weblet/allg/menu/fix	closed	32	selection	schema : 'mne_shipment', query : 'deliverynote', cols : 'refname,description,deliverynotenumbername', showcols : 'deliverynoteid', wcol : 'delivered,invoiceid', wop : '=,=', wval : 'true,', distinct : 1	detail	0		f	575ea20580ac	575e9c45802a	1237564116
@@ -17607,8 +17505,10 @@ admindb	1540557410	admindb	/weblet/allg/menu/fix	all	10	selection	classname : 't
 admindb	1608294692	admindb	/weblet/allg/menu/recursive	all	10	selection	schema : 'mne_fixture',\nquery : 'fixturetypetree',\ncols : 'action,item,menuid,typ,pos',\nscols : 'pos',\ndistinct : true,\nshowids : ['parentid'],\n\nloaddirect : 1	detail	0		f	575ea2058112	575e9c458029	1291123597
 admindb	1590669707	admindb	/weblet/allg/menu/fix	firstsel	10	firstsel	notitle : false,\n\n  schema : 'mne_application',\n   query :'table_all',\n    cols :'schema,table',\nshowcols :'schema,table'\n\n	firsttab,joins	0		f	575ea20580de	575e9c458002	1220269177
 admindb	1590669789	admindb	/weblet/allg/menu/fix	secondsel	10	secondsel	notitle : false,\n\n  schema : 'mne_application',\n   query : 'table_all',\n    cols : 'schema,table',\nshowcols : 'schema,table'\n\n	secondtab	0		f	575ea20580d3	575e9c458002	1220267153
-admindb	1473352929	admindb	/weblet/allg/menu/fix	all	0	selection	schema : 'mne_crm',  query : 'person_detail', cols : 'letterlastname,fullname', showcols : 'personid'	detail	0		f	57c555fd0000	57beb13a0000	1472550397
 admindb	1601477270	admindb	/weblet/allg/menu/rselect	productselect	0	popup	  schema : 'mne_crm',\n   query : 'producttree',\n    cols : 'action,item,menuid,typ,pos',\n   scols : 'pos',\nshowcols : 'productid,item',\n\nwcol : 'parentid',\nwop  : '=',\n\nnotitle : true\n\n\n\n		0		f	575ea20580f6	575e9c458017	1249980544
+admindb	1472537003	admindb	/weblet/allg/menu/fix	sub	20	selection	classname : 'tree', \n\nschema : 'mne_application',\n query : 'weblet_tabs',\n  cols : 'path,name',\n\n showcols : 'htmlcomposeid'	detail	0		f	575ea20580a0	575e9c45801d	1226481868
+admindb	1547561906	admindb	/weblet/allg/menu/fix	all	10	selection	classname : 'tree', schema: 'mne_application', query : 'procedure', \n\n     cols : 'schema,fullname', \n showcols : 'schema,fullname', \n\nloaddirect : 1	detail	0		f	575ea205810e	575e9c45801a	1222162435
+admindb	1465829261	admindb	/weblet/allg/menu/fix	all	10	selection	classname : 'tree', schema : 'mne_application', query : 'weblet_all', cols : 'schema,name', showcols : 'htmlcomposeid',loaddirect : 1	detail	0		f	575ea20580e4	575e9c45801d	1220255283
 admindb	1601629801	admindb	/weblet/allg/table/fix	parts	110	bottom	whereweblet : '/weblet/crm/table/productfilter',\n        css : 'project/allg.css',\n\nschema : 'mne_warehouse',\n query : 'orderproductpart_list',\n  cols : 'rowtyp,orderid,orderproductid,orderproductpartid,orderproducttype,partid,fixturetypeid,partcostcalc,orderproducttypetext,productnumber,productname,productcount,partgroup,partdescription,unit,count,actcount,rescount,partcost,partcostsumset,partcostsum,partcurrency,pownerid',\n scols : 'orderproducttype,sorting,position,rowtyp',\nshowids : [ 'orderid' ],\n\ndelconfirmids : [ 'partdescription'],\n   primarykey : ['orderproductpartid' ],\n\n   tablehidecols : [ 'rowtyp','orderid','orderproductid','orderproductpartid','orderproducttype','partid','fixturetypeid','partcostcalc'],\n   tablecoltype  : { partdescription : 'text', unit : 'text', count : 'text', actcount : 'text', partcost : 'text',  pownerid : 'selection'},\n   tablerowstyle : ['sum'],\ntablerowstylecol : ['rowtyp'],\n\nmodfunction : 'orderproductpart_ok',\nmodcols : ['orderproductid', 'orderproductpartid', 'partgroup', 'partdescription', 'partid', 'fixturetypeid', 'count', 'partcost', 'partcostcalc', 'actcount', 'unit', 'pownerid'],\nmodtyps : { count : 'double', partcost : 'double', partcostcalc : 'double', actcount : 'double' },\n\n\nsavedependvalues : true,\n\ndetailweblet : 'partsedit',\n\n	#product	0		f	575ea20581ea	575e9c458018	1291385862
 admindb	1601477527	admindb	/weblet/allg/table/select	timesedit_productselect	0	popup	schema : 'mne_crm',\nquery : 'orderproduct',\nshowids : ['orderid'],\nshowalias : [ '() => { return dw().config.dependweblet.obj.inputs.orderid.getValue(); }' ],\n\n    cols : 'productnumber,productname',\nshowcols : 'productname,orderproductid,count,count,productoptid,productoptid,position',\n   scols : 'position',\n\nnotitle : true\n\n		0		f	5f7472e58000	575e9c458018	1601467109
 admindb	1608126302	admindb	/weblet/allg/menu/fix	deliverynotenumber	20	selection	  schema : 'mne_warehouse',\n   query : 'purchasedelivery_detail',\n    cols : 'year,deliverynotenumber,partname',\nshowcols : 'purchasedeliveryid'\n	detail	0		f	575ea205813f	575e9c458033	1322644072
@@ -17617,8 +17517,6 @@ admindb	1601534525	admindb	/weblet/allg/table/select	timesedit_stepselect	0	popu
 admindb	1601539004	admindb	/weblet/crm/address/city	refselectperson_cityselectdetail	0	popup			0		f	5f758bbc8000	575e9c458018	1601539004
 admindb	1607955266	admindb	/weblet/warehouse/part/detail	detail	0	detail	mainweblet : true	bottom	0		f	575ea2058066	575e9c458025	1257409822
 admindb	1599567222	admindb	/weblet/allg/etc/color	color	0	popup	schema : 'mne_crm',\n  query: 'personowndata',\n\nshowids : [ 'personid' ]		0		f	575ea205804f	575e9c45802e	1256909955
-admindb	1599727846	admindb	/weblet/allg/etc/selectday	selectday	10	popup			0		f	575ea2058077	575e9c45802e	1261061031
-admindb	1590756883	admindb	/weblet/dbadmin/join/detail	detail	10	detail			0		f	575ea20580e9	575e9c458002	1220341776
 admindb	1601552963	admindb	/weblet/allg/table/fix	times	100	bottom	whereweblet : '/weblet/crm/table/productfilter',\n        css : 'projects/allg.css',\n\n schema : 'mne_personnal',\n  query : 'orderproducttime_list',\n   cols : 'sorting,rowtyp,orderid,orderproductid,orderproducttimeid,orderproducttype,productoptid,skillid,xlongdesc,longdesc,orderproducttypetext,productnumber,productname,count,step,stepdescription,skilltext,setduration,setdurationsum,timecostsumset,timecurrency,ready',\n  scols : 'orderproducttype,sorting,position,sortname,step,stepdescription',\nshowids : [ 'orderid' ],\n\nsavedependvalues : true,\n      primarykey : ['orderproducttimeid'],\n\ntablehidecols    : ['sorting','rowtyp','orderid','orderproductid','orderproducttimeid','orderproducttype','productoptid','skillid', 'longdesc', 'xlongdesc'],\ntablecoltype     : { count : 'text', step : 'text', setduration : 'text', ready : 'bool'},\ntablerowstyle    : ['sum'],\ntablerowstylecol : ['rowtyp'],\n     rowselector : 'tbody tr.sum1',\n\nmodfunction : 'orderproducttime_ok',\nmodcols : [ 'orderproducttimeid', 'orderproductid', 'skillid', 'setduration', 'step', 'description', 'xlongdesc', 'ready'],\nmodtyps : { setduration : 'long', step : 'long', ready : 'long' },\n\ndelfunction : 'orderproducttime_del',\ndelcols : [ 'orderproducttimeid' ],\ndeltyps : {},\ndelconfirmids : [ 'productnumber', 'productname' ],\n\ndelbutton : 'detaildel',\nselcol : 'productname',\n\ndetailweblet : 'timesedit',\n\n\n	#product	0		f	575ea20581f4	575e9c458018	1291384853
 admindb	1601539068	admindb	/weblet/crm/address/city	refselectcompany_cityselectdetail	0	popup			0		f	5f758bfc8000	575e9c458018	1601539068
 admindb	1601539085	admindb	/weblet/crm/address/country	refselectcompany_cityselectdetail_countryselectdetail	0	popup			0		f	5f758bd08000	575e9c458018	1601539024
@@ -17626,8 +17524,6 @@ admindb	1601552175	admindb	/weblet/allg/table/fix	parts	110	bottom	whereweblet :
 admindb	1608132974	admindb	/weblet/allg/menu/fix	documentnumber	10	selection	schema   : 'mne_warehouse',\nquery    : 'purchaseinvoice',\ncols     : 'doc1000,doc100,documentnumber', \nshowcols : 'purchaseinvoiceid',\nloaddirect : true	detail	0		f	575ea2058003	575e9c458026	1323078765
 admindb	1601477237	admindb	/weblet/allg/table/select	timesedit_productselect	0	popup	schema : 'mne_crm',\n query : 'offerproduct',\nshowids : ['offerid'],\nshowalias : [ '() => { return dw().config.dependweblet.obj.inputs.offerid.getValue(); }' ],\n\n    cols : 'productnumber,productname',\nshowcols : 'productname,offerproductid,count,count,productoptid,productoptid,position',\n   scols : 'position',\n\nnotitle : true\n\n\n		0		f	5f6c65128000	575e9c458017	1600939282
 admindb	1601553249	admindb	/weblet/allg/menu/fix	notactive	20	selection	  schema : 'mne_crm',\n   query : 'order_detail',\n    cols : 'refname,description',\nshowcols : 'orderid',\n\nwcol : 'open,closed',\n wop : '=,=',\nwval : 'false,false',\n\ndistinct : 1	detail	0		f	575ea205811b	575e9c458018	1246606620
-admindb	1547561906	admindb	/weblet/allg/menu/fix	all	10	selection	classname : 'tree', schema: 'mne_application', query : 'procedure', \n\n     cols : 'schema,fullname', \n showcols : 'schema,fullname', \n\nloaddirect : 1	detail	0		f	575ea205810e	575e9c45801a	1222162435
-admindb	1465829261	admindb	/weblet/allg/menu/fix	all	10	selection	classname : 'tree', schema : 'mne_application', query : 'weblet_all', cols : 'schema,name', showcols : 'htmlcomposeid',loaddirect : 1	detail	0		f	575ea20580e4	575e9c45801d	1220255283
 admindb	1601553135	admindb	/weblet/allg/menu/fix	closed	30	selection	  schema : 'mne_crm',\n   query : 'order_detail',\n    cols : 'refname,description',\nshowcols : 'orderid',\n\nwcol : 'closed' ,\n wop : '=',\nwval : 'true',\n\n distinct : 1	detail	0		f	575ea205811d	575e9c458018	1237464180
 admindb	1608221704	admindb	/weblet/allg/menu/recursive	all	10	selection	schema   : 'mne_fixture',\nquery    : 'fixturetree',\ncols     : 'action,fixturename,menuid,typ,pos',\nscols    : 'pos',\ndistinct : true,\nshowids  : ['parentid'],\n\nloaddirect : 1	detail	0		f	575ea205811f	575e9c45801e	1290071063
 admindb	1605274982	admindb	/weblet/allg/table/filter	detail	0	detail	schema : 'mne_personnal',\nquery  : 'skill',\ntable  : 'skill',\n\ncols       : 'skillid,sorting,text_de,text_en,unitcost',\nscols      : 'sorting',\nprimarykey : ['skillid'],\n\ntablecoltype : { skillid : 'text', sorting : 'text', text_de :  'text', text_en : 'text', unitcost : 'text'},\n\nokids         : ['skillid'],\ndelids        : [ 'skillid' ],\ndelconfirmids : [ 'skillid' ],\ndefvalues     : { 'skillid' : '' },\n\nselval : '0'\n		0		f	575ea2058029	575e9c458011	1309447391
@@ -17655,16 +17551,13 @@ admindb	1603287359	admindb	/weblet/allg/menu/fix	invoiced	90	selection	schema : 
 admindb	1603287371	admindb	/weblet/allg/menu/fix	firstreminder	110	selection	schema : 'mne_shipment', query : 'invoice', cols : 'refname,description,numname', showcols : 'invoiceid', wcol : 'firstreminder', wop : '=', wval : 'true'	detail	0		f	575ea20580ca	575e9c458030	1245414991
 admindb	1590760142	admindb	/weblet/allg/table/fix	joins	10	joins	showtitle : true,\n\nschema : 'mne_application',\n query : 'join_all',\n table : 'joindef',\n\n  cols : 'joindefid,joindef',\n scols : 'joindef',\n\nshowids : [ 'schema', 'table' ],\n delids : [ 'joindefid' ],\n\ntablehidecols : [ 'joindefid' ],\n\ndelbutton : 'refresh,add,ok,cancel,export'\n		0		f	575ea20580c6	575e9c458002	1220276304
 admindb	1347866119	admindb	/weblet/dbadmin/table/pkey	primary	10	bottom			0	admindb	f	575ea2058041	575e9c45800d	1221574895
-admindb	1589975191	admindb	/weblet/dbadmin/query/where	where	20	bottom	\n		0		f	575ea2058043	575e9c458001	1210872313
 admindb	1603117888	admindb	/weblet/hoai/compute	hoai	0	bottom	schema : 'mne_hoai',\nquery : 'order',\ntable : 'order',\nrefid : 'orderid',\n\nshowids : ['refid'],\nshowalias : [ 'orderid' ],\n\nvokfunction : 'orderhoai_ok',\n	#product,#times,#parts,#projectresult,#orderaccounting	0	showhoai	f	575ea2058040	575e9c458018	1281678929
-admindb	1603108517	admindb	/weblet/allg/table/filter	allprojectresult	1000	bottom	schema   : 'mne_crm',\nquery    : 'order_costsum',\ncols     : 'position,result,ordernumber,refname,sumendprice,sumendcost,sumendmargin,sumactprice,sumactcostcomp,sumactmargincomp,refcompanyid,refcompany,refpersonid,reffirstname,reflastname',\nscols    : 'position,ordernumber',\ndistinct : true,\n\nprimarykey : ['ordernumber'],\n\nwcol : 'companyown',\nwop  : '=',\nwval : 'false',\n\ntablerowstyle: ['sum',''],\ntablerowstylecol : ['position','result'],\ntablehidecols : ['position','result','refcompanyid','refcompany','refpersonid','reffirstname','reflastname'],\n		0	admincrm	f	575ea2058034	575e9c458018	1271836333
 admindb	1599743900	admindb	/weblet/allg/menu/recursive	selection	0	selection	schema : 'mne_crm' ,\n query :  'producttree' ,\n  name : 'main',\n\ncols : "action,item,menuid,typ,pos",\nscols : "pos",\n\nshowids : [ 'parentid' ],\n\n\n loaddirect : 1	detail	0		f	575ea205803f	575e9c458019	1236934504
-admindb	1599140493	admindb	/weblet/crm/person/own	own	400	bottom		#detail	0	adminpersonnal	f	57d0ff9c0000	575e9c45802e	1473314716
 admindb	1608101289	admindb	/weblet/allg/table/fix	outgoing	100	bottom	schema        : 'mne_warehouse',\n query        : 'partoutgoing',\n  cols        : 'partoutgoingid,count,partname,customer,ordernumber,orderdescription,orderproductname,orderpartdescription',\nshowids       : ['partingoingid'],\nprimarykey    : ['partoutgoingid'],\ntablehidecols : ['partoutgoingid'],\n\n	#partstoragelocation,#ingoing,#relocation	0		f	575ea2058059	575e9c458031	1267470769
 admindb	1589965289	admindb	/weblet/dbadmin/query/jointree	join	0	join		collist	0		f	575ea205806d	575e9c458001	1208860000
 admindb	1608114413	admindb	/weblet/allg/table/fix	bottom	10	bottom	tableweblet : '/weblet/warehouse/storage/relocationtable',\n\nschema        : "mne_warehouse",\nquery         : "relocation",\ncols          : 'partingoingid,relocationid,vendor,deliverynotenumber,oldstoragename,oldstoragelocationname,newstoragename,newstoragelocationname,part,parttype,sequence,count,fullname',\nshowids       : ['partid', 'partoutgoingid'],\nshowalias     : ['partid', '#'],\nshowops       : { partoutgoingid : '!=' },\n\nprimarykey    : [ 'relocationid'],\ndelconfirmids : ['newstoragename','newstoragelocationname','count','vendor'],\n\ntablehidecols : ['partingoingid','relocationid'],\ndetailweblet  : 'relocationdetail',\n\ndelbutton     : 'detail,detaildel'\n\n		0		f	575ea2058049	575e9c45802c	1267174835
+admindb	1599727846	admindb	/weblet/allg/etc/selectday	selectday	10	popup			0		f	575ea2058077	575e9c45802e	1261061031
 admindb	1597904541	admindb	/weblet/allg/table/fix	history	20	bottom	schema : 'mne_crm',\n query : 'person_history',\n  cols : 'colname,oldvalue,newvalue,operation,createdate,createuser',\n scols : '!createdate',\n\n  showids : [ 'refid' ],\nshowalias : [ 'personid' ],\n\n		0	erpcrm	f	575ea2058063	575e9c45802e	1264583186
-admindb	1434352461	admindb	/weblet/sysadmin/network/netparam	param	0	right	showtitle : true		0		f	575ea2058201	575e9c458037	1434352214
 admindb	1608038907	admindb	/weblet/warehouse/storage/ingoing	detail	0	detail	mainweblet : true	middle,bottom	0		f	575ea205809b	575e9c458031	1260785990
 admindb	1603175948	admindb	/weblet/crm/offer/detail	detail	0	detail	mainweblet : true	bottom	0		f	575ea205809c	575e9c458017	1237297593
 admindb	1608101263	admindb	/weblet/allg/table/fix	partstoragelocation	20	bottom	tableweblet : '/weblet/warehouse/part/storagelocationtable',\n\nschema : 'mne_warehouse',\nquery : 'partstoragelocation',\ncols : 'partid,partstoragelocationid,storagelocationid,storageid,partoutgoingid,partingoingid,vendor,deliverynotenumber,part,parttype,count,rcount,storagename,storagelocationname,outbounding',\nshowids : ['partid'],\nprimarykey : ['partstoragelocationid'],\n\ntablehidecols : ['partid','partstoragelocationid','storagelocationid','storageid','partoutgoingid','partingoingid'],\ndetailweblet : 'relocationdetail'	#ingoing,#outgoing,#relocation	0		f	575ea2058087	575e9c458031	1265317250
@@ -17677,7 +17570,7 @@ admindb	1608103108	admindb	/weblet/warehouse/storage/relocate	relocationdetail	1
 admindb	1597663569	admindb	/weblet/dbadmin/join/collist	firsttab	10	firsttab	notitle  : false,\nselectid : 'firsttab'\n\n	detail	0		f	575ea20580c1	575e9c458002	1220266963
 admindb	1603191483	admindb	/weblet/shipment/deliverynote	detail	0	detail	mainweblet : true	bottom	0		f	575ea20580a5	575e9c45802a	1237548569
 admindb	1608128018	admindb	/weblet/warehouse/purchase/delivery	detail	0	detail	mainweblet : true	bottom,middle	0		f	575ea20580ad	575e9c458033	1291020007
-admindb	1472537003	admindb	/weblet/allg/menu/fix	sub	20	selection	classname : 'tree', \n\nschema : 'mne_application',\n query : 'weblet_tabs',\n  cols : 'path,name',\n\n showcols : 'htmlcomposeid'	detail	0		f	575ea20580a0	575e9c45801d	1226481868
+admindb	1599140493	admindb	/weblet/crm/person/own	own	400	bottom		#detail	0	admerppersonnal	f	57d0ff9c0000	575e9c45802e	1473314716
 admindb	1600061954	admindb	/weblet/crm/product/detail	detail	0	detail	mainweblet : true\n	bottom	0		f	575ea205809a	575e9c458019	1236936308
 admindb	1598967677	admindb	/weblet/crm/company/detail	detail	10	detail	mainweblet : true	bottom	0		f	575ea20580c3	575e9c45802d	1226908308
 admindb	1347866145	admindb	/weblet/allg/table/fix	access	40	bottom	schema : 'mne_catalog',\n table : 'table_privilege',\n  cols : 'schema,table,user,select,insert,update,delete,reference,trigger',\nscols  : 'user',\n\ntablehidecols : [ 'schema', 'table'],\n tablecoltype : { user : 'text', select : 'bool', insert : 'bool', update : 'bool', delete : 'bool', reference : 'bool', trigger : 'bool' },\n\n   showids : [ 'schema', 'table' ],\nokfunction : 'table_access_ok',\n    okcols : [ 'schema', 'table', 'user', 'select', 'insert', 'update', 'delete', 'reference', 'trigger' ]		0	admindb	f	575ea20580b8	575e9c45800d	1222088958
@@ -17690,12 +17583,12 @@ admindb	1600333969	admindb	/weblet/allg/table/fix	address	10	bottom	       schem
 admindb	1597387008	admindb	/weblet/allg/menu/fix	all	50	selection	schema : 'mne_crm',\n query : 'person_detail',\n  cols : 'letterlastname,fullname',\n\nshowcols : 'personid'	detail	0	erpcrm	f	575ea20580b7	575e9c45802e	1197390312
 admindb	1289300156	admindb	/weblet/warehouse/part/detail	partselectedit	0	popup	showtitle : true		0		f	575ea20580da	575e9c458032	1289300156
 admindb	1603470150	admindb	/weblet/allg/table/fix	bottom	0	bottom	schema  : 'mne_shipment',\nquery   : 'invoicemanagement_auto',\ncols    : 'typ,invoiceauto,date,invoicenum,refname,description',\nshowids : [ "invoiceauto","ntyp" ] 		0		f	575ea20580c9	575e9c45802b	1245354103
+admindb	1590756883	admindb	/weblet/dbadmin/join/detail	detail	10	detail			0		f	575ea20580e9	575e9c458002	1220341776
 admindb	1591282813	admindb	/weblet/dbadmin/command/detail	detail	0	detail	showtitle : true	bottom	0		f	575ea20580c7	575e9c458006	1246350541
 admindb	1440594410	admindb	/weblet/dbadmin/table/check	checkdetail	10	popup	showtitle : true,\n  sschema : 'mne_application',\n   squery : 'table_checks'		0		f	575ea20580ea	575e9c45800d	1221722756
 admindb	1607598194	admindb	/weblet/allg/table/fix	history	100	bottom	schema    : 'mne_warehouse',\nquery     : 'purchase_history',\ncols      : 'dpytype,colname,oldvalue,newvalue,operation,createdate,createuser',\nscols     : '!createdate',\nshowids   : ['refid'],\nshowalias : ['purchaseid'],\n\ntablehidecols : ['dpytype']\n\n		0		f	575ea20580fa	575e9c458032	1288695691
 admindb	1608209153	admindb	/weblet/allg/etc/selectday	selectday	10	popup			0		f	575ea20580ef	575e9c458033	1291020719
 admindb	1591789832	admindb	/weblet/crm/address/city	detail	10	detail			0		f	575ea20580e8	575e9c458003	1226524986
-admindb	1603107373	admindb	/weblet/allg/table/fix	time	150	bottom	schema : 'mne_personnal',\n query : 'timeorder',\n  cols : 'sortcol,orderid,ordernumber,orderdescription,companyid,reffirstname,reflastname,productname,productstep,duration',\n scols : 'sortcol',\n  wcol : 'sortcol',\n  wop  : '<',\n  wval : '3',\n\n   showids : [ 'orderid' ],\nprimarykey : ['productname','productstep','duration'],\n\ndistinct : true,\n\n\n    tablehidecols: ['sortcol','orderid','ordernumber','orderdescription', 'companyid', 'reffirstname', 'reflastname'],\n    tablerowstyle: [ 'sum' ],\ntablerowstylecol : [ 'sortcol' ],\n\n\n\n		0	adminpersonnal	f	575ea20580f9	575e9c458018	1260455509
 admindb	1608277640	admindb	/weblet/allg/menu/rselect	categorie	1000	bottom	schema: "mne_fixture",\nquery: "fixturetree",\ntable: "fixturetree",\ncols: "action,item,menuid,typ,pos",\nscols: "pos",\nshowcols: "fullpath,menuid",\n\nwcol: "fixtureid,parentid",\nwop: "=,=",\nwval: ","		0		f	575ea20580fc	575e9c45801e	1290145252
 admindb	1608287708	admindb	/weblet/fixture/detail	detail	0	detail	mainweblet : true	bottom	0		f	575ea20580f1	575e9c45801e	1290071890
 admindb	1608294360	admindb	/weblet/fixture/type	detail	0	detail	mainweblet : true	bottom	0		f	575ea20580fe	575e9c458029	1291123803
@@ -17707,91 +17600,69 @@ admindb	1603366966	admindb	/weblet/allg/table/select	referenceadd	0	popup	  sche
 admindb	1601276681	admindb	/weblet/allg/table/fix	forcastall	200	bottom	schema : 'mne_crm',\n query : 'offerforecast',\n  cols : 'offerid,offernumber,refname,description,sumnet,sumnetprob,probabilitytext,expectedorderdate',\n scols : 'sorting,expectedorderdate,!probability,refname',\n\n tablehidecols : ['offerid'],\n\n report : 'mne_offerforecast'		0		f	575ea205812d	575e9c458017	1263312658
 admindb	1608133423	admindb	/weblet/warehouse/purchase/invoice	detail	0	detail	mainweblet : true	bottom	0		f	575ea2058151	575e9c458026	1322225248
 admindb	1608299634	admindb	/weblet/fixture/typecost	cost	0	bottom	loaddirect : true		0		f	575ea2058111	575e9c458029	1291647509
+admindb	1600865863	admindb	/weblet/personnal/offer/producttime	timesedit	0	popup			0		f	575ea205805f	575e9c458017	1291299227
 admindb	1609752114	admindb	/weblet/allg/table/fix	middle	0	middle	tableweblet : '/weblet/mail/imap/foldertable',\n\nschema  : "mne_mail",\nquery   : "imapfolder",\ntable   : 'imapfolder',\ncols    : "imapfolderid,folder,name,checkit,send",\nscols   : "name",\n\ntablehidecols : ['imapfolderid','folder'],\nokids : ['imapfolderid'],\ndelconfirmids : ['name'],\n\nrescanschema : "mne_mail",\nrescanfunction : "imapfolder_rescan"\n		0		f	575ea205810f	575e9c45802f	1309852446
 admindb	1603699904	admindb	/weblet/allg/menu/recursive	detail	0	detail	  schema : 'mne_application',\n   query : 'menu',\n    cols : "show,editname,menuid,pos,typ",\n   scols : "pos",\ndistinct : 1,\n\nshowids : ['menuname', 'parentid'],\nactioncol : '0'\n	bottom	0		f	575ea2058119	575e9c458027	1289899152
 admindb	1603700645	admindb	/weblet/personnal/time/dayreport	detail	0	detail		bottom	0		f	575ea2058004	575e9c45800f	1301382000
-admindb	1554107287	admindb	weblet/sysadmin/cert/ca/add	caadd	0	popup			0		f	5c9b68540000	575e9c458039	1553688660
 admindb	1515480368	admindb	/weblet/warehouse/purchase/invoicedelivery/detail	deliverynotesdetail	0	popup			0		f	575ea2058114	575e9c458026	1322473659
 admindb	1597762299	admindb	/weblet/crm/person/detail	detail	0	detail	mainweblet : true	bottom	0		f	575ea2058113	575e9c45802e	1226998215
 admindb	1607592133	admindb	/weblet/warehouse/storage/create	create	0	popup		#storagelocation	0		f	575ea2058129	575e9c458015	1400156357
 admindb	1603108185	admindb	/weblet/allg/table/fix	history	500	bottom	schema : 'mne_crm', \nquery  : 'order_history',\ncols : 'tabname,text,oldvalue,newvalue,createdate,createuser',\nscols : '!createdate',\n\nshowids :  ['orderid'],\nprimarykey : ['tabname,text,oldvalue,newvalue,createdate,createuser'],\n\n		0		f	575ea205812e	575e9c458018	1237464395
+admindb	1589965082	admindb	/weblet/dbadmin/query/collist	collist	0	collist			0		f	575ea2058030	575e9c458001	1210075262
 admindb	1597386810	admindb	/weblet/allg/table/fix	subweblet	10	bottom	schema : 'mne_application',\n query : 'weblet_detail',\ncols : 'htmlcomposetabid,position,subposition,depend,id,label,path,customall,ugroup',\nscols : 'position,subposition,id,depend',\nshowids : ['htmlcomposeid'],\nprimarykey : ['htmlcomposetabid'],\n\ntablehidecols : ['htmlcomposetabid'],\ndetailweblet : 'subwebletdetail',\nloaddirect : 1		0		f	575ea20581bc	575e9c45801d	1206446752
-admindb	1598000265	admindb	/weblet/allg/menu/fix	selection	0	selection	action : '/db/utils/repository/data.json',\nschema : 'mne_repository',\nquery  : 'repository',\ntable  : 'repository',\n\n    cols : 'name',\n   scols : 'name',\nshowcols : 'repositoryid',\n\nwcol : 'root',\nwop  : '=',\nwval : 'repository',\n\nloaddirect : true,\n	detail	0		f	575ea2058195	575e9c458022	1389633246
 admindb	1603360491	admindb	/weblet/allg/table/fix	incoicetime	200	bottom	schema  : 'mne_shipment',\nquery   : 'invoicetime',\ncols    : 'invoicetimeid,date,origclocktime,origduration,clocktime,duration,productnumber,productname,steptext,skilltext,fullname,num',\nscols   : 'date,clocktime,fullname',\nshowids : ['invoiceid'],\n\ntablehidecols : ['invoicetimeid'],\ntablecoltype  : { clocktime : 'text', duration : 'text', num : 'selection' },\n\nmodfunction : 'invoicetime_update',\nmodcols : ['invoicetimeid','clocktime','duration','num'],\nmodtyps : { num : 'long'},\n\nreport : 'mne_invoicetimesingle'\n		0		f	575ea205801a	575e9c458030	1348492247
-admindb	1607947896	admindb	/weblet/warehouse/part/vendor	vendordetail	0	popup			0		f	575ea2058148	575e9c458025	1257430996
-admindb	1477056259	admindb	/weblet/sysadmin/domain/detail	detail	0	detail	title : true	bottom	0		f	57bab6810000	57bab6120000	1471854209
 admindb	1605261104	admindb	/weblet/allg/table/fix	bdiaryoverview	330	bottom	notdepend : true,\nwhereweblet : '/weblet/builddiary/orderfilter',\ntableweblet : '/weblet/builddiary/overviewtable',\n\ntableinit : { selectlistids : 'bdiaryoverviewtable' },\n\nschema : 'mne_builddiary',\nquery : 'time_order',\n\ncols       : 'timeid,orderid,starttime,duration,rownum,ordernumber,orderdescription,day,date,week,startclocktime,endclocktime,weather,temperature,persons,important',\nscols      : 'date,starttime',\ndistinct   : true,\nprimarykey : ['timeid'],\n\ntablehidecols : ['timeid', 'orderid', 'starttime', 'duration'],\ntablecoltype : { date : 'text', startclocktime : 'text', endclocktime : 'text', weather : 'selection', temperature : 'text' },\n\nokfunction : 'bdtime_ok',\nokids  : [ 'timeid'],\nokcols : [ 'timeid', 'orderid', 'starttime', 'duration', 'weather', 'temperature' ],\noktyps : { start : 'long', duration : 'long', temperature : 'long' },\n\ndelfunction : 'bdtime_del',\ndelcols : [ 'timeid'],\ndelconfirmids : [ 'starttime']\n\n\n\n	#detail	0	erpbuilddiary	f	575ea2058019	575e9c45800f	1332503881
 admindb	1605514582	admindb	/weblet/allg/etc/color	color	0	popup	schema : 'mne_personnal',\nquery : 'personowndata',\n\nshowids : [ 'personid' ]\n		0		f	575ea20581d3	575e9c458020	1262682079
 admindb	1603454176	admindb	/weblet/shipment/invoicecond	detail_condnameselectdetail	0	popup	defvalues : { paytime : 30 }		0		f	575ea205800e	575e9c458030	1237841246
 admindb	1591614356	admindb	/weblet/dbadmin/selectlist/detail	detail	0	detail	\n		0		f	575ea2058100	575e9c458028	1289986253
 admindb	1604650225	admindb	/weblet/allg/table/fix	persontime	100	bottom	notdepend : true,\ntableweblet : '/weblet/personnal/time/persontimetable',\nwhereweblet : '/weblet/personnal/time/persontimefilter',\n\nschema : 'mne_personnal',\nquery  : 'persontime_dayalldetail',\ncols   : 'sortcol,fullname,ordernumber,orderdescription,productnumber,productname,orderproducttimedescription,date,dayname,duration',\nscols  : 'fullname,date,sortcol,productname',\n\nstarttimename : '-starttime',\n\n    ttablehidecols: ['sortcol','fullname'],\n    tablerowstyle: ['sum'],\ntablerowstylecol : ['sortcol'],\n\n         distinct : true,\n\nreport  : 'mne_personnal_persontime',\n		0		f	575ea205817b	575e9c45800f	1306244161
 admindb	1607584837	admindb	/weblet/allg/table/fix	parts	110	bottom	schema : 'mne_warehouse', query : 'storagelocation_part',\ncols : 'storagelocationid,storageid,name,rpartname,count,rcount,relpartname,relcount',\nscols : 'x,y,z',\n\ntablehidecols : ['storagelocationid','storageid'],\n\nshowids : ['storageid'],\nprimarykey : ['storagelocationid']\n		0		f	575ea20581a4	575e9c458015	1400505937
-admindb	1478009351	admindb	/weblet/dbadmin/user/group/detail	groups	20	bottom		bottom:detail	0	adminpersonnal	f	57beb17e0000	57beb13a0000	1472115070
 admindb	1598967602	admindb	/weblet/crm/company/own	own	0	bottom	\n\n\n\n		0		f	575ea20581ae	575e9c45802d	1409933368
 admindb	1601538583	admindb	/weblet/crm/reference/select	refselect	0	popup	wcol : 'refid,ref',\nwval : ',order',\nwop  : '<>,<>'		0		f	575ea20581b3	575e9c458018	1386962193
-admindb	1472115098	admindb	/weblet/allg/user/settings	usersettings	50	bottom	showtitle : true,\n   schema : 'mne_application',\n    query : 'userpref',\n    table : 'userpref',\n     edit : false	bottom:detail	0		f	57beb19a0000	57beb13a0000	1472115098
 admindb	1603287353	admindb	/weblet/allg/menu/fix	notinvoiced	80	selection	schema : 'mne_shipment', query : 'invoice', cols : 'refname,description,numname', showcols : 'invoiceid', wcol : 'invoiced', wop : '=', wval : 'false',\nloaddirect : 1	detail	0		f	575ea20580d6	575e9c458030	1244575241
-admindb	1601380050	admindb	/weblet/crm/order/detail	detail	0	detail	mainweblet : true	bottom	0		f	575ea20580a1	575e9c458018	1237460170
 admindb	1603099369	admindb	/weblet/basic/subweblet	repository	140	bottom	name : 'repository_reference',\n\nsubinit : { detail :\n             {\n                refid     : 'orderid',\n                refname   : 'ordername',\n                showalias : [ 'orderid' ]\n             }\n           }\n\n		0	erprepository	f	575ea2058199	575e9c458018	1391672058
 admindb	1605607688	admindb	/weblet/allg/table/fix	timemanagement	100	bottom	schema  : 'mne_personnal',\nquery   : 'persontimemanagement',\ncols    : 'personid,refname,ordernumber,description,productname,skilltext,startday,starttime,duration,note',\nscols   : 'startday,starttime',\nshowids : ['personid'],\n\ntablehidecols : ['personid']		0		f	575ea20581e7	575e9c458020	1256890822
 admindb	1601538390	admindb	/weblet/allg/etc/color	color	0	popup	schema : 'mne_crm',\nquery : 'order_detail',\n\nshowids : [ 'orderid' ]		0		f	575ea20581d4	575e9c458018	1256897040
+admindb	1597667097	admindb	/weblet/allg/menu/fix	kontinent	10	selection	   schema : 'mne_crm',\n    query : 'country',\n     cols : 'ucontinent,name',\n showcols : 'countryid',\n distinct : true\n	detail	0		f	575ea20580b6	575e9c458004	1226581669
 admindb	1420555674	admindb	/weblet/allg/table/fix	deliverynotepart	30	bottom	schema : 'mne_warehouse', query : 'purchasedelivery',\n  cols : 'purchasedeliveryid,documentnumber,deliverynotenumber,partname,deliverydate,vendor,count,rcount,scount,ordernumber',\n scols : 'deliverydate',\n\ntablehidecols : '0',\n\nshowdynpar : ' "partidInput.old" : "partid", "sortnumInput.old" : "#1" ',\n\npopup             : 'detail',\nignore_notdefined : true		0		f	575ea20581d5	575e9c458033	1291023196
 admindb	1603358307	admindb	/weblet/allg/table/fix	orderaccounting	300	bottom	schema  : 'mne_shipment',\nquery   : 'orderaccounting',\ncols    : 'sortcol,orderid,productnumber,productname,sumall,sumready,sumdeliver,sumdelivered,suminvoiced,sumpaid',\nscols   : 'sortcol,nproductnumber',\nshowids : ['orderid'],\n\ntablehidecols    : ['sortcol','orderid'],\ntablerowstyle    : ['sum'],\ntablerowstylecol : ['sortcol']\n		0		f	575ea205801f	575e9c458030	1348750397
-admindb	1473248697	admindb	/weblet/crm/person/owndata	owndata	0	bottom	 showtitle : true,\nshowdynpar : ' "personowndataidInput.old" : "personowndataid" ',\n\naddtitle : { de : 'Logindaten hinzufügen', 'en' : 'add login data' },\nmodtitle : { de : 'Logindaten bearbeiten', 'en' : 'modify login data' },\n\nignore_notdefined : true,\n       loaddirect : 1	detail,bottom:detail	0		f	57beb16e0000	57beb13a0000	1472115054
 admindb	1598872718	admindb	/weblet/allg/repository/content/interest	interest	100	detail			0		f	575ea20581d2	575e9c458035	1391609772
 admindb	1603444056	admindb	/weblet/allg/etc/selectday	selectday	10	popup			0		f	575ea20581fb	575e9c458030	1435739559
 admindb	1607611430	admindb	/weblet/allg/etc/selectday	selectday	10	popup			0		f	575ea205810b	575e9c458032	1288882709
-admindb	1554107422	admindb	/weblet/sysadmin/cert/ca/detail	detail	0	detail	showtitle : true		0		f	575ea2058212	575e9c458039	1459247454
-admindb	1554105933	admindb	weblet/allg/filesystem/file/add	certsadd	0	popup	root      : 'cert'\n		0		f	575ea2058216	575e9c458039	1462343104
-admindb	1603117991	admindb	/weblet/allg/table/fix	projectresult	200	bottom	css : 'projects/allg.css',\n\nschema : 'mne_crm',\nquery  : 'orderproductcost',\ncols   : 'sorting,result,orderproductid,orderproducttype,productname,count,actcount,sumendprice,sumendcost,sumendmargin,sumactprice,sumactcostcomp,sumactmargincomp',\nscols : 'sorting,position',\n\nshowids : ['orderid', 'orderproducttype' ],\nshowalias : [ 'orderid', '#' ],\nprimarykey : [ 'orderproductid'],\n\ntablehidecols    : [ 'sorting','result','orderproductid','orderproducttype'],\ntablerowstyle    : ['sum',''],\ntablerowstylecol : ['sorting','result'],\ntablecoltype     : { actcount : 'text' },\n\noktable     : 'orderproduct',\nokids       : ['orderproductid'],\nokcols      : ['actcount'],\nrowselector : 'tbody tr.sum1'\n	#product,#orderaccounting	0	admincrm	f	575ea205801b	575e9c458018	1264083810
+admindb	1237550887	admindb	/weblet/allg/menu/fix	all	100	selection	schema : 'mne_shipment', query : 'deliverynote', cols : 'refname,description,deliverynotenumbername', showcols : 'deliverynoteid'	detail	0		f	575ea2058031	575e9c45802a	1237495613
+admindb	1608041681	admindb	/weblet/allg/menu/fix	deliverynote	20	selection	schema   : 'mne_warehouse',\nquery    : 'purchasedelivery',\ncols     : 'vendorname,partname,deliverynotenumber',\nshowcols : 'purchasedeliveryid,partingoingid,deliverynotenumber,deliverydate,vendor,part,parttype',\ndistinct : 1,\n\nwcol : 'sortnum',\nwop  : '=',\nwval : '1'	detail	0		f	575ea2058047	575e9c458031	1261038628
 admindb	1600335334	admindb	/weblet/allg/table/fix	timemanagementopt	45	bottom	    schema : 'mne_personnal',\n     query : 'producttimeopt',\n      cols : 'sorting,producttimeid,step,skilltext,description,duration,cost,currency',\n     scols : 'sorting,step,description',\n   showids : ['productid'],\nprimarykey : ['producttimeid' ],\n\n   tablehidecols : ['sorting', 'producttimeid'],\n   tablerowstyle : ['sum'],\ntablerowstylecol : ['sorting'],\n    tablecoltype : { step : 'text', duration : 'text' },\n\nmodfunction : 'producttimeopt_update',\n    modcols : ['producttimeid', 'duration', 'step' ],\n    modtyps : { duration : 'long', step : 'long'},\n\n    adddetail : true,\n detailweblet : 'timemanagementoptedit',\ndelconfirmids : [ 'description' ],\n\nsavedependvalues : true\n	price	0		f	575ea2058013	575e9c458019	1348129460
 admindb	1608298680	admindb	/weblet/allg/menu/rselect	categorie	1000	bottom	schema: "mne_fixture",\nquery: "fixturetypetree",\ntable: "fixturetypetree",\ncols: "action,item,menuid,typ,pos",\nscols: "pos",\nshowcols: "fullpath,menuid",\n\nwcol: "fixturetypeid,parentid",\nwop: "=,=",\nwval: ","		0		f	5c17b66a0000	575e9c458029	1545057898
 admindb	1607592898	admindb	/weblet/warehouse/storage/optimize	optimize	300	popup		#storagelocation	0		f	575ea20581a9	575e9c458015	1400228709
 admindb	1603107817	admindb	/weblet/allg/table/fix	orderaccounting	300	bottom	schema : 'mne_shipment',\nquery  : 'orderaccounting',\ncols   : 'sortcol,orderid,productnumber,productname,sumall,sumready,sumdeliver,sumdelivered,suminvoiced,sumpaid',\nscols  : 'sortcol,nproductnumber',\n\nshowids : ['orderid'],\nprimarykey : ['productnumber'],\n\ntablehidecols : ['sortcol','orderid'],\n\ntablerowstyle: [ 'sum'],\ntablerowstylecol : ['sortcol'],\n\n		0	erpshipment	f	575ea2058002	575e9c458018	1348750701
 admindb	1604659633	admindb	/weblet/allg/table/fix	ordertime	110	bottom	notdepend : true,\ntableweblet : '/weblet/personnal/time/ordertimetable',\nwhereweblet : '/weblet/personnal/time/ordertimefilter',\n\nschema : 'mne_personnal',\nquery : 'timeorder',\n\ncols  : 'sortcol,vdate,fullname,productnumber,productname,productstep,dayname,date,duration,starttime,endtime,costpersonsingle,costperson',\nscols : 'sortcol,fullname,date,starttime,productname,productstep',\n\nstarttimename : '-starttime',\nvdayname : 'vdate',\n\n    tablehidecols: ['sortcol','vdate'],\n    tablerowstyle: ['sum'],\ntablerowstylecol : ['sortcol'],\n\nreport        : 'mne_personnal_ordertime_all',\nreport_all    : 'mne_personnal_ordertime_all',\nreport_single : 'mne_personnal_ordertime_single'\n		0		f	575ea2058021	575e9c45800f	1306847381
-admindb	1432824373	admindb	/weblet/sysadmin/zpush/detail	detail	0	detail	showtitle : true		0		f	575ea20581e9	575e9c458014	1432824373
 admindb	1472537356	admindb	/weblet/allg/menu/fix	templ	30	selection	classname : 'tree', schema : 'mne_application', query : 'weblet', cols : 'template,name', showcols : 'htmlcomposeid'	detail	0		f	575ea205801c	575e9c45801d	1246439280
-admindb	1473353328	admindb	/weblet/allg/menu/fix	employee	20	selection	schema :  'mne_crm', \n query : 'person_own',\n\n    cols : 'name',\nshowcols : 'personid',\n\nwcol : 'personid',\nwval : '',\nwop  : 'is not null',\n\nloaddirect : 1	detail	0		f	57beb2010000	57beb13a0000	1472115201
-admindb	1440590358	admindb	/weblet/menu/select	menuselect	0	popup	schema : 'mne_application',\n query : 'menu_select',\nnoleaf : true,\nshowdynpar : ' "name" : "%menuname" '		0		f	575ea2058102	575e9c458027	1289910833
-admindb	1589965082	admindb	/weblet/dbadmin/query/collist	collist	0	collist			0		f	575ea2058030	575e9c458001	1210075262
-admindb	1347866185	admindb	/weblet/allg/menu/fix	sys	30	selection	'classname' : 'tree',\n      schema: 'mne_application', \n    'query' : 'table_all',\n      'cols':'schema,table',\n  'showcols':'schema,table',\n   distinct : true	detail	0	admindb	f	575ea2058179	575e9c45800d	1308637423
 admindb	1597151389	admindb	/weblet/basic/subweblet	letter	20	bottom	   name : 'allg_letter', \n\nsubinit : { all : { schema : 'mne_crm',\n                     query : 'company_lettertree',\n                   showids : ["refid", "parentid"],\n                 showalias : ["companyid"] },\n            detail : { report : 'mne_letter_company', reportlist : 'lettercompany'}\n          },\n\nvalues : () =>\n         {\n           var detail = s.composeparent.obj.weblets[s.id].obj.weblets['detail'];\n           var vweblet = s.composeparent.obj.weblets['detail'];\n          \n           detail.obj.defvalues.refid   = vweblet.obj.run.values.companyid;\n           detail.obj.defvalues.refname = vweblet.obj.run.values.company;\n         },\n\n\n refidname : 'companyid',\n   refname : 'company'		0		f	575ea20581ec	575e9c45802d	1236724892
 admindb	1601553177	admindb	/weblet/allg/menu/fix	all	100	selection	  schema : 'mne_crm',\n   query : 'order_detail',\n    cols : 'refname,description',\nshowcols : 'orderid',\ndistinct : 1	detail	0		f	575ea2058117	575e9c458018	1237457925
 admindb	1589977698	admindb	/weblet/dbadmin/weblet/subwebletdetail	subwebletdetail	0	popup	\n		0		f	575ea2058131	575e9c45801d	1206446752
-admindb	1434697237	admindb	/weblet/sysadmin/network/config	detail	0	bottom	showtitle : true,\nloaddirect : true	detail,middle	0		f	575ea20581f8	575e9c458036	1433328333
-admindb	1434697246	admindb	/weblet/allg/subweblet	actlist	0	detail	name : 'sysadmin_netact'		0		f	575ea20581f9	575e9c458036	1434117769
 admindb	1607937903	admindb	/weblet/warehouse/purchase/delivery	deliverydetail	0	popup		#detail	0		f	575ea20580d4	575e9c458032	1288942324
 admindb	1600177682	admindb	/weblet/allg/menu/fix	allopen	100	selection	  schema : 'mne_crm', \n   query : 'offer_detail',\n    cols : 'refname,description,voffernumber',\nshowcols : 'offerid',\n   scols : '!istemplate,refname',\ndistinct : 1,\n\nwcol : 'probability,probability',\n wop : '!=,!=',\nwval : '100,0'\n	detail	0		f	575ea205811c	575e9c458017	1268218237
-admindb	1553703178	admindb	weblet/allg/filesystem/folder/show	csrs	250	bottom	showtitle : true,\n showpath : false,\n     root : 'cert',\n  startdir: 'csr',\n\ndelbutton : 'dirselect,dirlist,dirsymbol',\n\npopupadd : 'csradd',\n\nreshowvalue : true		0		f	575ea2058215	575e9c458039	1459840832
 admindb	1601371859	admindb	/weblet/allg/menu/fix	open	10	selection	schema : 'mne_crm',\n query : 'order_detail',\n  cols : 'refname,description',\n showcols : 'orderid',\n wcol : 'open,closed',\n wop : '=,=',\n wval : 'true,false',\n distinct : 1,\n loaddirect : 1	detail	0		f	575ea2058120	575e9c458018	1237464141
 admindb	1607609442	admindb	/weblet/allg/menu/recursive	parts	1000	selection	schema   : 'mne_warehouse',\nquery    : 'purchase_parttree',\ncols     : 'action,item,menuid,typ,pos',\nscols    : 'pos',\ndistinct : true,\n\nshowids  : ['parentid']	detail	0		f	575ea20580e2	575e9c458032	1322642505
 admindb	1591687340	admindb	/weblet/allg/menu/fix	my	10	selection	schema : 'mne_crm',\n query : 'company',\n  cols : 'lettercompany,company',\n showcols : 'companyid',\n distinct : 1,\n'wcol' : 'owner',\n 'wop' : '=',\n 'wval' : 'current_user',\n\n loaddirect : 1	detail	0		f	575ea205810d	575e9c45802d	1264448368
-admindb	1597667097	admindb	/weblet/allg/menu/fix	kontinent	10	selection	   schema : 'mne_crm',\n    query : 'country',\n     cols : 'ucontinent,name',\n showcols : 'countryid',\n distinct : true\n	detail	0		f	575ea20580b6	575e9c458004	1226581669
+admindb	1601466550	admindb	/weblet/personnal/order/producttime	timesedit	0	popup			0		f	575ea2058025	575e9c458018	1291385437
 admindb	1591719911	admindb	/weblet/allg/menu/fix	all	10	selection	  schema : 'mne_crm',\n   query : 'country',\n    cols : 'lettercountry,name',\nshowcols : 'countryid',\ndistinct : true,\n\nloaddirect : 1	detail	0		f	575ea20580c4	575e9c458004	1226580368
 admindb	1597386773	admindb	/weblet/allg/menu/fix	meine	0	selection	  schema : 'mne_crm', \n  query  : 'person_detail',\n    cols : 'letterlastname,fullname',\nshowcols : 'personid',\n\n'wcol' : 'owner',\n 'wop' : '=',\n'wval' : 'session_user',\n\nloaddirect : 1\n\n\n	detail	0		f	575ea2058115	575e9c45802e	1197458764
 admindb	1608275135	admindb	/weblet/fixture/cost	cost	0	bottom			0		f	575ea2058056	575e9c45801e	1291647285
-admindb	1553703189	admindb	weblet/allg/filesystem/folder/show	certs	200	bottom	showtitle : true,\nshowpath : false,\n     root : 'cert',\n  startdir: 'cert',\n\ndelbutton : 'dirselect,dirlist,dirsymbol',\n\npopupadd : 'certsadd',\n\nloaddirect : 1,\nreshowvalue : true\n		0		f	575ea2058218	575e9c458039	1459515940
-admindb	1553762960	admindb	/weblet/allg/menu/fix	all	0	selection	   schema : 'mne_application', \n    table : 'folder',\n     cols : 'name',\n showcols : 'folderid',\n    scols : 'name',\n     wcol : 'hostname',\n      wop : '=',\n     wval : window.mne_config.hostname,\n\nloaddirect : true	detail	0		f	575ea20581e4	575e9c458024	1426176253
-admindb	1554112593	admindb	weblet/allg/filesystem/folder/show	externca	400	bottom	showtitle : true,\n showpath : false,\n     root : 'cert',\n  startdir: 'extern',\n\ndelbutton : 'dirselect,dirlist,dirsymbol',\n\nvaluepre : '/sysexec/cert/ca/rdca',\n\npopupadd : 'caadd',\nreshowvalue : true		0		f	5ca1cbff0000	575e9c458039	1554107391
-admindb	1578577515	admindb	/weblet/allg/table/fix	list	0	middle	showtitle : true,\n shownull : true,\n\nvaluepre  : '/sysexec/network/rdconfig',\n\nschema : 'mne_system',\n query : 'network',\n  cols : 'available,hostname,networkid,typ,addr,mask,addr6,mask6,gateway,nameserver,search,configured',\n scols : 'networkid',\n  wcol : 'hostname',\n  wval : window.mne_config.hostname,\n  wop  : '=',\n\ntablehidecols: '0,1',\ntablerowstyle: 'enable',\ntablerowstylecol : '0',\n	bottom	0		f	575ea20581fa	575e9c458036	1433322586
 admindb	1593693079	admindb	/weblet/allg/menu/recursive	all	0	selection	schema : 'mne_base',\n query : 'lettertree',\n  cols : 'action,item,menuid,typ,pos',\n scols : 'pos',\n\nshowids : [ 'parentid' ],\n\nloaddirect : 1	detail	0		f	575ea20581ee	575e9c458010	1235986260
 admindb	1597667569	admindb	/weblet/allg/menu/fix	country	20	selection	    schema : 'mne_crm',\n     query : 'city',\n      cols : 'ucountry,name',\n  showcols : 'cityid',\n  distinct : true\n\n	detail	0		f	575ea2058023	575e9c458003	1226563112
 admindb	1598872723	admindb	/weblet/allg/repository/content/tree	selection	0	selection	\n	detail	0		f	575ea2058197	575e9c458035	1389948254
 admindb	1599565624	admindb	/weblet/allg/menu/fix	aggregat	100	selection	classname : 'tree',\n\nschema : 'mne_application',\nquery : 'query_cols',\ncols : 'qschema,query,unionnum',\nshowcols : 'queryid',\n\nwcol : 'groupby',\nwop : '=',\nwval : 'true'	detail	0		f	575ea205812c	575e9c458001	1306391863
 admindb	1347869139	admindb	/weblet/allg/menu/fix	usertable	40	selection	'classname' : 'tree',\n      schema: 'mne_application', \n    'query' : 'usertables',\n      'cols':'text',\n  'showcols':'schema,table',\n   distinct : true	detail	0	erpdb	f	575ea205815b	575e9c45800d	1347866478
-admindb	1237550887	admindb	/weblet/allg/menu/fix	all	100	selection	schema : 'mne_shipment', query : 'deliverynote', cols : 'refname,description,deliverynotenumbername', showcols : 'deliverynoteid'	detail	0		f	575ea2058031	575e9c45802a	1237495613
-admindb	1608041681	admindb	/weblet/allg/menu/fix	deliverynote	20	selection	schema   : 'mne_warehouse',\nquery    : 'purchasedelivery',\ncols     : 'vendorname,partname,deliverynotenumber',\nshowcols : 'purchasedeliveryid,partingoingid,deliverynotenumber,deliverydate,vendor,part,parttype',\ndistinct : 1,\n\nwcol : 'sortnum',\nwop  : '=',\nwval : '1'	detail	0		f	575ea2058047	575e9c458031	1261038628
-admindb	1591720200	admindb	/weblet/crm/address/country	detail	10	detail			0		f	575ea20580cb	575e9c458004	1226580663
+admindb	1440590358	admindb	/weblet/menu/select	menuselect	0	popup	schema : 'mne_application',\n query : 'menu_select',\nnoleaf : true,\nshowdynpar : ' "name" : "%menuname" '		0		f	575ea2058102	575e9c458027	1289910833
+admindb	1347866185	admindb	/weblet/allg/menu/fix	sys	30	selection	'classname' : 'tree',\n      schema: 'mne_application', \n    'query' : 'table_all',\n      'cols':'schema,table',\n  'showcols':'schema,table',\n   distinct : true	detail	0	admindb	f	575ea2058179	575e9c45800d	1308637423
 admindb	1607608370	admindb	/weblet/allg/menu/recursive	send	30	selection	schema   : 'mne_warehouse',\nquery    : 'purchase_parttree',\ncols     : 'action,item,menuid,typ,pos',\nscols    : 'pos',\ndistinct : true,\n\nwcol   : 'ordernumber,deliverydate,parentid',\nwop    : 'is not null,isnull,=',\nwval   : ",,",\n\nloaddirect : true	detail	0		f	575ea20581f3	575e9c458032	1288799887
 admindb	1607609223	admindb	/weblet/allg/menu/recursive	notsend	20	selection	schema : 'mne_warehouse',\nquery  : 'purchase_parttree',\ncols : 'action,item,menuid,typ,pos',\nscols : 'pos',\ndistinct : true,\n\nwcol   : 'orderdate,parentid',\nwop    : 'isnull,=',\nwval   : ',',\n	detail	0		f	575ea20581f1	575e9c458032	1288799490
 admindb	1605004744	admindb	/weblet/allg/table/fix	bdiarycomment	320	bottom	schema : 'mne_builddiary',\nquery : 'comment',\ntable : 'comment',\n\ncols  : 'commentid,timeid,typ,comment,important',\nscols : 'typ',\nshowids : ['timeid'],\nshowalias : ['bdtimeid'],\ndistinct : true,\n\ntablehidecols: ['commentid','timeid'],\ntablecoltype  : {  typ : 'selection' , comment : 'edit', important : 'bool' },\n\nokfunction : 'comment_mod',\nokids      : [ 'commentid'],\nokcols     : [ 'commentid','timeid','typ','comment','important'],\noktyps     : { important : 'bool'},\n\ndelids : [ 'commentid' ],\ndelconfirmids : [ 'comment' ],\n\ndefalias : { timeid : 'bdtimeid' }\n		0	erpbuilddiary	f	575ea2058181	575e9c45800f	1332428812
 admindb	1600177670	admindb	/weblet/allg/menu/fix	myopenbycustomer	0	selection	  schema : 'mne_crm', \n   query : 'offer_detail',\n    cols : 'refname,description,voffernumber',\nshowcols : 'offerid',\n   scols : '!istemplate,refname',\ndistinct : 1,\n\nwcol : 'loginname,probability,probability',\n wop : '=,<,>',\nwval : 'current_user,100,0',\n\nloaddirect : 1	detail	0		f	575ea20581eb	575e9c458017	1268223937
 admindb	1607957408	admindb	/weblet/warehouse/part/subpart	subpartdetail	0	popup			0		f	575ea205805b	575e9c458025	1258450772
 admindb	1608033265	admindb	/weblet/allg/menu/rselect	categorie	1000	bottom	schema: "mne_warehouse",\nquery: "parttree",\ntable: "parttree",\ncols: "action,item,menuid,typ,pos",\nscols: "pos",\nshowcols: "fullpath,menuid",\n\nwcol: "partid,parentid",\nwop: "=,=",\nwval: ","		0		f	575ea2058036	575e9c458025	1289825737
-admindb	1477057185	admindb	/weblet/sysadmin/domain/sogo	sogo	0	bottom	showtitle : true,\nloaddirect : 1		0		f	580a16f70000	57bab6120000	1477056247
-admindb	1478261988	admindb	/weblet/sysadmin/domain/dns/address	dnsaddress	10	bottom			0	adminsystem	f	581c7ce40000	57bab6120000	1478261988
 admindb	1601012770	admindb	/weblet/warehouse/offer/productpart	partsedit	0	popup			0		f	575ea2058026	575e9c458017	1291207348
-admindb	1605598241	admindb	/weblet/allg/table/fix	ownerref	40	bottom	schema  : 'mne_crm',\nquery   : 'personowner',\ncols    : 'ownerrefid,ownertyp,name',\nscols   : 'ownertyp,name',\nshowids : [ 'personid' ],\n\ntablehidecols : ['ownerrefid'],\n\n\n		0	adminpersonnal	f	5aabe97d0000	575e9c458020	1521215869
 admindb	1309856064	admindb	/weblet/mail/imap/mailbox	detail	0	detail	showtitle : true	middle,bottom	0		f	575ea2058039	575e9c45802f	1309798007
 admindb	1609765923	admindb	/weblet/hoai/admin/fee	detail	0	detail	schema     : 'mne_hoai',\nquery      : 'fee',\ncols       : 'year,feenameid,law,cost,startfee1,endfee1,startfee2,endfee2,startfee3,endfee3,startfee4,endfee4,startfee5,endfee5',\nscols      : 'cost',\nshowids    : ['feenameid'],\nprimarykey : ['cost'],\n\ntablehidecols : ['year','feenameid','law']	bottom	0		f	575ea2058055	575e9c45801f	1281414910
 admindb	1609768329	admindb	/weblet/hoai/admin/feeextra	feeextradetail	0	popup			0		f	575ea205803d	575e9c45801f	1281674518
@@ -17802,8 +17673,6 @@ admindb	1597663719	admindb	/weblet/allg/subweblet	partselectedit	0	popup	name : 
 admindb	1601385707	admindb	/weblet/crm/order/productdetail	productdetail	0	popup			0		f	575ea2058024	575e9c458018	1237462099
 admindb	1600333750	admindb	/weblet/crm/address/detail	addressedit	0	popup			0		f	575ea205805c	575e9c45802d	1264534631
 admindb	1600778436	admindb	/weblet/crm/offer/probability	forecast	50	bottom			0		f	575ea2058033	575e9c458017	1263285918
-admindb	1601466550	admindb	/weblet/personnal/order/producttime	timesedit	0	popup			0		f	575ea2058025	575e9c458018	1291385437
-admindb	1600865863	admindb	/weblet/personnal/offer/producttime	timesedit	0	popup			0		f	575ea205805f	575e9c458017	1291299227
 admindb	1601632748	admindb	/weblet/warehouse/order/productpart	partsedit	0	popup			0		f	575ea2058060	575e9c458018	1291386321
 admindb	1607595824	admindb	/weblet/warehouse/storage/relocate	middle	10	middle	\n	#detail	0		f	575ea20580d9	575e9c458031	1265017856
 admindb	1594392882	admindb	/weblet/crm/address/city	detail_cityselectdetail	10	popup	\n		0		f	575ea2058091	575e9c45802d	1226923538
@@ -17816,6 +17685,8 @@ admindb	1607598321	admindb	/weblet/menu/select	categorieselect_old	0	popup	schem
 admindb	1594394159	admindb	/weblet/crm/address/country	detail_cityselectdetail_countryselectdetail	10	popup			0		f	575ea20580b4	575e9c45802d	1226946381
 admindb	1603197250	admindb	/weblet/allg/table/fix	bottom	0	bottom	schema  : 'mne_shipment',\nquery   : 'deliverynoteproduct_list',\ncols    : 'cproductname,ccount,cunit',\nscols   : 'cposition',\nshowids : ['deliverynoteid']		0		f	575ea20580a4	575e9c45802a	1237495946
 admindb	1597900333	admindb	/weblet/dbadmin/weblet/detail	detail	0	detail	mainweblet : true	bottom	0		f	575ea20580cf	575e9c45801d	1206446752
+admindb	1591720200	admindb	/weblet/crm/address/country	detail	10	detail			0		f	575ea20580cb	575e9c458004	1226580663
+admindb	1601380050	admindb	/weblet/crm/order/detail	detail	0	detail	mainweblet : true	bottom	0		f	575ea20580a1	575e9c458018	1237460170
 admindb	1607962490	admindb	/weblet/warehouse/storage/relocate	relocationdetail	0	popup			0		f	575ea205807f	575e9c458025	1267558663
 admindb	1600674048	admindb	/weblet/allg/menu/fselect	detailaddselect	0	popup	schema : 'mne_crm',\n query : 'offer_detail',\n\n     cols : 'refname,description,voffernumber',\n showcols : 'offerid,name',\n distinct : 1\n		0		f	575ea20580a6	575e9c458017	1237372543
 admindb	1601384721	admindb	/weblet/allg/menu/rselect	productselect	0	popup	schema : 'mne_crm',\nquery : 'producttree',\ncols : 'action,item,menuid,typ,pos',\nscols : 'pos',\nshowcols : 'productid,item',\n\nwcol : 'parentid',\nwop : '=',\n		0		f	575ea2058071	575e9c458018	1237469640
@@ -17824,7 +17695,6 @@ admindb	1608101302	admindb	/weblet/allg/table/fix	relocation	200	bottom	tableweb
 admindb	1603355178	admindb	/weblet/allg/table/fix	middle	10	middle	 schema : 'mne_shipment', \n  query : 'invoiceproduct_list', \n   cols : 'sortcol,productname,rescount,productunit,fullnetprice,fullgrossprice,currency',\n  scols : 'cposition',\nshowids : [ 'invoiceid'],\nprimarykey : ['productname'],\nddistinct : 1,\n\ntablehidecols    : ['sortcol'],\ntablerowstyle    : ['sum'],\ntablerowstylecol : ['sortcol'],\n\n		0		f	575ea205813c	575e9c458030	1237812060
 admindb	1599116525	admindb	/weblet/basic/subweblet	repository	35	bottom	name : 'repository_reference',\n\nsubinit : { detail :\n            {\n              refid : 'personid',\n              refname : 'fullname',\n              showalias : [ 'personid' ]\n            }\n          }\n\n\n		0	erprepository	f	575ea2058142	575e9c45802e	1391757291
 admindb	1601384570	admindb	/weblet/crm/offer/productdetail	productdetail	0	popup			0		f	575ea205812f	575e9c458017	1237367720
-admindb	1475159218	admindb	/weblet/sysadmin/share/detail	detail	0	detail	showtitle : true	bottom	0		f	575ea20581e1	575e9c458024	1426176186
 admindb	1604401066	admindb	/weblet/allg/table/filter	projectbystep	35	bottom	schema   : 'mne_personnal',\nquery    : 'timeorder',\ncols     : 'sortcol,corderid,productname,productstep,duration,costskill,costperson',\nscols    : 'sortcol,productname,productstep',\nshowids  : ['orderid'],\ndistinct : true,\n\ntablehidecols    : ['sortcol','corderid'],\ntablerowstyle    : ['sum'],\ntablerowstylecol : ['sortcol']		0		f	575ea2058135	575e9c45800f	1301585163
 admindb	1604400844	admindb	/weblet/allg/table/filter	projectbyproduct	30	bottom	 schema : 'mne_personnal', query : 'timeorder',\n   cols : 'sortcol,corderid,productname,duration,costskill,costperson',\n  scols : 'sortcol,productname',\nshowids : ['orderid'],\n\ndistinct : true,\n\n    tablehidecols: ['sortcol','corderid'],\n    tablerowstyle: ['sum'],\ntablerowstylecol : ['sortcol'],\n\n		0		f	575ea2058128	575e9c45800f	1301583601
 admindb	1604400940	admindb	/weblet/allg/table/filter	projectbyperson	20	bottom	schema    : 'mne_personnal',\nquery     : 'timeorder',\ncols      : 'sortcol,corderid,orderdescription,fullname,date,duration,costskill,costperson',\nscols     : 'sortcol,fullname,date',\nshowids   : ['orderid', 'sortcolInput'],\nshowalias : ['orderid', '#1'],\n\n\n    tablehidecols: ['sortcol','corderid'],\n    tablerowstyle: ['sum'],\ntablerowstylecol : ['sortcol']		0		f	575ea2058134	575e9c45800f	1301585256
@@ -17838,19 +17708,18 @@ admindb	1601637888	admindb	/weblet/allg/file/list	file	130	bottom	showids : ['se
 admindb	1603117907	admindb	/weblet/crm/order/productlist	product	10	bottom	loaddirect : 1	#projectresult,#orderaccounting,#time,#parts	0		f	575ea2058180	575e9c458018	1237461953
 admindb	1591257211	admindb	/weblet/allg/table/fix	access	0	bottom	 schema : 'mne_application',\n  query : 'procedure_access',\n   cols : 'schema,fullname,user,privilege',\nshowids : [ 'schema', 'specific_name'],\n\ntablehidecols : [ 'schema', 'fullname' ],\n tablecoltype : { user : 'text' },\n\n  okschema : 'mne_catalog',\nokfunction : 'pgplsql_proc_access_add',\n    okcols : [ 'schema', 'fullname', 'user' ],\n\n  delfunction : 'pgplsql_proc_access_del',\n      delcols : [ 'schema', 'fullname', 'user' ],\ndelconfirmids : [ 'user' ],\n\nloaddirect : 1		0		f	575ea205813b	575e9c45801a	1222509985
 admindb	1603356197	admindb	/weblet/allg/table/fix	deliverynotes	15	bottom	schema  : 'mne_shipment',\nquery   : 'deliverynote_detail',\ncols    : 'deliverynoteid,invoiceid,deliverynotenumber,description,modifydate,ordernumber,company,contactname,ownername',\nscols   : 'modifydate,deliverynotenumber',\nshowids : ['invoiceid'],\n\n\ntablehidecols : ['deliverynoteid','invoiceid'],\n\ndetailscreen : 'shipment_deliverynote',\ndetailvalues : { deliverynoteid : 'deliverynoteid' }\n		0		f	575ea205816c	575e9c458030	1387716318
-admindb	1601538916	admindb	/weblet/crm/company/detail	refselectcompany	0	popup			0		f	575ea20581b4	575e9c458018	1386965749
 admindb	1608207853	admindb	/weblet/allg/table/fix	deliverynotes	10	bottom	schema : 'mne_warehouse',\n query : 'purchasedelivery',\n  cols : 'sortnum,purchasedeliveryid,purchaseid,partid,documentnumber,deliverynotenumber,partname,deliverydate,vendor,count,rcount,scount,ordernumber,crmordernumber,crmorder',\n scols : 'partname,sortnum,deliverydate',\nshowids : ['ordernumber'],\nprimarykey : ['sortnum', 'purchasedeliveryid'],\ndistinct : 1,\n\ntablehidecols    : ['sortnum','purchasedeliveryid','purchaseid','partid'],\ntablerowstyle    : ['sum'],\ntablerowstylecol : ['sortnum'],\n\nshowdynpar   : ['ordernumber'],\nloaddirect   : true,\n\nrowselector : 'tbody tr.sum1',\n\ndetailweblet : 'detail'		0		f	575ea205814b	575e9c458033	1291022491
 admindb	1607610335	admindb	/weblet/allg/table/fix	middle	10	middle	schema  : 'mne_warehouse',\nquery   : 'purchase',\n  cols  : 'purchaseid,createdate,partname,rescount,vendorname,ownername,delivered',\n scols  : 'createdate',\nshowids : [ 'vendorid', 'ordernumber'],\n\ntablehidecols : ['purchaseid'],\ndelbutton : ['detaildel'],\n\ndetailweblet : 'detail'		0		f	575ea2058152	575e9c458032	1288861254
 admindb	1609756697	admindb	/weblet/allg/table/fix	bottom	0	bottom	tableweblet : '/weblet/mail/imap/scantable',\nurl         : '/db/utils/imap/rescan.json',\nshowids     : ['imapmailboxid'],\n		0		f	575ea2058146	575e9c45802f	1310733433
 admindb	1607937910	admindb	/weblet/allg/table/fix	delivery	20	bottom	schema  : 'mne_warehouse',\nquery   : 'purchasedelivery',\ncols    : 'sortnum,purchasedeliveryid,partid,documentnumber,deliverynotenumber,partname,deliverydate,vendor,count,rcount,scount,ordernumber',\nscols   : 'partname,sortnum,deliverydate',\nshowids : ['purchaseid'],\nprimarykey : ['purchasedeliveryid'],\n\ntablehidecols : ['sortnum','purchasedeliveryid','partid','documentnumber'],\ntablerowstyle: ['sum'],\ntablerowstylecol : ['sortnum'],\n\ndelconfirmids : ['documentnumber'],\ndetailweblet : 'deliverydetail',\n\nloaddirect : true,\n\n		0		f	575ea205814f	575e9c458032	1288941845
 admindb	1608024621	admindb	/weblet/allg/table/fix	storagelocation	500	bottom	tableweblet : '/weblet/warehouse/part/storagelocationtable',\n\nschema     : 'mne_warehouse',\nquery      : 'partstoragelocation',\ncols       : 'partid,partstoragelocationid,storagelocationid,storageid,partoutgoingid,partingoingid,vendor,deliverynotenumber,part,parttype,count,rcount,storagename,storagelocationname,outbounding',\nshowids    : ['partid'],\nprimarykey : ['partstoragelocationid'],\n\ntablehidecols : ['partid','partstoragelocationid','storagelocationid','storageid','partoutgoingid','partingoingid'],\n\ndetailweblet : 'relocationdetail',	#detail	0		f	575ea2058164	575e9c458025	1259923336
-admindb	1605519543	admindb	/weblet/dbadmin/user/group	groups	20	bottom			0	adminpersonnal	f	575ea2058183	575e9c458020	1380116889
-admindb	1605543747	admindb	/weblet/personnal/person/owndata	owndata	0	bottom	loaddirect : true	#detail	0	adminpersonnal	f	575ea2058188	575e9c458020	1262674874
 admindb	1605275814	admindb	/weblet/allg/etc/selectday	selectday	0	popup			0		f	575ea20580d5	575e9c458020	1250511926
 admindb	1605607011	admindb	/weblet/allg/table/fix	skill	90	bottom	schema     : 'mne_personnal',\nquery      : 'personskill',\ntable      : 'personskill',\ncols       : 'personskillid,skillid,rating,fullname,skilltext,ratingtext',\nshowids    : ['personid'],\nprimarykey : ['personskillid'],\n\ntablehidecols : ['personskillid','skillid','rating','fullname'],\n\nokids : ['personskillid'],\n		0		f	575ea205818e	575e9c458020	1250507831
 admindb	1347866140	admindb	/weblet/allg/table/fix	foreign	30	bottom	schema : 'mne_application',\n query : 'table_fkeys',\n distinct : true,\n cols : 'schema,table,name,rschema,rtable,text_de,text_en,custom',\n\n tablehidecols: [ 'schema', 'table' ],\n\nshowids  : [  'schema',  'table'  ],\n \ndetailweblet : 'foreigndetail'		0	admindb	f	575ea2058178	575e9c45800d	1221555822
 admindb	1605003333	admindb	/weblet/allg/table/fix	bdcomment	0	popup	schema : 'mne_builddiary',\nquery : 'time_summary',\n\ncols : 'fullname,starttime,comment',\n\nshowids : ['orderid', 'personid' ]\n		0		f	575ea20581ad	575e9c45800f	1401454443
 admindb	1601538954	admindb	/weblet/crm/person/detail	refselectperson	0	popup			0		f	575ea2058170	575e9c458018	1386965765
+admindb	1597657792	admindb	/weblet/allg/table/select	search	90	selection	schema : 'mne_application', \n query : 'weblet_detail',\n\n    cols : 'htmlcomposeid,id,path,initpar',\nshowcols : 'htmlcomposeid',\n\ntablehidecols : [ 'htmlcomposeid' ],\n\nselectok : (res) => { var self = s.composeparent.obj.weblets[s.id];\n                      var i; for ( i in res.ids ) self.obj.run.values[res.ids[i]] = res.values[0][i];\n                      self.newselect = true }\n	detail	0		f	575ea205819a	575e9c45801d	1400059224
+admindb	1597906275	admindb	/weblet/allg/file/list	file	30	bottom	refidname : 'personid',\nshowids : ['refid'],\nshowalias : ['personid'],\n\n\n		0	erpcrm	f	575ea2058187	575e9c45802e	1310562237
 admindb	1607587850	admindb	/weblet/allg/table/fix	storagelocation	100	bottom	schema : 'mne_warehouse',\n query : 'storagelocation',\ncols : 'storagelocationid,storageid,storagedescription,name,rstoragelocationtypid,inherited,x,y,z,stocktime,releasetime,storagelocationtypid',\nscols : 'x,y,z',\n\ntablehidecols : ['storagelocationid','storageid','storagedescription'],\n\nshowids : ['storageid'],\nprimarykey : ['storagelocationid'],\n\ntablecoltype  : { name : 'text', x : 'text', y : 'text', z : 'text', stocktime : 'text', releasetime : 'text', storagelocationtypid : 'selection' },\n\nokschema : 'mne_warehouse',\noktable  : 'storagelocation',\nokids    : ['storagelocationid'],\nokcols   : ['storagelocationid', 'storageid', 'name', 'x', 'y', 'z', 'stocktime', 'releasetime', 'storagelocationtypid' ],\n\ndelschema     : 'mne_warehouse',\ndeltable      : 'storagelocation',\ndelids        : ['storagelocationid'],\ndelconfirmids : ['name'],\n\nloaddirect : 1\n		0		f	575ea20581a6	575e9c458015	1258443581
 admindb	1608032062	admindb	/weblet/allg/table/fix	relocation	600	bottom	tableweblet  : '/weblet/warehouse/storage/relocationtable',\n\nschema        : "mne_warehouse",\nquery         : "relocation",\ncols          : 'partingoingid,relocationid,vendor,deliverynotenumber,oldstoragename,oldstoragelocationname,newstoragename,newstoragelocationname,part,parttype,sequence,count,fullname',\nshowids       : ['partid'],\nprimarykey    : [ 'relocationid'],\n\ntablehidecols : ['partingoingid','relocationid'],\ndetailweblet  : 'relocationdetail',\n	#detail	0		f	575ea20581a7	575e9c458025	1267558776
 admindb	1600356123	admindb	/weblet/crm/offer/productlist	poptions	20	bottom	showalias : [ 'offerid', '#option']		0		f	575ea20581a3	575e9c458017	1237371709
@@ -17858,16 +17727,14 @@ admindb	1604669773	admindb	/weblet/allg/table/dynamic	quartal	120	bottom	notdepe
 admindb	1607598336	admindb	/weblet/menu/select	partselect_old	0	popup	schema : 'mne_warehouse',\nquery  : 'parttree_havevendor',\npopup  : 'partselectedit',\n\nresize : true\n		0		f	575ea205800f	575e9c458032	1270104635
 admindb	1389087833	admindb	/weblet/menu/select	partselect	0	popup	schema : 'mne_warehouse',\nquery  : 'parttree',\nresize : true		0		f	575ea2058193	575e9c458033	1389087833
 admindb	1599730746	admindb	/weblet/crm/dav/card	carddav	500	bottom	showalias : [ 'personid', '() => { return MneConfig.username; }' ]		0	erpcrm	f	575ea20581bf	575e9c45802e	1410784521
-admindb	1474373395	admindb	/weblet/dbadmin/user/passwd	passwd	20	bottom	 showtitle : true,\n  okschema : 'mne_system',\nokfunction : 'userpasswd',\n\nignore_notdefined : true,\n	bottom:detail	0		f	57beb1880000	57beb13a0000	1472115080
 admindb	1598872710	admindb	/weblet/allg/repository/content/log	log	0	detail	\n		0		f	575ea20581c8	575e9c458035	1390992137
 admindb	1427952927	admindb	/weblet/basic/count	count	0	count			0		f	575ea20581e2	575e9c458013	1427952927
 admindb	1591603931	admindb	/weblet/dbadmin/menu/detail	bottom	0	bottom			0		f	575ea205811a	575e9c458027	1289901272
-admindb	1597663676	admindb	/weblet/allg/subweblet	personselectadd	0	popup	name : 'crm_person',\n\nwidth: 80,\nheight: 80,\n\n     templ : '/templ/allg/ht',\n  templmap : { top : 'detail', bottom : 'bottom' },\ninitparsub : { orders : 'loaddirect : false', sharepasswd : 'loaddirect : true' },\n\n\n\n		0		f	575ea20581be	575e9c458024	1430201297
+admindb	1601538916	admindb	/weblet/crm/company/detail	refselectcompany	0	popup			0		f	575ea20581b4	575e9c458018	1386965749
 admindb	1597933921	admindb	/weblet/allg/table/fix	orders	5	bottom	schema : 'mne_crm',\nquery  : 'personorder',\n\ncols : 'orderid,ordernumber,description,customer,contact,owner',\nscols : 'ordernumber',\n\nwcol : 'open,closed', \n wop : '=,=',\nwval : 'true,false',\n\nshowids : [ 'personid' ],\n\ntablehidecols : [ 'orderid' ],\n\ndetailscreen : "crm_order",\ndetailvalues : { orderid : "orderid" },\n\nloaddirect : 1\n\n\n		0	erpcrm	f	575ea20581c4	575e9c45802e	1410010243
 admindb	1598872302	admindb	/weblet/basic/subweblet	content	0	bottom	name : 'repository_content',\nsubinit : { selection : { tesinit : true } },\n\nsubdepend : { 'log' : '#files,#interest,#send', 'interest' : '#files,#interest,#send' },\n\nloaddirect : true\n		0		f	575ea20581cb	575e9c458022	1389947182
 admindb	1598872514	admindb	/weblet/allg/repository/admin/fileoverview	files	100	bottom	\n	#interest,#content,#send	0		f	575ea20581cc	575e9c458022	1415612649
 admindb	1547548771	admindb	/weblet/dbadmin/table/fkey	foreigndetail	10	popup			0		f	575ea2058137	575e9c45800d	1221728783
-admindb	1478009733	admindb	/weblet/allg/table/select	personselect	0	popup	schema : 'mne_system',\nquery  : 'personsharepasswd',\n\n  cols : 'personid,refname,fullname',\n scols : 'refname,fullname',\nselcol : 'fullname',\n\ntablehidecols : '0',\n\npopup : 'personselectadd',\nclosepopupok : false\n\n		0		f	575ea20581e3	575e9c458024	1426266993
 admindb	1420729368	admindb	/weblet/dbadmin/table/content	content	100	bottom	showdynpar : '"schema" : "schema", "table" : "table"',\nshowdynparweblet : 'detail',\n\npopup : 'contentedit',\nno_vals : false,\nnotclose : true,\n\nignore_notdefined : true		0		f	575ea20581d8	575e9c45800d	1221469373
 admindb	1466414716	admindb	/weblet/basic/message	message	0	popup			0		f	575ea2058010	575e9c458013	1427952906
 admindb	1598872695	admindb	/weblet/allg/repository/admin/sendoverview	send	300	bottom	\n	#files,#interest,#content	0		f	575ea20581cf	575e9c458022	1394186821
@@ -17876,59 +17743,48 @@ admindb	1609764066	admindb	/weblet/allg/table/fix	feeextraglobal	30	bottom	schem
 admindb	1608193764	admindb	/weblet/allg/table/fix	deliverynotes	10	bottom	tableweblet : '/weblet/warehouse/purchase/invoicedeliverytable',\n\nschema     : 'mne_warehouse',\nquery      : 'purchaseinvoicedelivery',\ntable      : 'purchaseinvoicedelivery',\ncols       : 'purchaseinvoicedeliveryid,part,deliverynotenumber,ordernumber,orderdate,crmordernumber,crmorder',\nscols      : 'deliverynotenumber',\nshowids    : ['purchaseinvoiceid'],\nprimarykey : [ 'purchasedeliveryid' ],\n\n\ntablehidecols : ['purchaseinvoicedeliveryid'],\n\nokids         : ['purchaseinvoicedeliveryid'],\nokcols        : [ 'purchaseinvoicedeliveryid', 'purchasedeliveryid', 'purchaseinvoiceid'],\ndelconfirmids : ['deliverynotenumber'],\n\ndelbutton     : ['add'],\n	#opendelivery	0		f	575ea20581d7	575e9c458026	1322473121
 admindb	1597933958	admindb	/weblet/allg/table/fix	offers	6	bottom	schema : 'mne_crm',\nquery  : 'personoffer',\n\ncols : 'offerid,offernumber,description,version,customer,contact,owner',\nscols : 'offernumber',\n\nwcol : 'probability,probability', wop : '!=,!=', wval : '100,0',\nshowids : [ 'personid' ],\n\ntablehidecols : [ 'offerid' ],\n\ndetailscreen : "crm_offer",\ndetailvalues : { offerid : "offerid" },\n\n		0	erpcrm	f	575ea20581d1	575e9c45802e	1410010219
 admindb	1598967703	admindb	/weblet/allg/table/fix	order	4	bottom	schema : 'mne_crm',\nquery  : 'order_detail',\n\ncols : 'orderid,ordernumber,description',\nscols : 'ordernumber',\n\nwcol : 'open,closed', \n wop : '=,=',\nwval : 'true,false',\n\n  showids : [ 'refid' ],\nshowalias : [ 'companyid'],\n\ntablehidecols : ['orderid'],\n\ndetailscreen : "crm_order",\ndetailvalues : { orderid : "orderid" }\n\n\n		0		f	575ea20581c6	575e9c45802d	1409932985
-admindb	1472115139	admindb	/weblet/crm/address/city/detail	cityedit	0	popup	showtitle : true, ignore_notdefined : true		0		f	57beb1c30000	57beb13a0000	1472115139
-admindb	1472115148	admindb	/weblet/allg/etc/color	color	0	popup	schema : 'mne_personnal',\nquery : 'personowndata'		0		f	57beb1cc0000	57beb13a0000	1472115148
-admindb	1472115160	admindb	/weblet/crm/address/country/detail	countryedit	0	popup	showtitle : true, ignore_notdefined : true		0		f	57beb1d80000	57beb13a0000	1472115160
-admindb	1472115177	admindb	/weblet/allg/calendar/select/day	selectday	0	popup	showtitle : true		0		f	57beb1e90000	57beb13a0000	1472115177
-admindb	1472115525	admindb	/weblet/crm/person/detail	detail	0	detail	showtitle : true,\n\n   addtitle : { 'de' : 'Benutzer hinzufügen', 'en' : 'add user'    }, \n   modtitle : { 'de' : 'Benutzer bearbeiten', 'en' : 'modify user' },\n   deltitle : { 'de' : 'Benutzer <$1> wirklich löschen',    'en' : 'delete user <$1> really' },\n\n   refidobj : 'window.mne_config',\n  refidname : 'uowncompanyid',\nrefnamename : 'uowncompany'\n\n	bottom	0		f	57beb1ae0000	57beb13a0000	1472115118
 admindb	1607958324	admindb	/weblet/allg/table/fix	subpart	200	bottom	schema  : 'mne_warehouse', \nquery   : 'partsubpart', \ncols    : 'partsubpartid,partid,subpartid,categorie,count,name',\nscols   : 'categorie,name',\nshowids : ['partid'],\ndelconfirmids : [ 'name'],\n\ntablehidecols : ['partsubpartid','partid','subpartid' ], \n\ndetailweblet : 'subpartdetail'		0		f	575ea2058012	575e9c458025	1258450736
 admindb	1473406809	admindb	/weblet/allg/menu/fix	bycompany	60	selection	schema   : 'mne_crm',\nquery : 'person_detail', \ncols     : 'refname,fullname',\nshowcols : 'personid'	detail	0	erpcrm	f	575ea2058080	575e9c45802e	1324396275
-admindb	1597657792	admindb	/weblet/allg/table/select	search	90	selection	schema : 'mne_application', \n query : 'weblet_detail',\n\n    cols : 'htmlcomposeid,id,path,initpar',\nshowcols : 'htmlcomposeid',\n\ntablehidecols : [ 'htmlcomposeid' ],\n\nselectok : (res) => { var self = s.composeparent.obj.weblets[s.id];\n                      var i; for ( i in res.ids ) self.obj.run.values[res.ids[i]] = res.values[0][i];\n                      self.newselect = true }\n	detail	0		f	575ea205819a	575e9c45801d	1400059224
-admindb	1597906275	admindb	/weblet/allg/file/list	file	30	bottom	refidname : 'personid',\nshowids : ['refid'],\nshowalias : ['personid'],\n\n\n		0	erpcrm	f	575ea2058187	575e9c45802e	1310562237
 admindb	1600075997	admindb	/weblet/personnal/product/time	timemanagementoptedit	0	popup	schema : "mne_personnal",\nquery  : "producttimeopt",\ntable : "producttimeopt",\n\nokfunction  : 'producttimeopt_ok',\ndelfunction : 'producttimeopt_del'\n		0		f	575ea2058209	575e9c458019	1348129737
 admindb	1600767476	admindb	/weblet/crm/address/city	refselectcompany_cityselectdetail	0	popup			0		f	575ea205817e	575e9c458017	1387315640
-admindb	1551269671	admindb	weblet/allg/filesystem/file/add	certadd	0	popup	         root : 'cert',\n diraddaction : '',\n dirdelaction : '',\nfileaddaction : '',\n     mvaction : ''		0		f	575ea2058213	575e9c458038	1457711091
-admindb	1553268127	admindb	/weblet/allg/table/fix	devices	0	left	showtitle : true,\n shownull : true,\n\n         valuepre  : '/sysexec/network/rdvalues',\n     valuepreerror : '/db/utils/connect/func/execute.xml',\nvaluepreerrorparam : { schema : 'mne_system', name : 'network_del', 'par0' : window.mne_config.hostname, sqlend : 1  },\n\nschema : 'mne_system',\n table : 'netdevice',\n  cols : 'netdeviceid,addr,mask,broadcast,modifydate',\n scols : 'netdeviceid',\n\n wcol : 'hostname',\n wop  : '=',\n wval : window.mne_config.hostname\n		0		f	575ea205820a	575e9c458037	1434350568
 admindb	1589965925	admindb	/weblet/dbadmin/query/column	column	10	bottom	loaddirect : 1		0		f	575ea2058207	575e9c458001	1210872151
 admindb	1608132956	admindb	/weblet/allg/menu/fix	company	100	selection	schema   : 'mne_warehouse',\nquery    : 'purchaseinvoice',\ncols     : 'year,company,invoicenumber', \nshowcols : 'purchaseinvoiceid'	detail	0		f	575ea2058157	575e9c458026	1322735816
 admindb	1591789744	admindb	/weblet/crm/address/country	detail_countryselectdetail	10	popup			0		f	575ea20581fd	575e9c458003	1226582317
 admindb	1593768601	admindb	/weblet/allg/letter/detail	detail	0	detail			0		f	575ea20581f6	575e9c458010	1235986458
 admindb	1597923073	admindb	/weblet/allg/file/list	file	30	bottom	showids : ['refcompanyid'],\nshowalias : ['companyid'],\n\nrefidname : 'companyid'\n		0		f	575ea2058206	575e9c45802d	1309257155
 admindb	1601275004	admindb	/weblet/allg/file/list	file	130	bottom	showids : ['secondrefid'],\nshowalias : ['offerid'],\n\nrefidname : 'refid',\n defalias : { 'secondrefid' : 'offerid' }\n		0		f	575ea2058208	575e9c458017	1309266342
-admindb	1553703199	admindb	weblet/sysadmin/cert/key/table	keys	300	bottom	showtitle : true,\n showpath : false,\n     root : 'cert',\n  startdir: 'key',\n\ndelbutton : 'dirselect,dirlist,dirsymbol',\n\npopupadd : 'certsadd',\nreshowvalue : true		0		f	575ea2058217	575e9c458039	1459840726
 admindb	1608287814	admindb	/weblet/warehouse/purchase/delivery	detail_deliverynotenumberselectdetail	0	popup			0		f	5c751f140000	575e9c45801e	1551179540
 admindb	1600070668	admindb	/weblet/personnal/product/time	timemanagementedit	0	popup			0		f	575ea205817c	575e9c458019	1250839936
 admindb	1605261075	admindb	/weblet/personnal/time/monthreport	month	10	bottom	loaddirect : true		0		f	575ea205820c	575e9c45800f	1301675167
-admindb	1516288443	admindb	/weblet/menu/select	folderselect	0	popup	action : '/file/ls.xml',\nreadparam : { 'rootInput.old' : '"webcontent"', \n               'dirInput.old' : 'parentid',\n          'pointdirInput.old' : '""'\n},\n\naddaction : '/file/mkdir.xml',\naddparam  : { 'rootInput.old' : '"webcontent"', \n               'filenameInput.old' : 'this.act_values.parentid',\n               'filenameInput' : 'this.obj.inputs.item.value',\n               'nosql'         : '1'\n},\ndelaction : '/file/rmdir.xml',\ndelparam  : { 'rootInput.old' : '"webcontent"', \n               'dirInput.old' : 'this.act_values.parentid',\n               'nosql'         : '1'\n},\n\nloaddirect  : true,\nshowsubmenu : true,\nnoleaf      : 1\n		0		f	575ea205820b	575e9c458038	1454075213
 admindb	1608187716	admindb	/weblet/allg/etc/selectday	selectday	10	popup			0		f	575ea205802b	575e9c458026	1326475665
-admindb	1605543880	admindb	/weblet/allg/user/passwd	passwd	30	bottom			0	adminpersonnal	f	575ea2058189	575e9c458020	1380173784
 admindb	1609763997	admindb	/weblet/allg/table/fix	feeextra	20	bottom	schema : 'mne_hoai',\nquery  : 'feeextra',\n\nshowids : ['law'],\nshowalias : ['feenameid'],\n\ncols   : 'feeextraid,name,text,productnumber,productname',\nscols  : 'name',\n\ntablehidecols : ['feeextraid','name'],\ndetailweblet  : 'feeextradetail' 		0		f	575ea2058022	575e9c45801f	1281674463
 admindb	1599731842	admindb	/weblet/allg/vcard/import	vcardimport	10	popup	map : 'fullname: "company", firstname : "", lastname : "", telhome : "", telwork : "telefon", telnatel : "" '		0		f	575ea205802a	575e9c45802d	1280052767
 admindb	1600687997	admindb	/weblet/crm/reference/select	refselect	0	popup	wcol : 'refid,ref',\nwval : ',order',\nwop  : '<>,<>'		0		f	575ea205816f	575e9c458017	1387315626
 admindb	1605262999	admindb	/weblet/allg/table/fix	bdiarycomentoverview	340	bottom	notdepend : true,\nwhereweblet : '/weblet/builddiary/commentfilter',\nschema : 'mne_builddiary',\nquery : 'time_summary',\n\ncols  : 'ordernumber,orderdescription,starttime,weather,temperature,typtext,role,fullname,company,comment,important',\nscols : 'starttime',\nprimarykey : ['ordernumber', 'starttime', 'fullname'],\n\nwcol : 'typtext,comment',\nwop  : 'is not null,<>',\nwval : ',',		0	erpbuilddiary	f	575ea2058017	575e9c45800f	1332751286
+admindb	1605543747	admindb	/weblet/personnal/person/owndata	owndata	0	bottom	loaddirect : true	#detail	0	admerppersonnal	f	575ea2058188	575e9c458020	1262674874
+admindb	1599729835	admindb	/weblet/allg/user/passwd	passwd	410	bottom	\n		0	admerppersonnal	f	57d266100000	575e9c45802e	1473406480
 admindb	1603107898	admindb	/weblet/allg/table/fix	deliverynotes	400	bottom	schema  : 'mne_shipment',\nquery   : 'deliverynote_detail',\ncols    : 'deliverynoteid,deliverynotenumber,delivered,createdate,ownername',\nscols   : 'deliverynotenumber',\nshowids : ['orderid'],\n\nprimarykey : ['deliverynoteid'],\n\ntablehidecols : ['deliverynoteid'],\n\ndelbutton : 'ok',\n\ndetailscreen : "shipment_deliverynote",\ndetailvalues : { deliverynoteid : "deliverynoteid" }\n\n\n\n		0	erpshipment	f	575ea20581ce	575e9c458018	1417448613
 admindb	1603108033	admindb	/weblet/allg/table/fix	invoices	410	bottom	schema : 'mne_shipment',\nquery  : 'invoice_detail',\n\ncols : 'invoiceid,num,invoicetime,paysum,invoicecompany,invoicecontact,invoicepaid,ownername',\nscols: 'invoicetime,num',\n\ntablehidecols : ['invoiceid'],\n\nshowids : ['orderid'],\n\ndetailscreen : 'shipment_invoice',\ndetailvalues : { invoiceid : "invoiceid" }\n		0	erpshipment	f	575ea20581ca	575e9c458018	1417502635
 admindb	1603291424	admindb	/weblet/shipment/invoice	detail	0	detail	mainweblet : true	middle,bottom	0		f	575ea205808f	575e9c458030	1237808327
 admindb	1608102923	admindb	/weblet/warehouse/storage/outgoing	detail	0	detail		bottom	0		f	575ea2058067	575e9c45802c	1267089036
-admindb	1599729835	admindb	/weblet/allg/user/passwd	passwd	410	bottom	\n		0	adminpersonnal	f	57d266100000	575e9c45802e	1473406480
-admindb	1473405924	admindb	/weblet/allg/menu/fix	havelogin	10	selection	schema : 'mne_crm',  \n query : 'person_detail',\n\n     cols : 'letterlastname,fullname',\n showcols : 'personid',\n\nwcol : 'loginname',\nwop  : '^0=',\nwval : ''	detail	0		f	57d196640000	57beb13a0000	1473353316
 admindb	1607952778	admindb	/weblet/allg/table/fix	purchase	0	bottom	schema     : 'mne_warehouse',\nquery      : 'purchase',\ncols       : 'purchaseid,orderdate,vendorname,count,packagesize,rescount,vendorordernumber',\nscols      : 'orderdate,vendorname',\nshowids    : ['partid'],\nprimarykey : [ 'purchaseid'],\n\ntablehidecols : ['purchaseid'],\n\ndetailscreen    : 'warehouse_purchase',\ndetailvalues    : { purchaseid : 'purchaseid', partid : 'partid', part : 'part', parttype : 'parttype', partname : 'partname' },\n		0		f	575ea20580f7	575e9c458025	1288786588
 admindb	1597658001	admindb	/weblet/allg/subweblet	detailordernumberedit	0	popup	name   : 'warehouse_purchase',\n\ntempl  : '/templ/allg/hh',\ntemplmap : { top : 'detail', bottom : 'middle' },\n\ninitparsub : { detail : 'autosend : true' },\n\nwidth  : 75,\nheight : 75,\n\n		0		f	575ea2058032	575e9c458033	1328016321
-admindb	1453805096	admindb	/weblet/sysadmin/apache2/detail	detail	0	detail	showtitle : true		0		f	575ea205820e	575e9c458038	1453800703
-admindb	1453805129	admindb	/weblet/sysadmin/apache2/mod/table	module	100	bottom	showtitle : true		0		f	575ea205820f	575e9c458038	1453298868
-admindb	1453807783	admindb	/weblet/sysadmin/apache2/site/table	site	0	bottom	showtitle : true		0		f	575ea2058210	575e9c458038	1453807783
-admindb	1453824740	admindb	/weblet/sysadmin/apache2/site/detail	sitedetail	0	popup	showtitle : true		0		f	575ea2058211	575e9c458038	1453824740
-admindb	1462345648	admindb	weblet/allg/filesystem/folder/show	cert	200	bottom	showtitle : true,\nshowpath : false,\n     root : 'cert',\n  startdir: 'cert',\n\ndelbutton : 'dirselect,dirlist,dirsymbol',\n\nfiledelaction : '/sysexec/cert/http/rmcert',\n\npopupadd: 'certadd'		0		f	575ea2058214	575e9c458038	1457702905
-admindb	1553157287	admindb	/weblet/sysadmin/share/table	shares	10	bottom	schema : 'mne_system',\nquery  : 'shares',\n\ncols : 'sharesid,folderid,personid,fullname,readwrite,company',\nscols : 'fullname',\n\ntablehidecols : '0,1,2',\ntablecoltype  : ',,,,bool,',\n\noktable : 'shares',\nokids : 'sharesid',\nokcols : ',,,,readwrite,',\n\nshowdynpar : { "folderidInput.old" : "folderid" },\nholddynparvalues : 1,\n\nignore_notdefined : 1,\n\npopup : 'personselect',\n\nloaddirect : true\n\n		0		f	575ea20581f7	575e9c458024	1426265949
 admindb	1599838584	admindb	/weblet/crm/product/price	price	10	bottom	loaddirect : true		0		f	575ea20580af	575e9c458019	1236954541
 admindb	1603454894	admindb	/weblet/shipment/invoiceauto	detail	0	detail		bottom	0		f	575ea205804a	575e9c45802b	1245327032
 admindb	1603445016	admindb	/weblet/shipment/invoicecond	detail	0	detail			0		f	575ea2058048	575e9c458005	1237819838
 admindb	1605277148	admindb	/weblet/crm/person/detail	detail	0	detail	mainweblet : true,\ndelbutton : ['vcard'],\ndefvalues : { refid : MneConfig.uowncompanyid, refname : MneConfig.uowncompany },	bottom	0		f	575ea2058005	575e9c458020	1248768718
 admindb	1604905362	admindb	/weblet/builddiary/dayreport	builddiary	0	detail		bottom	1	erpbuilddiary	f	575ea2058150	575e9c45800f	1330701065
-admindb	1547628453	admindb	/weblet/menu/select	folderselect	0	popup	action : '/file/ls.xml',\nreadparam : { 'rootInput.old' : '"admin"', \n               'dirInput.old' : 'parentid',\n          'pointdirInput.old' : '""'\n},\n\naddaction : '/file/mkdir.xml',\naddparam  : { 'rootInput.old'  : '"admin"', \n               'dirInput.old'  : 'this.act_values.parentid',\n               'filenameInput' : 'this.obj.inputs.item.value',\n               'nosql'         : '1'\n},\nmodaction : '/file/mv.xml',\nmodparam  : { 'rootInput.old'      : '"admin"', \n               'dirInput.old'      : '( this.act_values.menuparentid == null ) ? "" : this.act_values.menuparentid',\n               'filenameInput.old' : 'this.act_values.name',\n               'filenameInput'     : 'this.obj.inputs.item.value',\n               'nosql'             : '1'\n},\ndelaction : '/file/rmdir.xml',\ndelparam  : { 'rootInput.old' : '"admin"', \n               'dirInput.old' : 'this.act_values.menuid',\n               'nosql'        : '1'\n},\n\nloaddirect  : true,\nshowsubmenu : true,\nnoleaf      : 1\n		0		f	575ea205820d	575e9c458024	1426176235
 admindb	1610111240	admindb	/weblet/allg/table/fix	middle	100	middle	schema        : 'mne_warehouse',\nquery         : 'purchase', \ncols          : 'purchaseid,ordernumber,partname,vendorname,count,packagesize,rescount,ownername,delivered,crmordernumber,crmorder',\nshowids       : ['ordernumber'],\nprimarykey    : [ 'purchaseid'],\ntablehidecols : ['purchaseid'],\n		0		f	575ea205813d	575e9c458033	1291021670
 admindb	1610121067	admindb	/weblet/main/menu	menu	0	menu	weblet : 'detail'	detail	0		f	575e9c458014	575e9c458013	1585893280
 admindb	1610520018	admindb	/weblet/allg/table/fix	vendor	100	bottom	schema        : 'mne_warehouse',\nquery         : 'partvendor',\ncols          : 'partvendorid,vendor,ordernumber,ordertext,packagesize,price,currency,preferred,leadtime',\nshowids       : ['partid'],\nprimarykeys   : ['partvendorid'],\n\ntablehidecols : [ 'partvendorid' ],\n\ndetailweblet : 'vendordetail'		0		f	575ea20580d8	575e9c458025	1257425740
+admindb	1605543880	admindb	/weblet/allg/user/passwd	passwd	30	bottom			0	admerppersonnal	f	575ea2058189	575e9c458020	1380173784
+admindb	1616503555	admindb	/weblet/allg/menu/fix	selection	0	selection	action : 'db/utils/repository/data.json',\nschema : 'mne_repository',\nquery  : 'repository',\ntable  : 'repository',\n\n    cols : 'name',\n   scols : 'name',\nshowcols : 'repositoryid',\n\nwcol : 'root',\nwop  : '=',\nwval : 'repository',\n\nloaddirect : true,\n	detail	0		f	575ea2058195	575e9c458022	1389633246
+admindb	1603107428	admindb	/weblet/allg/table/filter	projecttime	190	bottom	schema : 'mne_personnal', query : 'timeorder',\n  cols : 'sortcol,orderid,ordernumber,orderdescription,companyid,reffirstname,reflastname,fullname,productname,duration',\n scols : 'sortcol,fullname',\n\nshowids  : [ 'orderid'],\nprimarykey : ['fullname','productname'],\ndistinct : true,\n\n    tablehidecols: ['sortcol', 'orderid', 'ordernumber', 'orderdescription', 'companyid', 'reffirstname', 'reflastname'],\n    tablerowstyle: [ 'sum' ],\ntablerowstylecol : [ 'sortcol']\n\n		0	admerppersonnal	f	575ea2058000	575e9c458018	1299074563
+admindb	1603117991	admindb	/weblet/allg/table/fix	projectresult	200	bottom	css : 'projects/allg.css',\n\nschema : 'mne_crm',\nquery  : 'orderproductcost',\ncols   : 'sorting,result,orderproductid,orderproducttype,productname,count,actcount,sumendprice,sumendcost,sumendmargin,sumactprice,sumactcostcomp,sumactmargincomp',\nscols : 'sorting,position',\n\nshowids : ['orderid', 'orderproducttype' ],\nshowalias : [ 'orderid', '#' ],\nprimarykey : [ 'orderproductid'],\n\ntablehidecols    : [ 'sorting','result','orderproductid','orderproducttype'],\ntablerowstyle    : ['sum',''],\ntablerowstylecol : ['sorting','result'],\ntablecoltype     : { actcount : 'text' },\n\noktable     : 'orderproduct',\nokids       : ['orderproductid'],\nokcols      : ['actcount'],\nrowselector : 'tbody tr.sum1'\n	#product,#orderaccounting	0	admerpcrm	f	575ea205801b	575e9c458018	1264083810
+admindb	1603108517	admindb	/weblet/allg/table/filter	allprojectresult	1000	bottom	schema   : 'mne_crm',\nquery    : 'order_costsum',\ncols     : 'position,result,ordernumber,refname,sumendprice,sumendcost,sumendmargin,sumactprice,sumactcostcomp,sumactmargincomp,refcompanyid,refcompany,refpersonid,reffirstname,reflastname',\nscols    : 'position,ordernumber',\ndistinct : true,\n\nprimarykey : ['ordernumber'],\n\nwcol : 'companyown',\nwop  : '=',\nwval : 'false',\n\ntablerowstyle: ['sum',''],\ntablerowstylecol : ['position','result'],\ntablehidecols : ['position','result','refcompanyid','refcompany','refpersonid','reffirstname','reflastname'],\n		0	admerpcrm	f	575ea2058034	575e9c458018	1271836333
+admindb	1603107373	admindb	/weblet/allg/table/fix	time	150	bottom	schema : 'mne_personnal',\n query : 'timeorder',\n  cols : 'sortcol,orderid,ordernumber,orderdescription,companyid,reffirstname,reflastname,productname,productstep,duration',\n scols : 'sortcol',\n  wcol : 'sortcol',\n  wop  : '<',\n  wval : '3',\n\n   showids : [ 'orderid' ],\nprimarykey : ['productname','productstep','duration'],\n\ndistinct : true,\n\n\n    tablehidecols: ['sortcol','orderid','ordernumber','orderdescription', 'companyid', 'reffirstname', 'reflastname'],\n    tablerowstyle: [ 'sum' ],\ntablerowstylecol : [ 'sortcol' ],\n\n\n\n		0	admerppersonnal	f	575ea20580f9	575e9c458018	1260455509
+admindb	1605598241	admindb	/weblet/allg/table/fix	ownerref	40	bottom	schema  : 'mne_crm',\nquery   : 'personowner',\ncols    : 'ownerrefid,ownertyp,name',\nscols   : 'ownertyp,name',\nshowids : [ 'personid' ],\n\ntablehidecols : ['ownerrefid'],\n\n\n		0	admerppersonnal	f	5aabe97d0000	575e9c458020	1521215869
+admindb	1605519543	admindb	/weblet/dbadmin/user/group	groups	20	bottom			0	admerppersonnal	f	575ea2058183	575e9c458020	1380116889
 \.
 
 
@@ -17937,7 +17793,7 @@ admindb	1610520018	admindb	/weblet/allg/table/fix	vendor	100	bottom	schema      
 --
 
 COPY mne_application.htmlcomposetabnames (createdate, createuser, modifydate, modifyuser, label_en, label_de, custom, htmlcomposetabid, htmlcomposeid) FROM stdin;
-1237804275	admindb	1314377588	admindb	my	meine	f	575ea2058092	575e9c45802a
+1600773536	admindb	1600773536	admindb	city	Ortschaft	f	5f69dda08000	575e9c458017
 1226313601	admindb	1359387171	admindb	user settings	Benutzereinstellungen	f	575ea205804c	575e9c458034
 1600332195	admindb	1600332317	admindb	select person	Person auswählen	f	5f6321a38000	575e9c458022
 1600332546	admindb	1600332580	admindb	select person	Person auswählen	f	5f6323028000	5f4e3a268000
@@ -17959,7 +17815,6 @@ COPY mne_application.htmlcomposetabnames (createdate, createuser, modifydate, mo
 1598962094	admindb	1599116344	admindb	filing cabinet	Aktenschrank	f	5f4e39ae8000	575e9c45802d
 1600765650	admindb	1600767457	admindb	company	Firma	f	5f69bed28000	575e9c458017
 1600773490	admindb	1600773490	admindb	person	Person	f	5f69dd728000	575e9c458017
-1600773536	admindb	1600773536	admindb	city	Ortschaft	f	5f69dda08000	575e9c458017
 1600773759	admindb	1600773759	admindb	country	Land	f	5f69de7f8000	575e9c458017
 1600773774	admindb	1600773774	admindb	country	Land	f	5f69de8e8000	575e9c458017
 1220006312	admindb	1589977698	admindb	subweblet detail	Subwebletdetail	f	575ea2058131	575e9c45801d
@@ -17996,7 +17851,6 @@ COPY mne_application.htmlcomposetabnames (createdate, createuser, modifydate, mo
 1258443395	admindb	1607588481	admindb	storage	Lager	f	575ea20580a8	575e9c458015
 1246439280	admindb	1472537356	admindb	by template	nach Template	f	575ea205801c	575e9c45801d
 1267175450	admindb	1608103108	admindb	storage	Auslagerung	f	575ea20580bd	575e9c45802c
-1471854209	admindb	1477056259	admindb	domain	Domain	f	57bab6810000	57bab6120000
 1245327032	admindb	1603454894	admindb	invoice treatment	Rechnungslauf	f	575ea205804a	575e9c45802b
 1259923336	admindb	1608024621	admindb	storage location	Lagerplätze	f	575ea2058164	575e9c458025
 1237464180	admindb	1601553135	admindb	closed	geschlossen	f	575ea205811d	575e9c458018
@@ -18108,6 +17962,7 @@ COPY mne_application.htmlcomposetabnames (createdate, createuser, modifydate, mo
 1246606620	admindb	1601553249	admindb	not active	nicht aktiv	f	575ea205811b	575e9c458018
 1278914351	admindb	1603453353	admindb	select conditions	Konditionen auswählen	f	575ea2058011	575e9c458030
 1291385437	admindb	1601466550	admindb	time management	Zeitbedarf	f	575ea2058025	575e9c458018
+1237804275	admindb	1314377588	admindb	my	meine	f	575ea2058092	575e9c45802a
 1306391863	admindb	1599565624	admindb	querys with aggregate functions	Abfragen mit Aggregatfunktionen	f	575ea205812c	575e9c458001
 1301585164	admindb	1604401066	admindb	times actual order by working steps	akt. Auftrag nach Arbeitsschritt	f	575ea2058135	575e9c45800f
 1220276304	admindb	1590760142	admindb	joins	Joins	f	575ea20580c6	575e9c458002
@@ -18187,12 +18042,7 @@ COPY mne_application.htmlcomposetabnames (createdate, createuser, modifydate, mo
 1400505937	admindb	1607584837	admindb	storage location allocation	Lagerplatzbelegung	f	575ea20581a4	575e9c458015
 1265317250	admindb	1608101263	admindb	inbound location	Lagerplätze	f	575ea2058087	575e9c458031
 1387315640	admindb	1600767476	admindb	city	Ortschaft	f	575ea205817e	575e9c458017
-1472115098	admindb	1472115098	admindb	user settings	Benutzereinstellungen	f	57beb19a0000	57beb13a0000
-1472115139	admindb	1472115139	admindb	city's	Ortschaften	f	57beb1c30000	57beb13a0000
-1472115148	admindb	1472115148	admindb	color chooser	Farbauswahl	f	57beb1cc0000	57beb13a0000
-1472115070	admindb	1478009351	admindb	groups edit	Gruppen editieren	f	57beb17e0000	57beb13a0000
 1324396275	admindb	1473406809	admindb	by company	nach Firma	f	575ea2058080	575e9c45802e
-1472115080	admindb	1474373395	admindb	password	Password	f	57beb1880000	57beb13a0000
 1333620418	admindb	1600334906	admindb	associated company's	assoziierte Firmen	f	575ea2058163	575e9c45802e
 1400156357	admindb	1607592133	admindb	create storage	Lager erstellen	f	575ea2058129	575e9c458015
 1387315626	admindb	1600687997	admindb	customer	Kunde	f	575ea205816f	575e9c458017
@@ -18207,14 +18057,9 @@ COPY mne_application.htmlcomposetabnames (createdate, createuser, modifydate, mo
 1348134121	admindb	1609764066	admindb	global extra fee	global Extraleistungen	f	575ea2058014	575e9c45801f
 1348134142	admindb	1609768336	admindb	HOIA extra fee	HOIA Extraleistungen 	f	575ea2058001	575e9c45801f
 1427952927	admindb	1427952927	admindb			f	575ea20581e2	575e9c458013
-1434352214	admindb	1434352461	admindb	params	Parameter	f	575ea2058201	575e9c458037
-1433328333	admindb	1434697237	admindb	parameter	Parameter	f	575ea20581f8	575e9c458036
-1472115160	admindb	1472115160	admindb	country's	Länder	f	57beb1d80000	57beb13a0000
-1472115177	admindb	1472115177	admindb	day select	Datumsauswahl	f	57beb1e90000	57beb13a0000
 1210872151	admindb	1589965925	admindb	columns	Spalten	f	575ea2058207	575e9c458001
 1409932985	admindb	1598967703	admindb	orders	Aufträge	f	575ea20581c6	575e9c45802d
 1235986458	admindb	1593768601	admindb	letter	Briefe	f	575ea20581f6	575e9c458010
-1389633246	admindb	1598000265	admindb	all	Alle	f	575ea2058195	575e9c458022
 1235986260	admindb	1593693079	admindb	all	Alle	f	575ea20581ee	575e9c458010
 1380173784	admindb	1605543880	admindb	password	Password	f	575ea2058189	575e9c458020
 1410010243	admindb	1597933921	admindb	orders	Aufträge	f	575ea20581c4	575e9c45802e
@@ -18234,24 +18079,8 @@ COPY mne_application.htmlcomposetabnames (createdate, createuser, modifydate, mo
 1250839759	admindb	1600335206	admindb	time management	Zeitplanung	f	575ea205817a	575e9c458019
 1348129461	admindb	1600335334	admindb	optional activitys	optionale Tätigkeiten	f	575ea2058013	575e9c458019
 1332428812	admindb	1605004744	admindb	comments	BT Kommentar	f	575ea2058181	575e9c45800f
-1453800703	admindb	1453805096	admindb	apache	Apache	f	575ea205820e	575e9c458038
-1453298868	admindb	1453805129	admindb	modules	Modules	f	575ea205820f	575e9c458038
-1453807784	admindb	1453807784	admindb	sites	Seiten	f	575ea2058210	575e9c458038
-1453824740	admindb	1453824740	admindb	sites	Seiten	f	575ea2058211	575e9c458038
-1457702905	admindb	1462345648	admindb	certificates	Zertifikate	f	575ea2058214	575e9c458038
-1472115118	admindb	1472115525	admindb	user data	Benutzerdaten	f	57beb1ae0000	57beb13a0000
-1472115054	admindb	1473248697	admindb	login data	Logindaten	f	57beb16e0000	57beb13a0000
-1472115201	admindb	1473353329	admindb	employee	Mitarbeiter	f	57beb2010000	57beb13a0000
-1426176186	admindb	1475159218	admindb	shares	Freigaben	f	575ea20581e1	575e9c458024
-1426266993	admindb	1478009734	admindb			f	575ea20581e3	575e9c458024
 1265017856	admindb	1607595824	admindb	storage	Einlagerung	f	575ea20580d9	575e9c458031
-1457711091	admindb	1551269671	admindb	add Zertifikat	Zertifikat hinzufügen	f	575ea2058213	575e9c458038
 1237812060	admindb	1603355178	admindb	products	Produkte	f	575ea205813c	575e9c458030
-1459515940	admindb	1553703189	admindb	certificates	Zertifikate	f	575ea2058218	575e9c458039
-1462343104	admindb	1554105933	admindb	add certificate file	Zertifikat Datei hinzufügen	f	575ea2058216	575e9c458039
-1459840833	admindb	1553703178	admindb	certificate requests	Zertifikat Requests	f	575ea2058215	575e9c458039
-1459840726	admindb	1553703199	admindb	keys	Schlüssel	f	575ea2058217	575e9c458039
-1459247454	admindb	1554107422	admindb	certification authority	Zertifizierungsstellen	f	575ea2058212	575e9c458039
 1258443291	admindb	1607585056	admindb	all	Alle	f	575ea2058076	575e9c458015
 1521215869	admindb	1605598241	admindb	owner off	Betreuer von	f	5aabe97d0000	575e9c458020
 1248769914	admindb	1402929963	admindb	all	Alle	f	575ea205806e	575e9c458020
@@ -18260,15 +18089,12 @@ COPY mne_application.htmlcomposetabnames (createdate, createuser, modifydate, mo
 1226481868	admindb	1472537003	admindb	by path	nach Path	f	575ea20580a0	575e9c45801d
 1285653934	admindb	1603434342	admindb	invoice contacts	Rechungskontakte	f	575ea20580f3	575e9c458030
 1264710673	admindb	1607594582	admindb	personnal	Personal	f	575ea2058084	575e9c458015
-1472550397	admindb	1473352929	admindb	all	Alle	f	57c555fd0000	57beb13a0000
 1250507831	admindb	1605607011	admindb	skills	Qualifikationen	f	575ea205818e	575e9c458020
 1401454443	admindb	1605003333	admindb	comments	Kommentare	f	575ea20581ad	575e9c45800f
-1477056247	admindb	1477057185	admindb	groupware	Groupware	f	580a16f70000	57bab6120000
 1264448368	admindb	1591687340	admindb	my	meine	f	575ea205810d	575e9c45802d
 1236724892	admindb	1597151389	admindb	letter	Briefe	f	575ea20581ec	575e9c45802d
 1413798866	admindb	1598872522	admindb	interest	Interessenten	f	575ea20581df	575e9c458022
 1226907711	admindb	1591697523	admindb	all	Alle	f	575ea205808e	575e9c45802d
-1430201297	admindb	1597663676	admindb			f	575ea20581be	575e9c458024
 1473314716	admindb	1599140493	admindb	login data	Logindaten	f	57d0ff9c0000	575e9c45802e
 1263480568	admindb	1600086567	admindb	part management	Materialbedarf	f	575ea2058018	575e9c458019
 1263480675	admindb	1600077810	admindb	part	Material	f	575ea205803e	575e9c458019
@@ -18288,16 +18114,9 @@ COPY mne_application.htmlcomposetabnames (createdate, createuser, modifydate, mo
 1258447463	admindb	1607958904	admindb	inventory data	Lagerdaten	f	575ea205802f	575e9c458025
 1290071890	admindb	1608287708	admindb	fixture	Inventarartikel	f	575ea20580f1	575e9c45801e
 1551179540	admindb	1608287814	admindb	delivery note	Lieferschein	f	5c751f140000	575e9c45801e
-1478261988	admindb	1478261988	admindb	dns	DNS	f	581c7ce40000	57bab6120000
 1263285918	admindb	1600778436	admindb	forecast	Vorhersage	f	575ea2058033	575e9c458017
-1473353316	admindb	1473405924	admindb	with login	Mit Login	f	57d196640000	57beb13a0000
 1308646210	admindb	1347866190	admindb	views	Sichten	f	575ea2058156	575e9c45800d
 1417502635	admindb	1603108033	admindb	invoices	Rechnungen	f	575ea20581ca	575e9c458018
-1454075213	admindb	1516288443	admindb	select folder	Verzeichnis auswählen	f	575ea205820b	575e9c458038
-1426176235	admindb	1547628453	admindb	select folder	Verzeichnis auswählen	f	575ea205820d	575e9c458024
-1432824373	admindb	1432824373	admindb			f	575ea20581e9	575e9c458014
-1434117769	admindb	1434697246	admindb	actual values	aktuelle Werte	f	575ea20581f9	575e9c458036
-1426176253	admindb	1553762960	admindb	all shares	Alle Freigaben	f	575ea20581e4	575e9c458024
 1322741643	admindb	1608193758	admindb	open delivery notes of the vendor	offene Lieferscheine des Lieferanten	f	575ea20581d6	575e9c458026
 1289910833	admindb	1440590358	admindb	menu	Menü	f	575ea2058102	575e9c458027
 1267523837	admindb	1608101302	admindb	relocation request	Umlageraufträge	f	575ea2058127	575e9c458031
@@ -18307,16 +18126,10 @@ COPY mne_application.htmlcomposetabnames (createdate, createuser, modifydate, mo
 1256897040	admindb	1601538390	admindb	color picker	Farbauswahl	f	575ea20581d4	575e9c458018
 1291023196	admindb	1420555674	admindb	deliverynotes of the same parts	Lieferscheine mit gleichen Teilen	f	575ea20581d5	575e9c458033
 1309266342	admindb	1601275004	admindb	documents	Dokumente	f	575ea2058208	575e9c458017
-1554105794	admindb	1554105794	admindb	add certificate request	Zertifikatrequest hinzufügen	f	5ca1c5c20000	575e9c458039
-1553688660	admindb	1554107287	admindb	certification authority	externe Zertifizierungsstelle  hinzufügen	f	5c9b68540000	575e9c458039
-1426265949	admindb	1553157287	admindb	User	Benutzer	f	575ea20581f7	575e9c458024
-1554107391	admindb	1554112593	admindb	certificate authority	Zertifizierungsstellen	f	5ca1cbff0000	575e9c458039
-1434350568	admindb	1553268127	admindb	devices actual	Schnittstellen aktuell	f	575ea205820a	575e9c458037
 1220269859	admindb	1589977626	admindb	content	Inhalt	f	575ea2058008	575e9c458001
 1220269177	admindb	1590669707	admindb	first table	erste Tabelle	f	575ea20580de	575e9c458002
 1432221753	admindb	1597130133	admindb	address book	Addressbuch	f	575ea20581e8	575e9c45802d
 1415612649	admindb	1598872514	admindb	files overview	Dateienübersicht	f	575ea20581cc	575e9c458022
-1433322586	admindb	1578577516	admindb	network list	Netzwerk Liste	f	575ea20581fa	575e9c458036
 1391757291	admindb	1599116525	admindb	filing cabinet	Aktenschrank	f	575ea2058142	575e9c45802e
 1391609772	admindb	1598872718	admindb	interest	Interesse	f	575ea20581d2	575e9c458035
 1264583186	admindb	1597904541	admindb	history	Historie	f	575ea2058063	575e9c45802e
@@ -18340,6 +18153,7 @@ COPY mne_application.htmlcomposetabnames (createdate, createuser, modifydate, mo
 1545057898	admindb	1608298680	admindb	categorie	Kategorie	f	5c17b66a0000	575e9c458029
 1291021670	admindb	1610111240	admindb	total purchase	gesamte Bestellung	f	575ea205813d	575e9c458033
 1257425740	admindb	1610520018	admindb	vendor's	Lieferanten	f	575ea20580d8	575e9c458025
+1389633246	admindb	1616503555	admindb	all	Alle	f	575ea2058195	575e9c458022
 \.
 
 
@@ -18408,12 +18222,10 @@ COPY mne_application.htmlcomposetabselect (createdate, createuser, modifydate, m
 1515417297	admindb	1608100877	admindb	detail	partname,?partingoingid	mne_warehouse	partingoing					partname,deliverydate	partname,partingoingid	partname,deliverydate,vendor			f	0	5a536ed10000	575e9c458031	table	
 1516291535	admindb	1516291535	admindb	detail	schema,?schema,?fullname	mne_application	procedure					schema,fullname	schema,schema,fullname	schema,fullname			f	1	5a60c5cf0000	575e9c45801a	table	
 1301488163	admindb	1604483106	admindb	detail	!stepdescription,orderproducttimeid,productname,productnumber	mne_personnal	orderproducttime_person		=,=	ready,open	false,true	sortcol,stepdescription,skilltext	stepdescription,orderproducttimeid,productname,productnumber,sortcol	stepdescription,skilltext		orderid,productnumber,personid	f	\N	575ea30c8060	575e9c45800f	frame	[ () => { return this.obj.outputs.orderid.getValue() }, () => { return this.obj.inputs.productnumber.getValue() }, 'personid' ]
-1472135933	admindb	1472135933	admindb	usersettings	timezone	mne_catalog		pg_timezone_names				name		name			f	\N	57bf02fd0000	57beb13a0000	table	
 1429859932	admindb	1542788949	admindb	parts	wpowner,wpownerid	mne_crm	person_own		=	active	true	sorting,fullname	fullname,personid,sorting	fullname			f	1	575ea30c810a	575e9c458017	table	
 1515415671	admindb	1515415785	admindb	detail	description,?storageid	mne_warehouse	storage					description	description,storageid	description,storagetypname			f	0	5a5368770000	575e9c458015	table	
 1516285918	admindb	1516285973	admindb	detail	name,?cityid	mne_crm	city					name,postcode	name,cityid	name,postcode			f	0	5a60afde0000	575e9c458003	table	
 1516289258	admindb	1599800918	admindb	detail	schema,?schema,?table	mne_application	table_all					schema,table	schema,schema,table	schema,table			f	1	5a60bcea0000	575e9c45800d	fmenu	
-1516283906	admindb	1516284045	admindb	detail	lastname,?personid	mne_crm	person_detail					lastname,firstname	lastname,personid	lastname,firstname			f	0	5a60a8020000	57beb13a0000	table	
 1516290904	admindb	1516290925	admindb	detail	schema,?queryid	mne_application		queryname				schema,query	schema,queryid	schema,query			f	1	5a60c3580000	575e9c458001	table	
 1250511818	admindb	1605275742	admindb	detail	birthday								date		selectday		f	\N	575ea30c8042	575e9c458020	weblet	
 1290073577	admindb	1608287343	admindb	detail	fixturetype,fixturetypeid	mne_fixture	fixturetypetree		=	parentid		pos	fixturetype,fixturetypeid	action,item,menuid,typ,pos			f	\N	575ea30c8014	575e9c45801e	rmenu	
@@ -18431,7 +18243,6 @@ COPY mne_application.htmlcomposetabselect (createdate, createuser, modifydate, m
 1237381083	admindb	1324047651	admindb	productdetail	productname,productid	mne_crm	product					name	name,productid	name			f	0	575ea30c8028	575e9c458017	table	
 1246604399	admindb	1246604776	admindb	productdetail	productunit	mne_crm	orderproduct		<>,not is null	productunit,productunit	''	productunit	productunit	productunit			f	\N	575ea30c802a	575e9c458018	table	
 1247055500	admindb	1247055862	admindb	productdetail	currency,productcurrencyid	mne_base		currency				currency	currency,currencyid	currency			f	\N	575ea30c802b	575e9c458018	table	
-1426176271	admindb	1426176271	admindb	detail	location								menuid	menuid	folderselect		f	\N	575ea30c8109	575e9c458024	table	
 1267089756	admindb	1608104375	admindb	detail	partname,partid,storagelocationname,outstoragelocationname,spartstoragelocationid,outstoragelocationid,outstorageid	mne_warehouse	parttree_stocked		=,=	stocked,parentid	true,		partname,partid,#,#,#,#,#	action,item,menuid,typ,pos			f	\N	575ea30c8011	575e9c45802c	rmenu	
 1267543112	admindb	1608018227	admindb	relocationdetail	oldstorageid	mne_warehouse	partstoragelocation					storagename	storageid	storagename		partid	f	\N	575ea30c8027	575e9c458025	table	
 1267089239	admindb	1608104075	admindb	detail	outstorageid	mne_warehouse	storage_name		=,o=,o=	storageclass,storageclass,storageclass	inout,outgoing,nostorage	description	storageid	description			f	\N	575ea30c800f	575e9c45802c	table	
@@ -18468,7 +18279,6 @@ COPY mne_application.htmlcomposetabselect (createdate, createuser, modifydate, m
 1288882733	admindb	1607611400	admindb	detail	expected								date		selectday		f	\N	575ea30c8031	575e9c458032	weblet	
 1270113819	admindb	1607611508	admindb	detail	vendorname,partvendorid,vendorordernumber,packagesize	mne_warehouse	partvendor					preferred,price	vendor,partvendorid,ordernumber,packagesize	vendor,packagesize,price,currency,preferred,leadtime		partid	f	\N	575ea30c8030	575e9c458032	table	[ () => { return self.obj.inputs.partid.getValue() } ]
 1326451242	admindb	1607930440	admindb	deliverydetail	storageid	mne_warehouse	storage_name		=,o=,o=	storageclass,storageclass,storageclass	inout,ingoing,nostorage	description	storageid	description			f	\N	575ea30c8033	575e9c458032	table	
-1270104696	admindb	1607705495	admindb	detail	partname,partid,#partid,vendorname,partvendorid,vendorordernumber,packagesize	mne_warehouse	parttree_havevendor		=,=	havevendor,parentid	true,		partname,partid,partid,#,#,#,#	action,item,menuid,typ,pos			f	\N	575ea30c803c	575e9c458032	rmenu	
 1326451309	admindb	1607937951	admindb	deliverydetail	storagelocation,storagelocationid	mne_warehouse	storagelocation_empty					storagelocationname	storagelocationname,storagelocationid	storagelocationname		storageid	f	\N	575ea30c8058	575e9c458032	table	[ () => { return self.obj.inputs.storageid.getValue() } ]
 1258447572	admindb	1607960668	admindb	storagelocationmaster	storagelocationtypid	mne_warehouse		storagelocationtyp	>	num	0	text_#mne_langid#	storagelocationtypid	text_#mne_langid#			f	\N	575ea30c802c	575e9c458025	table	
 1257410420	admindb	1607941736	admindb	detail	treepath,treeparentid	mne_warehouse	parttree		=,=	partid,parentid	,	pos	fullpath,menuid	action,item,menuid,typ,pos			f	\N	575ea30c8048	575e9c458025	rmenu	
@@ -18484,10 +18294,10 @@ COPY mne_application.htmlcomposetabselect (createdate, createuser, modifydate, m
 1237549584	admindb	1603197416	admindb	detail	contactname,contactid	mne_crm	person_detail					fullname	fullname,personid	fullname		refid	f	\N	575ea30c8061	575e9c45802a	table	
 1281674737	admindb	1352985178	admindb	feeextradetail	vproductnumber,productname,productid	mne_crm	product					nproductnumber	productnumber,name,productid,nproductnumber	productnumber,name			f	0	575ea30c8078	575e9c45801f	table	
 1306847942	admindb	1545128342	admindb	ordertime	orderdescription,ordernumber,orderid	mne_crm	order_detail		=	open	true	ordernumber	description,ordernumber,orderid	ordernumber,description			f	\N	575ea30c805c	575e9c45800f	table	
-1454077203	admindb	1454077203	admindb	sitedetail	documentroot								menuid	menuid	folderselect		f	\N	575ea30c8079	575e9c458038	table	
 1289304285	admindb	1289304285	admindb	detailvendornameedit	vendor,companyid	mne_crm	company_detail					company	company,companyid	company			f	0	575ea30c807b	575e9c458032	table	
 1226909714	admindb	1382396300	admindb	detail	ownername,ownerid	mne_crm	person_own		=	active	true		fullname,personid	fullname			f	\N	575ea30c8083	575e9c45802d	table	
 1289926302	admindb	1591608669	admindb	bottom	ugroup	mne_application	group					group	group	group			f	0	575ea30c807f	575e9c458027	table	
+1270104696	admindb	1616399032	admindb	detail	partname,partid,#partid,vendorname,partvendorid,vendorordernumber,packagesize	mne_warehouse	parttree_needpurchase		=,=	needorder,parentid	true,		partname,partid,partid,#,#,#,#	action,item,menuid,typ,pos			f	\N	575ea30c803c	575e9c458032	rmenu	
 1322228389	admindb	1608188029	admindb	detail	ownaccount	mne_warehouse	purchaseaccount					fullname	accountnum	fullname			f	0	575ea30c80b3	575e9c458026	table	
 1271679254	admindb	1591682097	admindb	detail	startwebletname,startweblet	mne_application	weblet_all		<>,<>	schema,schema	dbadmin,main	label	label,name	label			f	0	575ea30c8080	575e9c458034	table	
 1236937804	admindb	1600158026	admindb	detail	treepath,treeparentid	mne_crm	producttree	producttree	=,=	productid,parentid	,	pos	fullpath,menuid	action,item,menuid,typ,pos			f	\N	575ea30c806c	575e9c458019	rmenu	
@@ -18525,6 +18335,7 @@ COPY mne_application.htmlcomposetabselect (createdate, createuser, modifydate, m
 1324289123	admindb	1327400949	admindb	detail	ordernumber,?orderid	mne_crm	order_detail		=	closed	false	ordernumber	ordernumber,orderid	ordernumber,description			f	0	575ea30c80ad	575e9c458018	table	
 1320850890	admindb	1382396405	admindb	popupvendordetailvendoredit	ownername,ownerid	mne_crm	person_own		=	active	true		fullname,personid	fullname			f	\N	575ea30c80b0	575e9c458025	table	
 1319174174	admindb	1382396373	admindb	detail	ownername,ownerid	mne_crm	person_own		=	active	true	fullname	fullname,personid	fullname			f	0	575ea30c80b1	575e9c458020	table	
+1601540931	admindb	1601540931	admindb	refselectcompany_cityselectdetail	country,countryid	mne_crm	country					name	name,countryid	name			f	0	5f7593430000	575e9c458018	table	
 1267100109	admindb	1608105087	admindb	detail	storagelocationname,deliverydate,spartstoragelocationid,ordernumber,orderdescription,orderproductname,customer,orderproductpartid	mne_warehouse	partstoragelocation					deliverydate,rcount	storagelocationname,deliverydate,partstoragelocationid,crmordernumber,crmorderdescription,crmorderproductname,crmcustomer,crmorderproductpartid,partid,count,partoutgoingid	storagename,storagelocationname,deliverydate,rcount,vendor,crmordernumber,crmorderdescription		partid,rcount,partoutgoingid%%rcount : ">=",  partoutgoingid : "is null"	f	\N	575ea30c8009	575e9c45802c	table	[ () => { return self.obj.inputs.partid.getValue() }, () => { return self.obj.inputs.count.getValue() }, () => { return '' } ]
 1265018632	admindb	1608042126	admindb	middle	newstorageid	mne_warehouse	storage					description	storageid	description			f	\N	575ea30c800a	575e9c458031	table	
 1281603612	admindb	1609767010	admindb	workphase	productnumber4,productid4	mne_crm	producttree		=	parentid			productnumber,productid	action,item,menuid,typ,pos	workphaseproduct		f	\N	575ea30c8002	575e9c45801f	rmenu	
@@ -18559,6 +18370,7 @@ COPY mne_application.htmlcomposetabselect (createdate, createuser, modifydate, m
 1330941511	admindb	1605259489	admindb	builddiary	weather	mne_application	selectlist		=	name	builddiary_weather	num	value,num	text			f	\N	575ea30c80c1	575e9c45800f	table	
 1322469013	admindb	1607698205	admindb	detail	ownername,ownerid	mne_crm	person_own		=,=	active,sorting	true,2	fullname	fullname,personid	fullname			f	0	575ea30c80ef	575e9c458032	table	
 1389084557	admindb	1389084557	admindb	detaildeliverynotenumberedit	storageid	mne_warehouse	storage_name		=,o=,o=	storageclass,storageclass,storageclass	inout,ingoing,nostorage	description	description	storageid			f	\N	575ea30c80f7	575e9c458031	table	
+1601541032	admindb	1601541032	admindb	refselectperson	ownername,ownerid	mne_crm	person_own		=	active	true	fullname	fullname,personid	fullname			f	0	5f7593a80000	575e9c458018	table	
 1389084852	admindb	1389084852	admindb	detaildeliverynotenumberedit	storagelocation,storagelocationid	mne_warehouse	storagelocation_empty					storagelocationname	storagelocationname,storagelocationid	storagelocationname		"storageidInput.old" : "%storageid"	f	\N	575ea30c80f8	575e9c458031	table	
 1347958622	admindb	1347959444	admindb	partsedit	partgroup	mne_warehouse	offerproductpart		!=	partgroup		partgroup	partgroup	partgroup,productname			f	1:productname	575ea30c8006	575e9c458017	table	
 1380025215	admindb	1601274359	admindb	file	typ	mne_application	selectlist		=	name	documenttyp	text	text,value	text,value			f	\N	575ea30c80d5	575e9c458017	table	
@@ -18574,8 +18386,6 @@ COPY mne_application.htmlcomposetabselect (createdate, createuser, modifydate, m
 1420550945	admindb	1608208905	admindb	detail	vendorname,partvendorid,packagesize	mne_warehouse	partvendor					preferred,price	vendor,partvendorid,packagesize	vendor,packagesize,price,currency,preferred,leadtime		partid	f	\N	575ea30c8105	575e9c458033	table	[ () => { return self.obj.inputs.partid.getValue() } ]
 1327310205	admindb	1400662926	admindb	inboundedit	newstoragelocationname,newstoragelocationid	mne_warehouse	storagelocation_disposable					!zcount,dispcount,effort,toname	toname,tostoragelocationid,effort	tostorage,toname,maxcount,zcount,dispcount		"tostorageidInput.old" : "%newstorageid", "partidInput.old" : "%partid", "dispcountInput.old" : "%count", "dispcountOp.old" : "#>="	f	\N	575ea30c8100	575e9c458031	table	
 1515170335	admindb	1515170483	admindb	detail	part,?partid	mne_warehouse	part					partname	part,partid	partname			f	0	5a4faa1f0000	575e9c458025	table	
-1478008022	admindb	1478008022	admindb	cityedit	country,countryid	mne_crm	country					name	name,countryid	name,phoneprefix			f	\N	58189cd60000	57beb13a0000	table	
-1478862575	admindb	1478862575	admindb	dnsaddress	record	mne_application		selectlist	=	name	dns_record	value	value,text_de	value,text_de			f	\N	5825a6ef0000	57bab6120000	table	
 1263993626	admindb	1263993781	admindb	forecast	expectedorderdate								date		selectday		f	\N	575ea30c800e	575e9c458017	table	
 1235479244	admindb	1382395285	admindb	detail	ownername,ownerid	mne_crm	person_own		=	active	true	fullname	fullname,personid	fullname			f	0	575ea30c8043	575e9c45802e	table	
 1382539703	admindb	1407335292	admindb	popupdetaildeliverynotenumbereditordernumberedit	expected								date		selectday		f	\N	575ea30c80f9	575e9c458031	table	
@@ -18597,8 +18407,6 @@ COPY mne_application.htmlcomposetabselect (createdate, createuser, modifydate, m
 1542789004	admindb	1601039786	admindb	parts	wproductname	mne_crm	offerproduct					productname	productname	productname		offerid	f	0	5bf5178c0000	575e9c458017	table	
 1601534440	admindb	1601534440	admindb	timesedit	step,skillid,setduration,description,longdesc								step,skillid,duration,description,longdesc		timesedit_stepselect		f	\N	5f7579e80000	575e9c458018	weblet	
 1601539470	admindb	1601539470	admindb	refselectcompany	ownername,ownerid	mne_crm	person_own		=	active	true	fullname	fullname,personid	fullname			f	0	5f758d8e0000	575e9c458018	table	
-1601540931	admindb	1601540931	admindb	refselectcompany_cityselectdetail	country,countryid	mne_crm	country					name	name,countryid	name			f	0	5f7593430000	575e9c458018	table	
-1601541032	admindb	1601541032	admindb	refselectperson	ownername,ownerid	mne_crm	person_own		=	active	true	fullname	fullname,personid	fullname			f	0	5f7593a80000	575e9c458018	table	
 1601541066	admindb	1601541066	admindb	refselectperson_cityselectdetail	country,countryid	mne_crm	country					name	name,countryid	name			f	0	5f7593ca0000	575e9c458018	table	
 1601539231	admindb	1601541660	admindb	refselectcompany	city,postcode,country,cityid	mne_crm	city					name,postcode	name,postcode,country	name,postcode			f	0	5f758c9f0000	575e9c458018	table	
 1601541006	admindb	1601541660	admindb	refselectperson	city,postcode,country,cityid	mne_crm	city					name,postcode	name,postcode,country	name,postcode			f	0	5f75938e0000	575e9c458018	table	
@@ -18611,8 +18419,6 @@ COPY mne_application.htmlcomposetabselect (createdate, createuser, modifydate, m
 1449731692	admindb	1449731692	admindb	usersettings	timezone	mne_catalog		pg_timezone_names				name		name			f	\N	575ea30c8115	575e9c458020	table	
 1347952331	admindb	1347959467	admindb	partmanagementedit	partgroup	mne_warehouse	productpart		!=	partgroup		partgroup	partgroup	partgroup,productname			f	1:productname	575ea30c8116	575e9c458019	table	
 1449498201	admindb	1449502674	admindb	detail	timezone	mne_catalog		pg_timezone_names				name	name	name			f	\N	575ea30c8112	575e9c458034	table	
-1516284179	admindb	1553763607	admindb	detail	name,?folderid	mne_application	folder		=	hostname	$window.mne_config.hostname	name	name,folderid	name			f	0	5a60a9130000	575e9c458024	table	
-1473920397	admindb	1574665469	admindb	detail	netdevice	mne_system	network		=,=	ownnetwork,typ	1,static	networkid	networkid	networkidname,addr,mask			f	0	57da3d8d0000	57bab6120000	table	
 1449645397	admindb	1604646165	admindb	persontime	enddate,month								date,#-2		selectday		f	\N	575ea30c8113	575e9c45800f	weblet	
 1449645416	admindb	1604646165	admindb	persontime	startdate,month								date,#-2		selectday		f	\N	575ea30c8114	575e9c45800f	weblet	
 1306855952	admindb	1604664370	admindb	ordertime	startdate,month								date,#-2		selectday		f	\N	575ea30c804b	575e9c45800f	weblet	
@@ -18624,19 +18430,13 @@ COPY mne_application.htmlcomposetabselect (createdate, createuser, modifydate, m
 1226408838	admindb	1589787671	admindb	webletselect	id	mne_application		htmlcomposetab				id	id	id		htmlcomposeid	f	\N	575ea30c8050	575e9c45801d	frame	
 1407337089	admindb	1407337089	admindb	vendornameedit	vendor,companyid	mne_crm	company_detail					company	company,companyid	company			f	0	575ea30c8103	575e9c458031	table	
 1407333390	admindb	1407337540	admindb	detaildeliverynotenumberedit	vendorname,vendorid	mne_warehouse	part_vendor		is not null	companyid		vendor	vendor,partvendorid	vendor		"partidInput.old" : "partid"	f	0	575ea30c8104	575e9c458031	table	
-1472135792	admindb	1472135792	admindb	detail	birthday								date		selectday		f	\N	57bf02700000	57beb13a0000	table	
-1472135814	admindb	1472135814	admindb	detail	city,postcode,cityid	mne_crm		city				name	name,postcode,cityid	name,postcode			f	\N	57bf02860000	57beb13a0000	table	
-1472135829	admindb	1472135829	admindb	detail	ownername,ownerid	mne_crm	person_own		=	active	true	fullname	fullname,personid	fullname			f	0	57bf02950000	57beb13a0000	table	
-1472135850	admindb	1472135850	admindb	detail	refname,refid	mne_crm	company_detail		=	companyown	true	company	company,companyid	company			f	\N	57bf02aa0000	57beb13a0000	table	
-1472135871	admindb	1472135871	admindb	owndata	color								color		color		f	\N	57bf02bf0000	57beb13a0000	table	
-1472135886	admindb	1472135886	admindb	owndata	validuntil								date		selectday		f	\N	57bf02ce0000	57beb13a0000	table	
-1472135919	admindb	1472135919	admindb	usersettings	startwebletname,startweblet	mne_application	weblet_all		<>	schema	dbadmin	name	label,name	label			f	0	57bf02ef0000	57beb13a0000	table	
 1267729305	admindb	1600083142	admindb	partmanagementedit	fixturetype,partdescription,fixturetypeid,partcost,unit	mne_fixture	fixturetypetree		=	parentid			fixturetype,fixturetype,fixturetypeid,unitcost,unit	action,item,menuid,typ,pos,fixturetype,fixturetypeid,unitcost,unit			f	\N	575ea30c810f	575e9c458019	rmenu	
 1292235264	admindb	1601033828	admindb	partsedit	fixturetype,partdescription,fixturetypeid,partcost,unit	mne_fixture	fixturetypetree		=	parentid			fixturetype,fixturetype,fixturetypeid,unitcost,unit	action,item,menuid,typ,pos,fixturetype,fixturetypeid,unitcost,unit			f	\N	575ea30c810e	575e9c458017	rmenu	
 1291368929	admindb	1601034740	admindb	partsedit	partname,partdescription,partid,partcost,unit	mne_warehouse	parttree		=	parentid			partname,partname,partid,unitcost,unit	action,item,menuid,typ,pos			f	\N	575ea30c810d	575e9c458017	rmenu	
 1386592724	admindb	1603109917	admindb	hoai	year	mne_hoai	fee					!year	year	year			f	\N	575ea30c811d	575e9c458018	table	
 1348493529	admindb	1603356810	admindb	incoicetime	num	mne_shipment	invoice_detail					num	num,num	num		orderid	f	\N	575ea30c8117	575e9c458030	table	
 1237298816	admindb	1609915443	admindb	detail	contactname,contactid	mne_crm	person_detail					lastname	fullname,personid	lastname,firstname		refid	f	\N	575ea30c8044	575e9c458017	table	[ () => { return self.obj.inputs.refid.getValue(false) } ]
+1612284013	admindb	1612284013	admindb	bottom	parentname,parentid	mne_application	menu					pos	item,menuid	action,item,menuid,typ,pos		menuname,typ,parentid	f	\N	6019806d0000	575e9c458027	rmenu	[ () => { return this.config.dependweblet.config.dependweblet.obj.run.values.menuname }, () => { return '' } ]
 \.
 
 
@@ -18647,7 +18447,6 @@ COPY mne_application.htmlcomposetabselect (createdate, createuser, modifydate, m
 COPY mne_application.htmlcomposetabslider (createdate, createuser, modifydate, modifyuser, sliderpos, slidername, custom, htmlcomposeid) FROM stdin;
 1237833880	admindb	1237834289	admindb	20%	s0	f	575e9c458005
 1391680059	admindb	1391680059	admindb	30%	s0	f	575e9c458035
-1453804496	admindb	1453805037	admindb	180px	s0	f	575e9c458038
 1238156154	admindb	1515765884	admindb	20%	s0	f	575e9c458010
 1288948638	admindb	1288948638	admindb	40%	s2	f	575e9c458032
 1589782258	admindb	1589786103	admindb	33%	s2	f	575e9c45801d
@@ -19098,8 +18897,9 @@ COPY mne_application.menu (createdate, createuser, modifydate, modifyuser, menup
 --
 
 COPY mne_application.querycolnames (createdate, createuser, modifydate, modifyuser, text_de, text_en, colid, schema, query) FROM stdin;
-1358260498	admindb	1358260498	admindb	\N	\N	prefix	mne_crm	account
-1380109905	admindb	1380109905	admindb	\N	\N	refid	mne_shipment	deliverynote
+1607510241	admindb	1607510241	admindb	\N	\N	uownblz	mne_crm	order_detail
+1545403743	admindb	1545403743	admindb	\N	\N	userid	mne_personnal	time
+1291366311	admindb	1291366311	admindb	\N	\N	count	mne_crm	offercost
 1601384868	admindb	1601384868	admindb	\N	\N	open	mne_crm	orderproduct
 1608221689	admindb	1608221689	admindb	\N	\N	menuid	mne_fixture	fixturetree
 1609766841	admindb	1609766841	admindb	\N	\N	pos	mne_crm	producttree
@@ -19675,7 +19475,6 @@ COPY mne_application.querycolnames (createdate, createuser, modifydate, modifyus
 1603198358	admindb	1603198358	admindb	\N	\N	orderid	mne_shipment	deliverynote_detail
 1603198358	admindb	1603198358	admindb	\N	\N	ordernumber	mne_shipment	deliverynote_detail
 1603198358	admindb	1603198358	admindb	Lieferscheinnummer	delievery note number	deliverynotenumber	mne_shipment	deliverynote_detail
-1609766841	admindb	1609766841	admindb	\N	\N	menuid	mne_crm	producttree
 1603198358	admindb	1603198358	admindb	Beschreibung	\N	description	mne_shipment	deliverynote_detail
 1603198358	admindb	1603198358	admindb	ausgeliefert	\N	delivered	mne_shipment	deliverynote_detail
 1603198358	admindb	1603198358	admindb	\N	\N	ownerid	mne_shipment	deliverynote_detail
@@ -19758,7 +19557,6 @@ COPY mne_application.querycolnames (createdate, createuser, modifydate, modifyus
 1600179117	admindb	1600179117	admindb	\N	\N	uownhttp	mne_crm	offer_detail
 1600179117	admindb	1600179117	admindb	\N	\N	uownfax	mne_crm	offer_detail
 1600179117	admindb	1600179117	admindb	\N	\N	uownemail	mne_crm	offer_detail
-1608287743	admindb	1608287743	admindb	\N	\N	fixturetypecostid	mne_fixture	fixture
 1603198358	admindb	1603198358	admindb	\N	\N	fromsign	mne_shipment	deliverynote_detail
 1603198358	admindb	1603198358	admindb	\N	\N	tosign	mne_shipment	deliverynote_detail
 1603198358	admindb	1603198358	admindb	\N	\N	orderownerid	mne_shipment	deliverynote_detail
@@ -19833,7 +19631,6 @@ COPY mne_application.querycolnames (createdate, createuser, modifydate, modifyus
 1601458426	admindb	1601458426	admindb	\N	\N	description	mne_personnal	orderproducttime_list
 1601458426	admindb	1601458426	admindb	\N	\N	setduration	mne_personnal	orderproducttime_list
 1601458426	admindb	1601458426	admindb	\N	\N	count	mne_personnal	orderproducttime_list
-1603455299	admindb	1603455299	admindb	\N	\N	typ	mne_shipment	invoicemanagement_auto
 1601458426	admindb	1601458426	admindb	Gesammtdauer	sum duration	setdurationsum	mne_personnal	orderproducttime_list
 1601458426	admindb	1601458426	admindb	\N	\N	skillid	mne_personnal	orderproducttime_list
 1601458426	admindb	1601458426	admindb	\N	\N	skilltext	mne_personnal	orderproducttime_list
@@ -20051,6 +19848,7 @@ COPY mne_application.querycolnames (createdate, createuser, modifydate, modifyus
 1600870188	admindb	1600870188	admindb	\N	\N	producttimeid	mne_personnal	offerproducttime
 1600870188	admindb	1600870188	admindb	\N	\N	productoptid	mne_personnal	offerproducttime
 1600870188	admindb	1600870188	admindb	\N	\N	offerproducttype	mne_personnal	offerproducttime
+1603345954	admindb	1603345954	admindb	\N	\N	invoicename	mne_shipment	invoice_detail
 1600870188	admindb	1600870188	admindb	Art	product type	offerproducttypetext	mne_personnal	offerproducttime
 1600870188	admindb	1600870188	admindb	Produkt	product	productname	mne_personnal	offerproducttime
 1600870188	admindb	1600870188	admindb	\N	\N	setduration	mne_personnal	offerproducttime
@@ -20130,7 +19928,6 @@ COPY mne_application.querycolnames (createdate, createuser, modifydate, modifyus
 1603345954	admindb	1603345954	admindb	Summe	sum	paysum	mne_shipment	invoice_detail
 1603345954	admindb	1603345954	admindb	\N	\N	fromsign	mne_shipment	invoice_detail
 1603345954	admindb	1603345954	admindb	\N	\N	uowntelefon	mne_shipment	invoice_detail
-1603345954	admindb	1603345954	admindb	\N	\N	invoicename	mne_shipment	invoice_detail
 1603345954	admindb	1603345954	admindb	\N	\N	iwithtimesheet	mne_shipment	invoice_detail
 1603345954	admindb	1603345954	admindb	\N	\N	uownaccount	mne_shipment	invoice_detail
 1603345954	admindb	1603345954	admindb	\N	\N	tosign	mne_shipment	invoice_detail
@@ -20190,10 +19987,6 @@ COPY mne_application.querycolnames (createdate, createuser, modifydate, modifyus
 1603345954	admindb	1603345954	admindb	\N	\N	invoiced	mne_shipment	invoice_detail
 1603345954	admindb	1603345954	admindb	\N	\N	lettersubject	mne_shipment	invoice_detail
 1603345954	admindb	1603345954	admindb	Beschreibung	\N	description	mne_shipment	invoice_detail
-1605541710	admindb	1605541710	admindb	\N	\N	rolname	mne_application	usergroup
-1605541710	admindb	1605541710	admindb	\N	\N	group	mne_application	usergroup
-1605541710	admindb	1605541710	admindb	\N	\N	ismember	mne_application	usergroup
-1605541710	admindb	1605541710	admindb	\N	\N	groupname	mne_application	usergroup
 1608047769	admindb	1608047769	admindb	\N	\N	partstoragelocationid	mne_warehouse	storagelocation_disposable
 1608047769	admindb	1608047769	admindb	\N	\N	storagelocationid	mne_warehouse	storagelocation_disposable
 1608047769	admindb	1608047769	admindb	\N	\N	partid	mne_warehouse	storagelocation_disposable
@@ -20225,6 +20018,7 @@ COPY mne_application.querycolnames (createdate, createuser, modifydate, modifyus
 1608276929	admindb	1608276929	admindb	\N	\N	modifyuser	mne_fixture	fixturecost
 1609766841	admindb	1609766841	admindb	\N	\N	menuname	mne_crm	producttree
 1609766841	admindb	1609766841	admindb	\N	\N	parentid	mne_crm	producttree
+1609766841	admindb	1609766841	admindb	\N	\N	menuid	mne_crm	producttree
 1609766841	admindb	1609766841	admindb	Unterkategorie	sub category	item	mne_crm	producttree
 1609766841	admindb	1609766841	admindb	Kategorie	category	parentname	mne_crm	producttree
 1603358746	admindb	1603358746	admindb	\N	\N	invoiceid	mne_shipment	invoice
@@ -20307,6 +20101,8 @@ COPY mne_application.querycolnames (createdate, createuser, modifydate, modifyus
 1608287743	admindb	1608287743	admindb	Typkategorie	type categorie	typetreepath	mne_fixture	fixture
 1608287743	admindb	1608287743	admindb	\N	\N	fixturetype	mne_fixture	fixture
 1608287743	admindb	1608287743	admindb	\N	\N	fixturecostid	mne_fixture	fixture
+1608287743	admindb	1608287743	admindb	\N	\N	fixturetypecostid	mne_fixture	fixture
+1603455299	admindb	1603455299	admindb	\N	\N	typ	mne_shipment	invoicemanagement_auto
 1603455299	admindb	1603455299	admindb	Startdatum	start date	invoiceauto	mne_shipment	invoicemanagement_auto
 1603455299	admindb	1603455299	admindb	\N	\N	ntyp	mne_shipment	invoicemanagement_auto
 1603455299	admindb	1603455299	admindb	\N	\N	invoiceid	mne_shipment	invoicemanagement_auto
@@ -20386,7 +20182,6 @@ COPY mne_application.querycolnames (createdate, createuser, modifydate, modifyus
 1607510241	admindb	1607510241	admindb	\N	\N	uowncompanyownprefix	mne_crm	order_detail
 1607510241	admindb	1607510241	admindb	\N	\N	uownaccount	mne_crm	order_detail
 1607510241	admindb	1607510241	admindb	\N	\N	uownbank	mne_crm	order_detail
-1607510241	admindb	1607510241	admindb	\N	\N	uownblz	mne_crm	order_detail
 1607510241	admindb	1607510241	admindb	\N	\N	uowncompany	mne_crm	order_detail
 1607510241	admindb	1607510241	admindb	\N	\N	uownpostbox	mne_crm	order_detail
 1607510241	admindb	1607510241	admindb	\N	\N	uownstreet	mne_crm	order_detail
@@ -20549,19 +20344,6 @@ COPY mne_application.querycolnames (createdate, createuser, modifydate, modifyus
 1607608514	admindb	1607608514	admindb	\N	\N	ordernumber	mne_warehouse	purchase_parttree
 1607608514	admindb	1607608514	admindb	\N	\N	deliverydate	mne_warehouse	purchase_parttree
 1607608514	admindb	1607608514	admindb	\N	\N	orderdate	mne_warehouse	purchase_parttree
-1607611275	admindb	1607611275	admindb	\N	\N	menuname	mne_warehouse	parttree_needpurchase
-1607611275	admindb	1607611275	admindb	\N	\N	parentid	mne_warehouse	parttree_needpurchase
-1607611275	admindb	1607611275	admindb	\N	\N	menuid	mne_warehouse	parttree_needpurchase
-1607611275	admindb	1607611275	admindb	\N	\N	item	mne_warehouse	parttree_needpurchase
-1607611275	admindb	1607611275	admindb	\N	\N	parentname	mne_warehouse	parttree_needpurchase
-1607611275	admindb	1607611275	admindb	\N	\N	treepath	mne_warehouse	parttree_needpurchase
-1607611275	admindb	1607611275	admindb	\N	\N	pos	mne_warehouse	parttree_needpurchase
-1607611275	admindb	1607611275	admindb	\N	\N	partid	mne_warehouse	parttree_needpurchase
-1607611275	admindb	1607611275	admindb	\N	\N	typ	mne_warehouse	parttree_needpurchase
-1607611275	admindb	1607611275	admindb	\N	\N	action	mne_warehouse	parttree_needpurchase
-1607611275	admindb	1607611275	admindb	\N	\N	mincount	mne_warehouse	parttree_needpurchase
-1607611275	admindb	1607611275	admindb	\N	\N	sum	mne_warehouse	parttree_needpurchase
-1607611275	admindb	1607611275	admindb	\N	\N	needorder	mne_warehouse	parttree_needpurchase
 1608112642	admindb	1608112642	admindb	\N	\N	menuname	mne_warehouse	partoutgoing_tree
 1608112642	admindb	1608112642	admindb	\N	\N	parentid	mne_warehouse	partoutgoing_tree
 1608112642	admindb	1608112642	admindb	\N	\N	menuid	mne_warehouse	partoutgoing_tree
@@ -20784,7 +20566,9 @@ COPY mne_application.querycolnames (createdate, createuser, modifydate, modifyus
 1608188280	admindb	1608188280	admindb	\N	\N	ordernumber	mne_warehouse	purchasedelivery_invoice
 1608188280	admindb	1608188280	admindb	\N	\N	orderdate	mne_warehouse	purchasedelivery_invoice
 1608188280	admindb	1608188280	admindb	\N	\N	crmorder	mne_warehouse	purchasedelivery_invoice
+1358260498	admindb	1358260498	admindb	\N	\N	prefix	mne_crm	account
 1608188280	admindb	1608188280	admindb	\N	\N	crmordernumber	mne_warehouse	purchasedelivery_invoice
+1347950513	admindb	1347950513	admindb	\N	\N	productpartid	mne_warehouse	productpart
 1608188280	admindb	1608188280	admindb	mit Rechnung	with invoice	haveinvoice	mne_warehouse	purchasedelivery_invoice
 1608188280	admindb	1608188280	admindb	\N	\N	paytime	mne_warehouse	purchasedelivery_invoice
 1607950930	admindb	1607950930	admindb	\N	\N	menuname	mne_warehouse	parttree_havevendor
@@ -20862,7 +20646,6 @@ COPY mne_application.querycolnames (createdate, createuser, modifydate, modifyus
 1380106947	admindb	1380106947	admindb	\N	\N	birthday	mne_crm	person_deliver
 1358260498	admindb	1358260498	admindb	\N	\N	fullname	mne_crm	account
 1358260498	admindb	1358260498	admindb	\N	\N	kontoid	mne_crm	account
-1347950513	admindb	1347950513	admindb	\N	\N	productpartid	mne_warehouse	productpart
 1347950513	admindb	1347950513	admindb	\N	\N	productid	mne_warehouse	productpart
 1347950513	admindb	1347950513	admindb	\N	\N	partgroup	mne_warehouse	productpart
 1347950513	admindb	1347950513	admindb	\N	\N	partdescription	mne_warehouse	productpart
@@ -20955,7 +20738,6 @@ COPY mne_application.querycolnames (createdate, createuser, modifydate, modifyus
 1380107761	admindb	1380107761	admindb	\N	\N	productname	mne_personnal	orderproducttime_skill
 1380107761	admindb	1380107761	admindb	\N	\N	loginname	mne_personnal	orderproducttime_skill
 1380107761	admindb	1380107761	admindb	\N	\N	login	mne_personnal	orderproducttime_skill
-1545403743	admindb	1545403743	admindb	\N	\N	userid	mne_personnal	time
 1545403743	admindb	1545403743	admindb	\N	\N	timeid	mne_personnal	time
 1545403743	admindb	1545403743	admindb	\N	\N	orderproducttimeid	mne_personnal	time
 1545403743	admindb	1545403743	admindb	\N	\N	start	mne_personnal	time
@@ -20966,8 +20748,6 @@ COPY mne_application.querycolnames (createdate, createuser, modifydate, modifyus
 1545403743	admindb	1545403743	admindb	\N	\N	month	mne_personnal	time
 1545403743	admindb	1545403743	admindb	\N	\N	year	mne_personnal	time
 1545403743	admindb	1545403743	admindb	Tag	day	daytext	mne_personnal	time
-1393496771	admindb	1393496771	admindb	\N	\N	username	mne_application	loginuser
-1393496771	admindb	1393496771	admindb	\N	\N	systemuser	mne_application	loginuser
 1545403743	admindb	1545403743	admindb	\N	\N	duration	mne_personnal	time
 1310657260	admindb	1310657260	admindb	\N	\N	imapfolderid	mne_mail	imapfolder
 1310657260	admindb	1310657260	admindb	\N	\N	imapmailboxid	mne_mail	imapfolder
@@ -21166,6 +20946,7 @@ COPY mne_application.querycolnames (createdate, createuser, modifydate, modifyus
 1410267797	admindb	1410267797	admindb	\N	\N	invoicerefid	mne_shipment	invoicepaid
 1410267797	admindb	1410267797	admindb	\N	\N	withvat	mne_shipment	invoicepaid
 1410267797	admindb	1410267797	admindb	\N	\N	costumercount	mne_shipment	invoicepaid
+1224836999	admindb	1224836999	admindb	\N	\N	ttab	mne_application	join_all
 1410267797	admindb	1410267797	admindb	Anzahl Rechnungsempfänger	count invoice customer	rescostumercount	mne_shipment	invoicepaid
 1410267797	admindb	1410267797	admindb	Anzahl	count	rescount	mne_shipment	invoicepaid
 1410267797	admindb	1410267797	admindb	Nettopreis	net price	netprice	mne_shipment	invoicepaid
@@ -21325,7 +21106,6 @@ COPY mne_application.querycolnames (createdate, createuser, modifydate, modifyus
 1224836999	admindb	1224836999	admindb	\N	\N	ftab	mne_application	join_all
 1224836999	admindb	1224836999	admindb	\N	\N	fcols	mne_application	join_all
 1224836999	admindb	1224836999	admindb	\N	\N	tschema	mne_application	join_all
-1224836999	admindb	1224836999	admindb	\N	\N	ttab	mne_application	join_all
 1224836999	admindb	1224836999	admindb	\N	\N	tcols	mne_application	join_all
 1224836999	admindb	1224836999	admindb	\N	\N	op	mne_application	join_all
 1224836999	admindb	1224836999	admindb	\N	\N	typ	mne_application	join_all
@@ -21403,6 +21183,7 @@ COPY mne_application.querycolnames (createdate, createuser, modifydate, modifyus
 1380109582	admindb	1380109582	admindb	Auftrag	\N	orderdescription	mne_personnal	time_list
 1380109582	admindb	1380109582	admindb	mit Komentar	with comment	havecomment	mne_personnal	time_list
 1380109905	admindb	1380109905	admindb	\N	\N	deliverynoteid	mne_shipment	deliverynote
+1380109905	admindb	1380109905	admindb	\N	\N	refid	mne_shipment	deliverynote
 1380109905	admindb	1380109905	admindb	\N	\N	orderid	mne_shipment	deliverynote
 1380109905	admindb	1380109905	admindb	Beschreibung	\N	description	mne_shipment	deliverynote
 1380109905	admindb	1380109905	admindb	\N	\N	invoiceid	mne_shipment	deliverynote
@@ -21620,7 +21401,6 @@ COPY mne_application.querycolnames (createdate, createuser, modifydate, modifyus
 1291366311	admindb	1291366311	admindb	\N	\N	offerproductid	mne_crm	offercost
 1291366311	admindb	1291366311	admindb	\N	\N	productname	mne_crm	offercost
 1291366311	admindb	1291366311	admindb	Kosten/Einheit	\N	offerproductcost	mne_crm	offercost
-1291366311	admindb	1291366311	admindb	\N	\N	count	mne_crm	offercost
 1291366311	admindb	1291366311	admindb	Kosten	\N	sumcost	mne_crm	offercost
 1534144660	admindb	1534144660	admindb	\N	\N	postbox	mne_crm	person_private
 1534144660	admindb	1534144660	admindb	\N	\N	city	mne_crm	person_private
@@ -21650,7 +21430,6 @@ COPY mne_application.querycolnames (createdate, createuser, modifydate, modifyus
 1305893645	admindb	1305893645	admindb	\N	\N	name	mne_application	table_fkeys
 1305893645	admindb	1305893645	admindb	\N	\N	column	mne_application	table_fkeys
 1305893645	admindb	1305893645	admindb	Referenz Schema	reference schema	rschema	mne_application	table_fkeys
-1534144680	admindb	1534144680	admindb	\N	\N	refid	mne_crm	person_buissiness
 1305893645	admindb	1305893645	admindb	Referenz Tabelle	reference table	rtable	mne_application	table_fkeys
 1305893645	admindb	1305893645	admindb	Referenz Spalte	reference column	rcolumn	mne_application	table_fkeys
 1305893645	admindb	1305893645	admindb	\N	\N	position	mne_application	table_fkeys
@@ -21732,6 +21511,7 @@ COPY mne_application.querycolnames (createdate, createuser, modifydate, modifyus
 1311055999	admindb	1311055999	admindb	\N	\N	createuser	mne_crm	companyemail
 1311055999	admindb	1311055999	admindb	\N	\N	modifydate	mne_crm	companyemail
 1400224142	admindb	1400224142	admindb	\N	\N	storageid	mne_warehouse	storage
+1534144680	admindb	1534144680	admindb	\N	\N	refid	mne_crm	person_buissiness
 1400224142	admindb	1400224142	admindb	\N	\N	description	mne_warehouse	storage
 1400224142	admindb	1400224142	admindb	\N	\N	storageclass	mne_warehouse	storage
 1400224142	admindb	1400224142	admindb	\N	\N	storagetypid	mne_warehouse	storage
@@ -21955,7 +21735,6 @@ COPY mne_application.querycolnames (createdate, createuser, modifydate, modifyus
 1337850852	admindb	1337850852	admindb	\N	\N	deliverynotenumber	mne_warehouse	purchaseinvoicedelivery
 1337850852	admindb	1337850852	admindb	Teil	part	part	mne_warehouse	purchaseinvoicedelivery
 1337850852	admindb	1337850852	admindb	\N	\N	invoicenumber	mne_warehouse	purchaseinvoicedelivery
-1377236436	admindb	1377236436	admindb	\N	\N	firstname	mne_shipment	invoicetime
 1337850852	admindb	1337850852	admindb	\N	\N	invoicedate	mne_warehouse	purchaseinvoicedelivery
 1337850852	admindb	1337850852	admindb	\N	\N	purpose	mne_warehouse	purchaseinvoicedelivery
 1337850852	admindb	1337850852	admindb	\N	\N	remittee	mne_warehouse	purchaseinvoicedelivery
@@ -21972,6 +21751,7 @@ COPY mne_application.querycolnames (createdate, createuser, modifydate, modifyus
 1400572392	admindb	1400572392	admindb	\N	\N	partingoingid	mne_warehouse	partstoragelocation
 1400572392	admindb	1400572392	admindb	\N	\N	partid	mne_warehouse	partstoragelocation
 1400572392	admindb	1400572392	admindb	\N	\N	count	mne_warehouse	partstoragelocation
+1422262545	admindb	1422262545	admindb	\N	\N	refid	mne_repository	repository
 1400572392	admindb	1400572392	admindb	verfügbar	availible	rcount	mne_warehouse	partstoragelocation
 1400572392	admindb	1400572392	admindb	\N	\N	createdate	mne_warehouse	partstoragelocation
 1400572392	admindb	1400572392	admindb	\N	\N	createuser	mne_warehouse	partstoragelocation
@@ -22031,6 +21811,7 @@ COPY mne_application.querycolnames (createdate, createuser, modifydate, modifyus
 1377236436	admindb	1377236436	admindb	Ende	end	clocktimeend	mne_shipment	invoicetime
 1377236436	admindb	1377236436	admindb	Tag	day	daytext	mne_shipment	invoicetime
 1377236436	admindb	1377236436	admindb	\N	\N	comment	mne_shipment	invoicetime
+1377236436	admindb	1377236436	admindb	\N	\N	firstname	mne_shipment	invoicetime
 1377236436	admindb	1377236436	admindb	\N	\N	lastname	mne_shipment	invoicetime
 1377236436	admindb	1377236436	admindb	Name	name	fullname	mne_shipment	invoicetime
 1377236436	admindb	1377236436	admindb	\N	\N	steptext	mne_shipment	invoicetime
@@ -22045,6 +21826,8 @@ COPY mne_application.querycolnames (createdate, createuser, modifydate, modifyus
 1377236582	admindb	1377236582	admindb	Art	type	orderproducttypetext	mne_personnal	orderproducttime_workstep
 1377236582	admindb	1377236582	admindb	\N	\N	productoptid	mne_personnal	orderproducttime_workstep
 1524485514	admindb	1524485514	admindb	\N	\N	-starttime	mne_personnal	persontime_all
+1422262545	admindb	1422262545	admindb	\N	\N	name	mne_repository	repository
+1422262545	admindb	1422262545	admindb	\N	\N	root	mne_repository	repository
 1377236582	admindb	1377236582	admindb	\N	\N	productname	mne_personnal	orderproducttime_workstep
 1380106947	admindb	1380106947	admindb	\N	\N	personid	mne_crm	person_deliver
 1380106947	admindb	1380106947	admindb	\N	\N	firstname	mne_crm	person_deliver
@@ -22108,13 +21891,11 @@ COPY mne_application.querycolnames (createdate, createuser, modifydate, modifyus
 1377235972	admindb	1377235972	admindb	\N	\N	skillid	mne_personnal	offerproducttime_workstep
 1377235972	admindb	1377235972	admindb	\N	\N	skilltext	mne_personnal	offerproducttime_workstep
 1377235972	admindb	1377235972	admindb	\N	\N	step	mne_personnal	offerproducttime_workstep
-1515748505	admindb	1515748505	admindb	\N	\N	rating	mne_personnal	personskill
 1377235972	admindb	1377235972	admindb	\N	\N	steptext	mne_personnal	offerproducttime_workstep
 1377235972	admindb	1377235972	admindb	\N	\N	longdesc	mne_personnal	offerproducttime_workstep
 1377235972	admindb	1377235972	admindb	Tätigkeit	\N	description	mne_personnal	offerproducttime_workstep
 1377235972	admindb	1377235972	admindb	\N	\N	sortname	mne_personnal	offerproducttime_workstep
 1377235972	admindb	1377235972	admindb	Kosten	cost	cost	mne_personnal	offerproducttime_workstep
-1515748505	admindb	1515748505	admindb	\N	\N	firstname	mne_personnal	personskill
 1377235972	admindb	1377235972	admindb	\N	\N	currency	mne_personnal	offerproducttime_workstep
 1377235972	admindb	1377235972	admindb	\N	\N	createdate	mne_personnal	offerproducttime_workstep
 1377235972	admindb	1377235972	admindb	\N	\N	createuser	mne_personnal	offerproducttime_workstep
@@ -22273,9 +22054,6 @@ COPY mne_application.querycolnames (createdate, createuser, modifydate, modifyus
 1410256508	admindb	1410256508	admindb	History	history	showhistory	mne_application	table_all
 1410256508	admindb	1410256508	admindb	User/Time Spalten	user/time columns	haveusertimecolumn	mne_application	table_all
 1422262545	admindb	1422262545	admindb	\N	\N	repositoryid	mne_repository	repository
-1422262545	admindb	1422262545	admindb	\N	\N	name	mne_repository	repository
-1422262545	admindb	1422262545	admindb	\N	\N	refid	mne_repository	repository
-1422262545	admindb	1422262545	admindb	\N	\N	root	mne_repository	repository
 1422262545	admindb	1422262545	admindb	\N	\N	createdate	mne_repository	repository
 1422262545	admindb	1422262545	admindb	\N	\N	createuser	mne_repository	repository
 1422262545	admindb	1422262545	admindb	\N	\N	modifydate	mne_repository	repository
@@ -22332,13 +22110,11 @@ COPY mne_application.querycolnames (createdate, createuser, modifydate, modifyus
 1479483531	admindb	1479483531	admindb	Einheit	\N	unit	mne_warehouse	offerproductpart_list
 1479483531	admindb	1479483531	admindb	Betreuer	manager	pownerid	mne_warehouse	offerproductpart_list
 1479483531	admindb	1479483531	admindb	Betreuer	manager	powner	mne_warehouse	offerproductpart_list
-1578380726	admindb	1578380726	admindb	\N	\N	dnsaddressid	mne_system	dnsaddress
 1479483531	admindb	1479483531	admindb	Betreuerfirma	company of the manager	pownercompany	mne_warehouse	offerproductpart_list
 1512555690	admindb	1512555690	admindb	\N	\N	schema	mne_application	table_index_column
 1512555690	admindb	1512555690	admindb	\N	\N	table	mne_application	table_index_column
 1512555690	admindb	1512555690	admindb	Index	\N	index	mne_application	table_index_column
 1512555690	admindb	1512555690	admindb	Unique	\N	isunique	mne_application	table_index_column
-1515748505	admindb	1515748505	admindb	\N	\N	color	mne_personnal	personskill
 1512555690	admindb	1512555690	admindb	Spalte	\N	column	mne_application	table_index_column
 1512555690	admindb	1512555690	admindb	Postion	\N	position	mne_application	table_index_column
 1512555690	admindb	1512555690	admindb	\N	\N	text_de	mne_application	table_index_column
@@ -22358,16 +22134,6 @@ COPY mne_application.querycolnames (createdate, createuser, modifydate, modifyus
 1542875263	admindb	1542875263	admindb	IV - bis	\N	endfee4	mne_hoai	fee
 1542875263	admindb	1542875263	admindb	V - von	\N	startfee5	mne_hoai	fee
 1542875263	admindb	1542875263	admindb	V - bis	\N	endfee5	mne_hoai	fee
-1473783246	admindb	1473783246	admindb	\N	\N	sharesid	mne_system	shares
-1473783246	admindb	1473783246	admindb	\N	\N	folderid	mne_system	shares
-1473783246	admindb	1473783246	admindb	\N	\N	personid	mne_system	shares
-1473783246	admindb	1473783246	admindb	\N	\N	readwrite	mne_system	shares
-1473783246	admindb	1473783246	admindb	\N	\N	location	mne_system	shares
-1473783246	admindb	1473783246	admindb	\N	\N	name	mne_system	shares
-1473783246	admindb	1473783246	admindb	\N	\N	description	mne_system	shares
-1473783246	admindb	1473783246	admindb	\N	\N	firstname	mne_system	shares
-1473783246	admindb	1473783246	admindb	\N	\N	lastname	mne_system	shares
-1473783246	admindb	1473783246	admindb	Name	name	fullname	mne_system	shares
 1431940072	admindb	1431940072	admindb	\N	\N	personowndataid	mne_personnal	personowndatapublic
 1431940072	admindb	1431940072	admindb	\N	\N	personid	mne_personnal	personowndatapublic
 1431940072	admindb	1431940072	admindb	\N	\N	loginname	mne_personnal	personowndatapublic
@@ -22379,9 +22145,6 @@ COPY mne_application.querycolnames (createdate, createuser, modifydate, modifyus
 1431940072	admindb	1431940072	admindb	\N	\N	currency	mne_personnal	personowndatapublic
 1431940072	admindb	1431940072	admindb	kann sich einloggen	can login	canlogin	mne_personnal	personowndatapublic
 1431940072	admindb	1431940072	admindb	Benutzername	user name	username	mne_personnal	personowndatapublic
-1473783246	admindb	1473783246	admindb	\N	\N	company	mne_system	shares
-1473783246	admindb	1473783246	admindb	Webdav Zugriff	webdav access	havedav	mne_system	shares
-1473783246	admindb	1473783246	admindb	Smb Zugriff	smb access	havesmb	mne_system	shares
 1449582738	admindb	1449582738	admindb	\N	\N	sortcol	mne_personnal	ordertime_quarter
 1449582738	admindb	1449582738	admindb	\N	\N	timetyp	mne_personnal	ordertime_quarter
 1449582738	admindb	1449582738	admindb	Zeit	time	starttime	mne_personnal	ordertime_quarter
@@ -22395,27 +22158,6 @@ COPY mne_application.querycolnames (createdate, createuser, modifydate, modifyus
 1449582738	admindb	1449582738	admindb	Dauer	duration	duration	mne_personnal	ordertime_quarter
 1449582738	admindb	1449582738	admindb	Dauer	duration	dduration	mne_personnal	ordertime_quarter
 1449582738	admindb	1449582738	admindb	\N	\N	-start	mne_personnal	ordertime_quarter
-1459515687	admindb	1459515687	admindb	\N	\N	certcaid	mne_system	certca
-1459515687	admindb	1459515687	admindb	\N	\N	country	mne_system	certca
-1459515687	admindb	1459515687	admindb	\N	\N	state	mne_system	certca
-1459515687	admindb	1459515687	admindb	\N	\N	city	mne_system	certca
-1459515687	admindb	1459515687	admindb	\N	\N	org	mne_system	certca
-1459515687	admindb	1459515687	admindb	\N	\N	orgunit	mne_system	certca
-1459515687	admindb	1459515687	admindb	\N	\N	email	mne_system	certca
-1459515687	admindb	1459515687	admindb	Passwort	password	passwd	mne_system	certca
-1459515687	admindb	1459515687	admindb	\N	\N	createdate	mne_system	certca
-1459515687	admindb	1459515687	admindb	\N	\N	createuser	mne_system	certca
-1459515687	admindb	1459515687	admindb	\N	\N	modifydate	mne_system	certca
-1459515687	admindb	1459515687	admindb	\N	\N	modifyuser	mne_system	certca
-1459515687	admindb	1459515687	admindb	Zertifikat erneuern	renew certificate	overwrite	mne_system	certca
-1477560480	admindb	1477560480	admindb	\N	\N	mailaliasid	mne_system	mailalias
-1477560480	admindb	1477560480	admindb	\N	\N	alias	mne_system	mailalias
-1477560480	admindb	1477560480	admindb	\N	\N	loginname	mne_system	mailalias
-1477560480	admindb	1477560480	admindb	\N	\N	personid	mne_system	mailalias
-1477560480	admindb	1477560480	admindb	\N	\N	createdate	mne_system	mailalias
-1477560480	admindb	1477560480	admindb	\N	\N	createuser	mne_system	mailalias
-1477560480	admindb	1477560480	admindb	\N	\N	modifydate	mne_system	mailalias
-1477560480	admindb	1477560480	admindb	\N	\N	modifyuser	mne_system	mailalias
 1479483372	admindb	1479483372	admindb	\N	\N	sorting	mne_warehouse	orderproductpart_list
 1479483372	admindb	1479483372	admindb	\N	\N	rowtyp	mne_warehouse	orderproductpart_list
 1479483372	admindb	1479483372	admindb	\N	\N	position	mne_warehouse	orderproductpart_list
@@ -22500,17 +22242,6 @@ COPY mne_application.querycolnames (createdate, createuser, modifydate, modifyus
 1472214992	admindb	1472214992	admindb	\N	\N	start	mne_personnal	timeorder_single
 1472214992	admindb	1472214992	admindb	\N	\N	end	mne_personnal	timeorder_single
 1472214992	admindb	1472214992	admindb	Login	lgoin	loginname	mne_personnal	timeorder_single
-1478018905	admindb	1478018905	admindb	\N	\N	personid	mne_system	personsharepasswd
-1478018905	admindb	1478018905	admindb	\N	\N	loginname	mne_system	personsharepasswd
-1478018905	admindb	1478018905	admindb	\N	\N	validuntil	mne_system	personsharepasswd
-1478018905	admindb	1478018905	admindb	Passwort	password	passwd1	mne_system	personsharepasswd
-1478018905	admindb	1478018905	admindb	Passwort wiederhohlen	password check	passwd2	mne_system	personsharepasswd
-1478018905	admindb	1478018905	admindb	\N	\N	firstname	mne_system	personsharepasswd
-1478018905	admindb	1478018905	admindb	\N	\N	lastname	mne_system	personsharepasswd
-1478018905	admindb	1478018905	admindb	Name	name	fullname	mne_system	personsharepasswd
-1478018905	admindb	1478018905	admindb	\N	\N	refname	mne_system	personsharepasswd
-1478018905	admindb	1478018905	admindb	Webdav Zugriff	webdav access	havedav	mne_system	personsharepasswd
-1478018905	admindb	1478018905	admindb	SMB Zugriff	smb access	havesmb	mne_system	personsharepasswd
 1479483531	admindb	1479483531	admindb	\N	\N	sorting	mne_warehouse	offerproductpart_list
 1479483531	admindb	1479483531	admindb	\N	\N	rowtyp	mne_warehouse	offerproductpart_list
 1479483531	admindb	1479483531	admindb	\N	\N	position	mne_warehouse	offerproductpart_list
@@ -22570,10 +22301,13 @@ COPY mne_application.querycolnames (createdate, createuser, modifydate, modifyus
 1515748505	admindb	1515748505	admindb	\N	\N	personskillid	mne_personnal	personskill
 1515748505	admindb	1515748505	admindb	\N	\N	skillid	mne_personnal	personskill
 1515748505	admindb	1515748505	admindb	\N	\N	skilltext	mne_personnal	personskill
+1515748505	admindb	1515748505	admindb	\N	\N	rating	mne_personnal	personskill
 1515748505	admindb	1515748505	admindb	Beurteilung	rating	ratingtext	mne_personnal	personskill
 1515748505	admindb	1515748505	admindb	\N	\N	personid	mne_personnal	personskill
 1515748505	admindb	1515748505	admindb	\N	\N	loginname	mne_personnal	personskill
 1515748505	admindb	1515748505	admindb	\N	\N	lastname	mne_personnal	personskill
+1515748505	admindb	1515748505	admindb	\N	\N	firstname	mne_personnal	personskill
+1515748505	admindb	1515748505	admindb	\N	\N	color	mne_personnal	personskill
 1515748505	admindb	1515748505	admindb	\N	\N	createdate	mne_personnal	personskill
 1515748505	admindb	1515748505	admindb	\N	\N	createuser	mne_personnal	personskill
 1515748505	admindb	1515748505	admindb	\N	\N	modifyuser	mne_personnal	personskill
@@ -22598,118 +22332,10 @@ COPY mne_application.querycolnames (createdate, createuser, modifydate, modifyus
 1515764924	admindb	1515764924	admindb	\N	\N	createuser	mne_application	weblet_detail
 1515764924	admindb	1515764924	admindb	\N	\N	modifyuser	mne_application	weblet_detail
 1515764924	admindb	1515764924	admindb	angepasst	customized	customall	mne_application	weblet_detail
-1516204173	admindb	1516204173	admindb	Gruppe	\N	group	mne_application	group
 1522155621	admindb	1522155621	admindb	\N	\N	name	mne_application	selectlist
 1522155621	admindb	1522155621	admindb	\N	\N	num	mne_application	selectlist
 1522155621	admindb	1522155621	admindb	\N	\N	value	mne_application	selectlist
 1522155621	admindb	1522155621	admindb	\N	\N	text	mne_application	selectlist
-1553165612	admindb	1553165612	admindb	\N	\N	folderid	mne_application	folder
-1553165612	admindb	1553165612	admindb	\N	\N	location	mne_application	folder
-1553165612	admindb	1553165612	admindb	\N	\N	hostname	mne_application	folder
-1553165612	admindb	1553165612	admindb	\N	\N	name	mne_application	folder
-1553165612	admindb	1553165612	admindb	\N	\N	description	mne_application	folder
-1553165612	admindb	1553165612	admindb	Benutzeranzahl	user cont	sharecount	mne_application	folder
-1553165612	admindb	1553165612	admindb	\N	\N	createdate	mne_application	folder
-1553165612	admindb	1553165612	admindb	\N	\N	createuser	mne_application	folder
-1553165612	admindb	1553165612	admindb	\N	\N	modifydate	mne_application	folder
-1553165612	admindb	1553165612	admindb	\N	\N	modifyuser	mne_application	folder
-1553754877	admindb	1553754877	admindb	\N	\N	apachemodid	mne_system	apachemod
-1553754877	admindb	1553754877	admindb	\N	\N	hostname	mne_system	apachemod
-1553754877	admindb	1553754877	admindb	\N	\N	enabled	mne_system	apachemod
-1553754877	admindb	1553754877	admindb	\N	\N	createdate	mne_system	apachemod
-1553754877	admindb	1553754877	admindb	\N	\N	createuser	mne_system	apachemod
-1553754877	admindb	1553754877	admindb	\N	\N	modifydate	mne_system	apachemod
-1553754877	admindb	1553754877	admindb	\N	\N	modifyuser	mne_system	apachemod
-1553755649	admindb	1553755649	admindb	\N	\N	apachesiteid	mne_system	apachesite
-1553755649	admindb	1553755649	admindb	\N	\N	enabled	mne_system	apachesite
-1553755649	admindb	1553755649	admindb	\N	\N	hostname	mne_system	apachesite
-1553755649	admindb	1553755649	admindb	\N	\N	domain	mne_system	apachesite
-1553755649	admindb	1553755649	admindb	\N	\N	alias	mne_system	apachesite
-1553755649	admindb	1553755649	admindb	\N	\N	documentroot	mne_system	apachesite
-1553755649	admindb	1553755649	admindb	\N	\N	email	mne_system	apachesite
-1553755649	admindb	1553755649	admindb	\N	\N	httpsonly	mne_system	apachesite
-1553755649	admindb	1553755649	admindb	\N	\N	conftext	mne_system	apachesite
-1553755649	admindb	1553755649	admindb	\N	\N	lastread	mne_system	apachesite
-1553755649	admindb	1553755649	admindb	Zertifikat erneuern	renew certificate	renewcert	mne_system	apachesite
-1553755649	admindb	1553755649	admindb	CA Passwort	ca password	passwd	mne_system	apachesite
-1553755649	admindb	1553755649	admindb	\N	\N	createdate	mne_system	apachesite
-1553755649	admindb	1553755649	admindb	\N	\N	createuser	mne_system	apachesite
-1553755649	admindb	1553755649	admindb	\N	\N	modifydate	mne_system	apachesite
-1553755649	admindb	1553755649	admindb	\N	\N	modifyuser	mne_system	apachesite
-1553755649	admindb	1553755649	admindb	\N	\N	port	mne_system	apachesite
-1553755649	admindb	1553755649	admindb	\N	\N	sport	mne_system	apachesite
-1553766118	admindb	1553766118	admindb	\N	\N	sogoid	mne_system	sogo
-1553766118	admindb	1553766118	admindb	Zertifikat vorhanden	certifikates ok	certok	mne_system	sogo
-1553766118	admindb	1553766118	admindb	Domain vorhanden	domain ok	domainok	mne_system	sogo
-1553766118	admindb	1553766118	admindb	\N	\N	mailcanonical	mne_system	sogo
-1553766118	admindb	1553766118	admindb	\N	\N	mailrelay	mne_system	sogo
-1553766118	admindb	1553766118	admindb	\N	\N	mailrelayuser	mne_system	sogo
-1553766118	admindb	1553766118	admindb	Mail Passwort	mail password	mailrelaypassword	mne_system	sogo
-1553766118	admindb	1553766118	admindb	CA Passwort	ca password	passwd	mne_system	sogo
-1553766118	admindb	1553766118	admindb	\N	\N	createdate	mne_system	sogo
-1553766118	admindb	1553766118	admindb	\N	\N	createuser	mne_system	sogo
-1553766118	admindb	1553766118	admindb	\N	\N	modifydate	mne_system	sogo
-1553766118	admindb	1553766118	admindb	\N	\N	modifyuser	mne_system	sogo
-1578380726	admindb	1578380726	admindb	\N	\N	name	mne_system	dnsaddress
-1578380726	admindb	1578380726	admindb	\N	\N	address	mne_system	dnsaddress
-1578380726	admindb	1578380726	admindb	\N	\N	record	mne_system	dnsaddress
-1578380726	admindb	1578380726	admindb	\N	\N	fix	mne_system	dnsaddress
-1578380726	admindb	1578380726	admindb	\N	\N	mac	mne_system	dnsaddress
-1578380726	admindb	1578380726	admindb	\N	\N	comment	mne_system	dnsaddress
-1578380726	admindb	1578380726	admindb	\N	\N	createdate	mne_system	dnsaddress
-1578380726	admindb	1578380726	admindb	\N	\N	createuser	mne_system	dnsaddress
-1578380726	admindb	1578380726	admindb	\N	\N	modifydate	mne_system	dnsaddress
-1578380726	admindb	1578380726	admindb	\N	\N	modifyuser	mne_system	dnsaddress
-1578499160	admindb	1578499160	admindb	\N	\N	domainid	mne_system	domain
-1578499160	admindb	1578499160	admindb	\N	\N	domain	mne_system	domain
-1578499160	admindb	1578499160	admindb	\N	\N	typ	mne_system	domain
-1578499160	admindb	1578499160	admindb	\N	\N	workgroup	mne_system	domain
-1578499160	admindb	1578499160	admindb	\N	\N	description	mne_system	domain
-1578499160	admindb	1578499160	admindb	\N	\N	netdevice	mne_system	domain
-1578499160	admindb	1578499160	admindb	\N	\N	primaryname	mne_system	domain
-1578499160	admindb	1578499160	admindb	\N	\N	primaryaddr	mne_system	domain
-1578499160	admindb	1578499160	admindb	\N	\N	dnsforwarder	mne_system	domain
-1578499160	admindb	1578499160	admindb	\N	\N	dnssearch	mne_system	domain
-1578499160	admindb	1578499160	admindb	Administrator	administrator	admin	mne_system	domain
-1578499160	admindb	1578499160	admindb	Admin Password	admin password	adminpassword	mne_system	domain
-1578499160	admindb	1578499160	admindb	Password Check	password check	adminpassword2	mne_system	domain
-1578499160	admindb	1578499160	admindb	\N	\N	dhcpstart	mne_system	domain
-1578499160	admindb	1578499160	admindb	\N	\N	dhcpend	mne_system	domain
-1578499160	admindb	1578499160	admindb	\N	\N	dhcp6start	mne_system	domain
-1578499160	admindb	1578499160	admindb	\N	\N	dhcp6end	mne_system	domain
-1578499160	admindb	1578499160	admindb	\N	\N	createdate	mne_system	domain
-1578499160	admindb	1578499160	admindb	\N	\N	createuser	mne_system	domain
-1578499160	admindb	1578499160	admindb	\N	\N	modifydate	mne_system	domain
-1578499160	admindb	1578499160	admindb	\N	\N	modifyuser	mne_system	domain
-1579620562	admindb	1579620562	admindb	\N	\N	networkid	mne_system	network
-1579620562	admindb	1579620562	admindb	\N	\N	ownnetwork	mne_system	network
-1579620562	admindb	1579620562	admindb	Schnittstelle	interface	networkidname	mne_system	network
-1579620562	admindb	1579620562	admindb	Rechner	\N	hostname	mne_system	network
-1579620562	admindb	1579620562	admindb	vorhanden	\N	available	mne_system	network
-1579620562	admindb	1579620562	admindb	\N	\N	search	mne_system	network
-1579620562	admindb	1579620562	admindb	\N	\N	typ	mne_system	network
-1579620562	admindb	1579620562	admindb	\N	\N	nameserver	mne_system	network
-1579620562	admindb	1579620562	admindb	\N	\N	mask	mne_system	network
-1579620562	admindb	1579620562	admindb	\N	\N	mask6	mne_system	network
-1579620562	admindb	1579620562	admindb	\N	\N	gateway	mne_system	network
-1579620562	admindb	1579620562	admindb	\N	\N	domain	mne_system	network
-1579620562	admindb	1579620562	admindb	\N	\N	configured	mne_system	network
-1579620562	admindb	1579620562	admindb	\N	\N	broadcast	mne_system	network
-1579620562	admindb	1579620562	admindb	\N	\N	addr	mne_system	network
-1579620562	admindb	1579620562	admindb	\N	\N	addr6	mne_system	network
-1579620562	admindb	1579620562	admindb	\N	\N	createdate	mne_system	network
-1579620562	admindb	1579620562	admindb	\N	\N	createuser	mne_system	network
-1579620562	admindb	1579620562	admindb	\N	\N	modifydate	mne_system	network
-1579620562	admindb	1579620562	admindb	\N	\N	modifyuser	mne_system	network
-1579620644	admindb	1579620644	admindb	\N	\N	netparamid	mne_system	netparam
-1579620644	admindb	1579620644	admindb	\N	\N	domain	mne_system	netparam
-1579620644	admindb	1579620644	admindb	\N	\N	search	mne_system	netparam
-1579620644	admindb	1579620644	admindb	\N	\N	gw	mne_system	netparam
-1579620644	admindb	1579620644	admindb	\N	\N	nameserver	mne_system	netparam
-1579620644	admindb	1579620644	admindb	\N	\N	createdate	mne_system	netparam
-1579620644	admindb	1579620644	admindb	\N	\N	createuser	mne_system	netparam
-1579620644	admindb	1579620644	admindb	\N	\N	modifydate	mne_system	netparam
-1579620644	admindb	1579620644	admindb	\N	\N	modifyuser	mne_system	netparam
 1610369005	admindb	1610369005	admindb	\N	\N	menuname	mne_application	menu
 1610369005	admindb	1610369005	admindb	\N	\N	parentid	mne_application	menu
 1610369005	admindb	1610369005	admindb	\N	\N	menuid	mne_application	menu
@@ -22812,6 +22438,29 @@ COPY mne_application.querycolnames (createdate, createuser, modifydate, modifyus
 1611062059	admindb	1611062059	admindb	\N	\N	regexp	mne_application	table_cols
 1611062059	admindb	1611062059	admindb	\N	\N	regexphelp	mne_application	table_cols
 1611062059	admindb	1611062059	admindb	\N	\N	custom	mne_application	table_cols
+1611328172	admindb	1611328172	admindb	\N	\N	username	mne_application	loginuser
+1611328172	admindb	1611328172	admindb	\N	\N	systemuser	mne_application	loginuser
+1616399206	admindb	1616399206	admindb	\N	\N	menuname	mne_warehouse	parttree_needpurchase
+1616399206	admindb	1616399206	admindb	\N	\N	parentid	mne_warehouse	parttree_needpurchase
+1616399206	admindb	1616399206	admindb	\N	\N	menuid	mne_warehouse	parttree_needpurchase
+1616399206	admindb	1616399206	admindb	\N	\N	item	mne_warehouse	parttree_needpurchase
+1616399206	admindb	1616399206	admindb	\N	\N	parentname	mne_warehouse	parttree_needpurchase
+1616399206	admindb	1616399206	admindb	\N	\N	treepath	mne_warehouse	parttree_needpurchase
+1616399206	admindb	1616399206	admindb	\N	\N	pos	mne_warehouse	parttree_needpurchase
+1616399206	admindb	1616399206	admindb	\N	\N	partid	mne_warehouse	parttree_needpurchase
+1616399206	admindb	1616399206	admindb	\N	\N	part	mne_warehouse	parttree_needpurchase
+1616399206	admindb	1616399206	admindb	\N	\N	parttype	mne_warehouse	parttree_needpurchase
+1616399206	admindb	1616399206	admindb	\N	\N	partname	mne_warehouse	parttree_needpurchase
+1616399206	admindb	1616399206	admindb	\N	\N	typ	mne_warehouse	parttree_needpurchase
+1616399206	admindb	1616399206	admindb	\N	\N	action	mne_warehouse	parttree_needpurchase
+1616399206	admindb	1616399206	admindb	\N	\N	mincount	mne_warehouse	parttree_needpurchase
+1616399206	admindb	1616399206	admindb	\N	\N	sum	mne_warehouse	parttree_needpurchase
+1616399206	admindb	1616399206	admindb	\N	\N	needorder	mne_warehouse	parttree_needpurchase
+1617712917	admindb	1617712917	admindb	Gruppe	\N	group	mne_application	group
+1617713076	admindb	1617713076	admindb	\N	\N	rolname	mne_application	usergroup
+1617713076	admindb	1617713076	admindb	\N	\N	group	mne_application	usergroup
+1617713076	admindb	1617713076	admindb	\N	\N	ismember	mne_application	usergroup
+1617713076	admindb	1617713076	admindb	\N	\N	groupname	mne_application	usergroup
 \.
 
 
@@ -22820,20 +22469,26 @@ COPY mne_application.querycolnames (createdate, createuser, modifydate, modifyus
 --
 
 COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuser, tabnum, colnum, queryid, fieldtyp, lang, colid, field, format, groupby, cannull, musthaving) FROM stdin;
-1382375860	admindb	1382375860	admindb	15	32	50659ba10000	1	0	open	open		t	f	f
-1400478534	admindb	1400478534	admindb	0	8	4af408450000	4	0	x	x		f	f	f
-1579620562	admindb	1579620562	admindb	0	9	57da3e460000	2	0	mask6	mask6		f	f	f
-1449571160	admindb	1449571160	admindb	-1	0	4ff3f1700000	2	0	sortcol	1		f	f	f
-1449571160	admindb	1449571160	admindb	-1	1	4ff3f1700000	2	0	timetyp	2		f	f	f
+1603197205	admindb	1603197205	admindb	8	2	48b44ed00000	2	0	name	name		f	f	f
+1603197205	admindb	1603197205	admindb	0	3	48b44ed00000	2	0	id	id		f	f	f
+1601361463	admindb	1601361463	admindb	0	11	504ef00d0000	2	0	law	law		f	f	f
+1288277504	admindb	1288277504	admindb	0	7	4b28e4fb0000	2	0	x	x		f	f	f
+1601361463	admindb	1601361463	admindb	0	12	504ef00d0000	2	0	zone	zone		f	f	f
+1593692431	admindb	1593692431	admindb	0	1	4b1d00050000	2	0	refid	refid		f	t	f
+1377236436	admindb	1377236436	admindb	1	13	506055be0000	2	0	comment	comment		f	t	f
+1601458335	admindb	1601458335	admindb	-1	1	5065618c0000	2	0	rowtyp	1		f	f	f
+1607680016	admindb	1607680016	admindb	1	19	4bb1c1150000	2	0	part	part		f	f	f
+1605600809	admindb	1605600809	admindb	0	3	4e0c922a0000	2	0	text_en	text_en		f	f	f
+1605600809	admindb	1605600809	admindb	0	4	4e0c922a0000	2	1	text	text		f	f	f
 1216810623	admindb	1216810623	admindb	0	0	test_1	2	0	test	name		f	t	f
 1524476722	admindb	1524476722	admindb	-1	0	4ddcca360000	2	0	sortcol	2		f	f	f
-1459515687	admindb	1459515687	admindb	0	3	56fcfd960000	2	0	city	city		f	f	f
 1391607496	admindb	1391607496	admindb	0	2	4e27c0a80000	2	0	email	email		f	f	f
 1288277504	admindb	1288277504	admindb	0	9	4b28e4fb0000	2	0	z	z		f	f	f
 1288277504	admindb	1288277504	admindb	0	8	4b28e4fb0000	2	0	y	y		f	f	f
 1348750874	admindb	1348750874	admindb	-1	0	5063f6ec0000	2	0	sortcol	1		f	f	f
 1386585811	admindb	1386585811	admindb	10	1	4c5264930000	2	0	year	year		f	f	f
 1544598911	admindb	1544598911	admindb	0	5	4cd3af8b0000	4	0	count	count		f	f	f
+1382375860	admindb	1382375860	admindb	15	32	50659ba10000	1	0	open	open		t	f	f
 1605600809	admindb	1605600809	admindb	0	0	4e0c922a0000	2	0	skillid	skillid		f	f	f
 1347950513	admindb	1347950513	admindb	0	0	4b4f2f900000	2	0	productpartid	productpartid		f	f	f
 1347950513	admindb	1347950513	admindb	0	1	4b4f2f900000	2	0	productid	productid		f	f	f
@@ -22858,8 +22513,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1347950513	admindb	1347950513	admindb	0	20	4b4f2f900000	4	0	createdate	createdate		f	f	f
 1605600809	admindb	1605600809	admindb	0	1	4e0c922a0000	4	0	sorting	sorting		f	f	f
 1605600809	admindb	1605600809	admindb	0	2	4e0c922a0000	2	0	text_de	text_de		f	f	f
-1605600809	admindb	1605600809	admindb	0	3	4e0c922a0000	2	0	text_en	text_en		f	f	f
-1605600809	admindb	1605600809	admindb	0	4	4e0c922a0000	2	1	text	text		f	f	f
 1605600809	admindb	1605600809	admindb	0	5	4e0c922a0000	6	0	unitcost	unitcost	%.2f	f	f	f
 1605600809	admindb	1605600809	admindb	1	6	4e0c922a0000	2	0	currency	currency		f	f	f
 1605600809	admindb	1605600809	admindb	0	7	4e0c922a0000	1000	0	createdate	createdate		f	f	f
@@ -22990,6 +22643,7 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1380021051	admindb	1380021051	admindb	-1	10	4ec64f920000	2	0	resultrefid	COALESCE(#13.invoicerefid,#0.invoiceid)		t	f	f
 1380021051	admindb	1380021051	admindb	23	11	4ec64f920000	1	0	invoiced	invoiced		t	f	f
 1607950930	admindb	1607950930	admindb	0	2	4def76ee0000	2	0	menuid	treeid		f	f	f
+1608018842	admindb	1608018842	admindb	4	23	4b62b7ca0000	2	0	part	part		f	f	f
 1607950930	admindb	1607950930	admindb	0	3	4def76ee0000	2	0	item	treename		f	f	f
 1603114650	admindb	1603114650	admindb	8	28	504f4c000000	2	0	phasename7	phasename		f	f	f
 1603114650	admindb	1603114650	admindb	9	29	504f4c000000	2	0	phasename8	phasename		f	f	f
@@ -23023,6 +22677,7 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1351243433	admindb	1351243433	admindb	-1	9	mne_crmbase_offerproduct_list_2	2	0	productnumber	null		f	f	f
 1351243433	admindb	1351243433	admindb	-1	10	mne_crmbase_offerproduct_list_2	2	0	productdescription	null	xml	f	f	f
 1608043083	admindb	1608043083	admindb	3	20	4b6adbe10000	2	0	oldstoragelocationid	storagelocationid		f	f	f
+1601366439	admindb	1601366439	admindb	17	20	4b4f6c350000	2	0	part	part		f	f	f
 1351243433	admindb	1351243433	admindb	-1	11	mne_crmbase_offerproduct_list_2	6	0	productcount	cast(null as integer)		f	f	f
 1351243433	admindb	1351243433	admindb	-1	12	mne_crmbase_offerproduct_list_2	2	0	productunit	null		f	f	f
 1351243433	admindb	1351243433	admindb	-1	13	mne_crmbase_offerproduct_list_2	6	0	productresultvat	cast(null as double precision)	%.1f	f	f	f
@@ -23048,6 +22703,7 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1351243433	admindb	1351243433	admindb	-1	21	mne_crmbase_offerproduct_list_2	6	0	sumcost	sum(#0.productcost * #0.count)	%.2f	f	f	t
 1351243433	admindb	1351243433	admindb	-1	22	mne_crmbase_offerproduct_list_2	6	0	sumcostcalc	sum( mne_crm.offerproduct_cost(#0.offerproductid) * #0.count )	%.2f	f	f	t
 1608018842	admindb	1608018842	admindb	4	24	4b62b7ca0000	2	0	parttype	parttype		f	f	f
+1608018842	admindb	1608018842	admindb	-1	25	4b62b7ca0000	2	0	partname	#4.part || ' ' || #4.parttype		f	f	f
 1351243433	admindb	1351243433	admindb	-1	23	mne_crmbase_offerproduct_list_2	6	0	sumdiff	sum((#0.productprice - #0.productcost ) * #0.count)	%.2f	f	f	t
 1351243433	admindb	1351243433	admindb	-1	24	mne_crmbase_offerproduct_list_2	2	0	currency	COALESCE(#25.currency, #27.currency)		f	f	f
 1351243433	admindb	1351243433	admindb	-1	25	mne_crmbase_offerproduct_list_2	2	0	isproduct	''		f	f	f
@@ -23083,7 +22739,7 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1400572392	admindb	1400572392	admindb	0	2	4b8b8fcb0000	2	0	partingoingid	partingoingid		f	f	f
 1400572392	admindb	1400572392	admindb	0	3	4b8b8fcb0000	2	0	partid	partid		f	f	f
 1400572392	admindb	1400572392	admindb	0	4	4b8b8fcb0000	4	0	count	count		f	f	f
-1347537029	admindb	1347537029	admindb	0	1	48e65ec40000	4	0	id	oid		f	t	f
+1604299995	admindb	1604299995	admindb	0	1	4dc8eb0f0000	4	0	vyear	vyear		t	f	f
 1400572392	admindb	1400572392	admindb	-1	5	4b8b8fcb0000	4	0	rcount	CASE WHEN #19.partoutgoingid IS NULL THEN #0.count - COALESCE(#35.sum,0) ELSE 0 END		f	f	f
 1400572392	admindb	1400572392	admindb	0	6	4b8b8fcb0000	4	0	createdate	createdate		f	f	f
 1400572392	admindb	1400572392	admindb	0	7	4b8b8fcb0000	2	0	createuser	createuser		f	f	f
@@ -23112,8 +22768,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1608018842	admindb	1608018842	admindb	3	20	4b62b7ca0000	2	0	newstoragelocationname	name		f	f	f
 1608018842	admindb	1608018842	admindb	-1	21	4b62b7ca0000	2	0	newstoragelocation	#9.xname || ' ' || #3.x || COALESCE ( ', ' || #9.yname ||  ' ' || #3.y, '' ) || COALESCE (', ' || #9.zname || ' ' || #3.z, '' )		f	f	f
 1608018842	admindb	1608018842	admindb	2	22	4b62b7ca0000	2	0	partid	partid		f	f	f
-1608018842	admindb	1608018842	admindb	4	23	4b62b7ca0000	2	0	part	part		f	f	f
-1608018842	admindb	1608018842	admindb	-1	25	4b62b7ca0000	2	0	partname	#4.part || ' ' || #4.parttype		f	f	f
 1608018842	admindb	1608018842	admindb	-1	26	4b62b7ca0000	1	0	stocked	COALESCE(#0.partstoragelocationid <> #10.partstoragelocationid,true)		f	f	f
 1608018842	admindb	1608018842	admindb	17	27	4b62b7ca0000	2	0	partoutgoingid	partoutgoingid		f	f	f
 1608018842	admindb	1608018842	admindb	23	29	4b62b7ca0000	2	0	deliverynotenumber	deliverynotenumber		f	f	f
@@ -23178,8 +22832,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1352985807	admindb	1352985807	admindb	2	13	4c64cc090000	2	1	text	text		f	f	f
 1603197205	admindb	1603197205	admindb	0	0	48b44ed00000	2	0	htmlcomposetabid	htmlcomposetabid		f	f	f
 1603197205	admindb	1603197205	admindb	0	1	48b44ed00000	2	0	htmlcomposeid	htmlcomposeid		f	f	f
-1603197205	admindb	1603197205	admindb	8	2	48b44ed00000	2	0	name	name		f	f	f
-1603197205	admindb	1603197205	admindb	0	3	48b44ed00000	2	0	id	id		f	f	f
 1603197205	admindb	1603197205	admindb	0	4	48b44ed00000	2	0	depend	depend		f	f	f
 1603197205	admindb	1603197205	admindb	0	5	48b44ed00000	2	0	position	position		f	f	f
 1603197205	admindb	1603197205	admindb	0	6	48b44ed00000	4	0	subposition	subposition		f	f	f
@@ -23214,7 +22866,7 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1603198358	admindb	1603198358	admindb	-1	11	mne_finance_delivery_detail_1	2	0	data	''	xml	f	f	f
 1603198358	admindb	1603198358	admindb	45	12	mne_finance_delivery_detail_1	2	0	fromsign	sign		f	f	f
 1603198358	admindb	1603198358	admindb	281	13	mne_finance_delivery_detail_1	2	0	tosign	sign		f	f	f
-1305893645	admindb	1305893645	admindb	0	2	48cfa87a0000	2	0	name	name		f	t	f
+1607510648	admindb	1607510648	admindb	2	15	53fafc520000	4	0	step	step		f	f	f
 1603198358	admindb	1603198358	admindb	7	14	mne_finance_delivery_detail_1	2	0	orderownerid	personid		f	f	f
 1603198358	admindb	1603198358	admindb	-1	15	mne_finance_delivery_detail_1	2	0	orderownername	#7.firstname || ' ' || #7.lastname		f	f	f
 1400572392	admindb	1400572392	admindb	-1	20	4b8b8fcb0000	2	0	storagelocation	#18.xname || ' ' || #10.x || COALESCE ( ', ' || #18.yname ||  ' ' || #10.y, '' ) || COALESCE (', ' || #18.zname || ' ' || #10.z , '' )		f	f	f
@@ -23245,7 +22897,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1348750874	admindb	1348750874	admindb	-1	6	5063f6ec0000	4	0	nproductnumber	CAST (#2.productnumber AS INT4 )		t	f	f
 1348750874	admindb	1348750874	admindb	2	7	5063f6ec0000	2	0	productname	productname		t	f	f
 1348750874	admindb	1348750874	admindb	-1	8	5063f6ec0000	6	0	sumall	#2.count * #2.productprice	%.2f	t	f	f
-1601361463	admindb	1601361463	admindb	0	11	504ef00d0000	2	0	law	law		f	f	f
 1348750874	admindb	1348750874	admindb	-1	9	5063f6ec0000	6	0	sumready	#2.actcount * #2.productprice	%.2f	t	f	f
 1348750874	admindb	1348750874	admindb	-1	10	5063f6ec0000	6	0	sumdeliver	SUM(COALESCE(#14.count * #2.productprice,0.0))	%.2f	f	f	f
 1348750874	admindb	1348750874	admindb	-1	11	5063f6ec0000	6	0	sumdelivered	SUM(COALESCE(#14.count * #2.productprice * ( CASE WHEN #16.delivered THEN 1.0 ELSE 0.0 END ),0.0))	%.2f	f	f	f
@@ -23341,7 +22992,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1380109582	admindb	1380109582	admindb	-1	18	4cc1793d0000	2	0	orderdescription	''		f	f	f
 1380109582	admindb	1380109582	admindb	-1	19	4cc1793d0000	2	0	havecomment	''		f	f	f
 1400572392	admindb	1400572392	admindb	56	28	4b8b8fcb0000	2	0	crmorderproductname	productname		f	f	f
-1516204173	admindb	1516204173	admindb	0	0	4b39feaa0000	2	0	group	rolname		f	t	f
 1351145892	admindb	1351145892	admindb	-1	24	mne_crmbase_orderproduct_list_2	2	0	currency	COALESCE(#2.currency, #4.currency)		f	f	f
 1351145892	admindb	1351145892	admindb	4	25	mne_crmbase_orderproduct_list_2	2	0	ocurrency	currency		t	f	f
 1351145892	admindb	1351145892	admindb	-1	26	mne_crmbase_orderproduct_list_2	6	0	netcalc	cast(null as double precision)	%.2f	f	f	f
@@ -23363,7 +23013,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1382394975	admindb	1382394975	admindb	10	4	4a4b2af00000	2	0	personid	personid		f	f	f
 1382394975	admindb	1382394975	admindb	10	5	4a4b2af00000	2	0	sign	sign		f	f	f
 1382394975	admindb	1382394975	admindb	-1	6	4a4b2af00000	2	0	name	#10.firstname || ' ' || #10.lastname		f	f	f
-1601361463	admindb	1601361463	admindb	0	12	504ef00d0000	2	0	zone	zone		f	f	f
 1382394975	admindb	1382394975	admindb	-1	7	4a4b2af00000	2	0	fullname	#10.firstname || ' ' || #10.lastname		f	f	f
 1382394975	admindb	1382394975	admindb	54	8	4a4b2af00000	2	0	color	color		f	t	f
 1382394975	admindb	1382394975	admindb	54	9	4a4b2af00000	1	0	active	active		f	t	f
@@ -23375,7 +23024,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1382394995	admindb	1382449220	admindb	-1	2	5265620b0000	2	0	firstname	'#mne_lang#keiner#'		f	f	f
 1382394995	admindb	1382449243	admindb	-1	6	5265620b0000	2	0	name	'#mne_lang#keiner#'		f	f	f
 1382394995	admindb	1382449250	admindb	-1	3	5265620b0000	2	0	lastname	'#mne_lang#keiner#'		f	f	f
-1459515687	admindb	1459515687	admindb	0	4	56fcfd960000	2	0	org	org		f	f	f
 1603198358	admindb	1603198358	admindb	-1	27	mne_finance_delivery_detail_1	2	0	country	CASE WHEN #348.personid IS NOT NULL THEN CASE WHEN #373.addressid IS NOT NULL THEN CASE WHEN (select countrycarcode from mne_settings) <> #715.countrycarcode THEN #715.name_#mne_langid# ELSE '' END ELSE CASE WHEN (select countrycarcode from mne_settings) <> #720.countrycarcode THEN #720.name_#mne_langid# ELSE '' END END ELSE CASE WHEN #544.addressid IS NOT NULL THEN CASE WHEN (select countrycarcode from mne_settings) <> #710.countrycarcode THEN #710.name_#mne_langid# ELSE '' END WHEN #672.addressid IS NOT NULL THEN CASE WHEN (select countrycarcode from mne_settings) <> #725.countrycarcode THEN #725.name_#mne_langid# ELSE '' END ELSE CASE WHEN (select countrycarcode from mne_settings) <> #730.countrycarcode THEN #730.name_#mne_langid# ELSE '' END END END		f	f	f
 1603198358	admindb	1603198358	admindb	-1	28	mne_finance_delivery_detail_1	2	0	continent	CASE WHEN #348.personid IS NOT NULL THEN CASE WHEN #373.addressid IS NOT NULL THEN CASE WHEN (select countrycarcode from mne_settings) <> #715.countrycarcode THEN #715.continent_#mne_langid# ELSE '' END ELSE CASE WHEN (select countrycarcode from mne_settings) <> #720.countrycarcode THEN #720.continent_#mne_langid# ELSE '' END END ELSE CASE WHEN #544.addressid IS NOT NULL THEN CASE WHEN (select countrycarcode from mne_settings) <> #710.countrycarcode THEN #710.continent_#mne_langid# ELSE '' END WHEN #672.addressid IS NOT NULL THEN CASE WHEN (select countrycarcode from mne_settings) <> #725.countrycarcode THEN #725.continent_#mne_langid# ELSE '' END ELSE CASE WHEN (select countrycarcode from mne_settings) <> #730.countrycarcode THEN #730.continent_#mne_langid# ELSE '' END END END		f	f	f
 1603198358	admindb	1603198358	admindb	-1	29	mne_finance_delivery_detail_1	2	0	countrycarcode	CASE WHEN #348.personid IS NOT NULL THEN CASE WHEN #373.addressid IS NOT NULL THEN CASE WHEN (select countrycarcode from mne_settings) <> #715.countrycarcode THEN #715.countrycarcode ELSE '' END ELSE CASE WHEN (select countrycarcode from mne_settings) <> #720.countrycarcode THEN #720.countrycarcode ELSE '' END END ELSE CASE WHEN #544.addressid IS NOT NULL THEN CASE WHEN (select countrycarcode from mne_settings) <> #710.countrycarcode THEN #710.countrycarcode ELSE '' END WHEN #672.addressid IS NOT NULL THEN CASE WHEN (select countrycarcode from mne_settings) <> #725.countrycarcode THEN #725.countrycarcode ELSE '' END ELSE CASE WHEN (select countrycarcode from mne_settings) <> #730.countrycarcode THEN #730.countrycarcode ELSE '' END END END		f	f	f
@@ -23384,7 +23032,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1603198358	admindb	1603198358	admindb	0	32	mne_finance_delivery_detail_1	2	0	contactid	contactid		f	t	f
 1603198358	admindb	1603198358	admindb	734	33	mne_finance_delivery_detail_1	2	0	invoiceid	invoiceid		f	f	f
 1603198358	admindb	1603198358	admindb	734	34	mne_finance_delivery_detail_1	4	0	invoicenum	num		f	f	f
-1603093595	admindb	1603093595	admindb	0	9	4e09ae250000	2	0	uid	uid		f	t	f
 1603198358	admindb	1603198358	admindb	754	35	mne_finance_delivery_detail_1	2	0	uowncompanyownprefix	prefix		f	f	f
 1603198358	admindb	1603198358	admindb	754	36	mne_finance_delivery_detail_1	2	0	uownaccount	account		f	f	f
 1603198358	admindb	1603198358	admindb	754	37	mne_finance_delivery_detail_1	2	0	uownbank	bank		f	f	f
@@ -23507,8 +23154,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1608276929	admindb	1608276929	admindb	2	13	5fdc573f0000	2	0	modifyuser	modifyuser		f	f	f
 1400224142	admindb	1400224142	admindb	4	18	4af3f7630000	2	1	storagetypname	text		f	f	f
 1400224142	admindb	1400224142	admindb	3	19	4af3f7630000	2	1	storagelocationtypname	text		f	f	f
-1393496771	admindb	1393496771	admindb	0	0	4b41e9050000	2	0	username	usename		f	t	f
-1393496771	admindb	1393496771	admindb	-1	1	4b41e9050000	1	0	systemuser	substring(#0.usename from 1 for 6) = 'mneerp' OR #0.usename = 'postgres'		f	f	f
 1522741806	admindb	1522741806	admindb	35	21	4a4dfde00000	2	0	reflastname	lastname		t	f	f
 1522741806	admindb	1522741806	admindb	10	22	4a4dfde00000	1	0	open	open		t	f	f
 1522741806	admindb	1522741806	admindb	10	23	4a4dfde00000	1	0	closed	closed		t	f	f
@@ -23626,8 +23271,9 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1351243384	admindb	1351243384	admindb	-1	25	mne_crmbase_offerproduct_list_1	2	0	isproduct	CASE WHEN NOT #0.productid IS NULL THEN '#mne_lang#ja' ELSE '#mne_lang#nein' END		f	f	f
 1351243384	admindb	1351243384	admindb	-1	26	mne_crmbase_offerproduct_list_1	4	0	priceisnull	CASE WHEN #0.productprice = 0.0 THEN 1 ELSE 0 END		f	f	f
 1351243384	admindb	1351243384	admindb	-1	27	mne_crmbase_offerproduct_list_1	2	0	result	CASE WHEN ( #0.productprice - #0.productcost ) < 0.0 THEN 'negativ' ELSE 'positiv' END		f	f	f
-1604299995	admindb	1604299995	admindb	0	1	4dc8eb0f0000	4	0	vyear	vyear		t	f	f
 1351243384	admindb	1351243384	admindb	11	28	mne_crmbase_offerproduct_list_1	6	0	productunitprice	unitprice		f	f	f
+1407337526	admindb	1407337526	admindb	9	5	4b8ce6330000	2	0	companyid	companyid		f	t	f
+1311055999	admindb	1311055999	admindb	0	7	4e25207f0000	2	0	modifyuser	modifyuser		f	f	f
 1608287743	admindb	1608287743	admindb	-1	31	4ce4ee6a0000	2	0	fixturetypecostid	COALESCE(#20.fixturetypecostid, '#' ||'#' ||'#' ||'#' ||'#' ||'#' ||'#' ||'#' ||'#' ||'#' ||'#' ||'#' ||'#' ||'#' ||'#' ||'#')		f	f	f
 1351243384	admindb	1351243384	admindb	-1	29	mne_crmbase_offerproduct_list_1	2	0	pricechange	CASE WHEN COALESCE(#11.unitprice <> #0.productprice,true) THEN 'x' ELSE '' END		f	f	f
 1351243384	admindb	1351243384	admindb	5	30	mne_crmbase_offerproduct_list_1	2	0	pcurrency	currency		f	f	f
@@ -23682,8 +23328,7 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1609766841	admindb	1609766841	admindb	-1	10	49ba1e2f0000	2	0	typnoleaf	CASE WHEN mne_catalog.tree_typnoleaf('mne_crm', 'producttree', #0.treeid, 'productid') THEN '' ELSE 'leaf' END		f	f	f
 1609766841	admindb	1609766841	admindb	-1	11	49ba1e2f0000	2	0	action	CASE WHEN NULLIF(#0.productid,'') IS NULL\n  THEN '{ "action": "submenu", "parameter" : [ "", "", { "menuid" : "' || #0.treeid || '" } ] } '\nELSE\n  '{    "action" : "show",\n     "parameter" : [ "", "",   { "parentid" : "' || COALESCE(#0.parentid,'') || '", "menuid" : "' || #0.treeid || '", "productid" : "' || #0.productid  || '"} ] }'\nEND		f	f	f
 1609766841	admindb	1609766841	admindb	5	12	49ba1e2f0000	2	0	productnumber	productnumber		f	t	f
-1407337526	admindb	1407337526	admindb	9	5	4b8ce6330000	2	0	companyid	companyid		f	t	f
-1311055999	admindb	1311055999	admindb	0	7	4e25207f0000	2	0	modifyuser	modifyuser		f	f	f
+1305893645	admindb	1305893645	admindb	0	2	48cfa87a0000	2	0	name	name		f	t	f
 1601014240	admindb	1601014240	admindb	11	17	4b4f6cbb0000	2	0	partcurrency	currency		f	f	f
 1534144614	admindb	1534144614	admindb	0	1	49b7ab2f0000	2	0	name	name		f	f	f
 1534144614	admindb	1534144614	admindb	2	2	49b7ab2f0000	2	0	street	street		f	f	f
@@ -23756,6 +23401,7 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1309265501	admindb	1309265501	admindb	1	9	4e09cc780000	2	0	firstname	firstname		f	f	f
 1309265501	admindb	1309265501	admindb	1	10	4e09cc780000	2	0	lastname	lastname		f	f	f
 1309265501	admindb	1309265501	admindb	-1	11	4e09cc780000	2	0	fullname	#1.firstname || ' ' || #1.lastname		f	f	f
+1607927232	admindb	1607927232	admindb	0	3	4bb49a0a0000	4	0	count	count		f	f	f
 1309265501	admindb	1309265501	admindb	-1	12	4e09cc780000	2	0	refname	#1.firstname || ' ' || #1.lastname		f	f	f
 1608047769	admindb	1608047769	admindb	0	0	4cc822170000	2	0	partstoragelocationid	partstoragelocationid		f	f	f
 1323353550	admindb	1323353550	admindb	0	4	4ee0c53e0000	4	0	count	count		f	f	f
@@ -23820,7 +23466,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1410251426	admindb	1410251426	admindb	-1	12	540eb7210000	2	0	netprice	SUM(#2.count * (#3.productprice * COALESCE(#5.rate_purchase,1.0))) / COALESCE(#10.count,1.0)	%.2f	f	f	t
 1410251426	admindb	1410251426	admindb	-1	13	540eb7210000	2	0	fullnetprice	SUM(#2.count * (#3.productprice * COALESCE(#5.rate_purchase,1.0)))	%.2f	f	f	t
 1410251426	admindb	1410251426	admindb	-1	14	540eb7210000	2	0	resvat	#4.withvat * (COALESCE(#3.productvat, (select vat from mne_crm.productdefault)))	%.1f	t	f	f
-1347537029	admindb	1347537029	admindb	0	0	48e65ec40000	2	0	name	rolname		f	t	f
 1410251426	admindb	1410251426	admindb	-1	15	540eb7210000	2	0	resabsvat	SUM(#4.withvat * (COALESCE(#3.productvat, (select vat from mne_crm.productdefault))) / 100 *  #2.count * (#3.productprice * COALESCE(#5.rate_purchase,1.0))) / COALESCE(#10.count,1.0)	%.2f	f	f	t
 1324461797	admindb	1324461797	admindb	-1	6	4bceb0630000	6	0	sumactcost	SUM(#2.productcost * #2.actcount )	%.2f	f	f	t
 1324461797	admindb	1324461797	admindb	-1	7	4bceb0630000	6	0	sumendcostcalc	SUM(#2.productcostcalc * #2.count )	%.2f	f	f	t
@@ -23854,7 +23499,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1324461797	admindb	1324461797	admindb	3	20	4bceb0630000	2	0	refcompanyid	companyid		t	f	f
 1324461797	admindb	1324461797	admindb	3	21	4bceb0630000	2	0	refcompany	name		t	f	f
 1324461797	admindb	1324461797	admindb	6	22	4bceb0630000	2	0	refpersonid	personid		t	f	f
-1579620562	admindb	1579620562	admindb	0	8	57da3e460000	2	0	mask	mask		f	f	f
 1324461797	admindb	1324461797	admindb	6	23	4bceb0630000	2	0	reffirstname	firstname		t	f	f
 1324461797	admindb	1324461797	admindb	6	24	4bceb0630000	2	0	reflastname	lastname		t	f	f
 1386585811	admindb	1386585811	admindb	0	0	4c5264930000	2	0	law	law		f	f	f
@@ -23879,8 +23523,11 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1600074069	admindb	1600074069	admindb	0	5	49ba28220000	2	0	xdescription	description	xml	f	f	f
 1600074069	admindb	1600074069	admindb	0	6	49ba28220000	1	0	withworkingstep	withworkingstep		f	f	f
 1600074069	admindb	1600074069	admindb	3	7	49ba28220000	2	0	treename	treename		f	f	f
+1347537029	admindb	1347537029	admindb	0	0	48e65ec40000	2	0	name	rolname		f	t	f
+1347537029	admindb	1347537029	admindb	0	1	48e65ec40000	4	0	id	oid		f	t	f
 1382471065	admindb	1382471065	admindb	0	5	5065c6690000	2	0	offerid	offerid		f	f	f
 1382471065	admindb	1382471065	admindb	0	6	5065c6690000	2	0	offerproductid	offerproductid		f	f	f
+1479483531	admindb	1479483531	admindb	-1	1	5065c9a30000	2	0	rowtyp	2		f	f	f
 1382471065	admindb	1382471065	admindb	5	7	5065c6690000	2	0	offerproductpartid	offerproductpartid		f	f	f
 1382471065	admindb	1382471065	admindb	-1	8	5065c6690000	2	0	rofferproductpartid	'##' || '##' ||'##' ||'##' ||'##' ||'##' ||'##' ||'##'		f	f	f
 1382471065	admindb	1382471065	admindb	0	9	5065c6690000	2	0	offerproducttype	offerproducttype		f	f	f
@@ -24270,6 +23917,7 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1264759887	admindb	1264759887	admindb	2	3	4b62b3e60000	2	0	modifyuser	modifyuser		f	f	f
 1338553773	admindb	1338553773	admindb	-1	0	mne_crmbase_orderproduct_sum_1	2	0	sortcol	2		f	f	f
 1338553773	admindb	1338553773	admindb	-1	1	mne_crmbase_orderproduct_sum_1	2	0	position	1000		f	f	f
+1400478534	admindb	1400478534	admindb	0	8	4af408450000	4	0	x	x		f	f	f
 1338553773	admindb	1338553773	admindb	1	2	mne_crmbase_orderproduct_sum_1	2	0	ordernumber	ordernumber		t	f	f
 1338553773	admindb	1338553773	admindb	1	3	mne_crmbase_orderproduct_sum_1	2	0	orderdescription	description		t	f	f
 1338553773	admindb	1338553773	admindb	0	4	mne_crmbase_orderproduct_sum_1	2	0	orderid	orderid		t	f	f
@@ -24466,7 +24114,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1607927232	admindb	1607927232	admindb	0	0	4bb49a0a0000	2	0	purchaseid	purchaseid		f	f	f
 1607927232	admindb	1607927232	admindb	0	1	4bb49a0a0000	2	0	partid	partid		f	f	f
 1607927232	admindb	1607927232	admindb	0	2	4bb49a0a0000	2	0	partvendorid	partvendorid		f	t	f
-1607927232	admindb	1607927232	admindb	0	3	4bb49a0a0000	4	0	count	count		f	f	f
 1607927232	admindb	1607927232	admindb	0	4	4bb49a0a0000	1001	0	orderdate	orderdate		f	t	f
 1607927232	admindb	1607927232	admindb	0	5	4bb49a0a0000	2	0	ordernumber	ordernumber		f	t	f
 1607927232	admindb	1607927232	admindb	-1	6	4bb49a0a0000	2	0	vendorordernumber	COALESCE(#0.vendorordernumber, '#mne_lang#keine Bestellnummer')		f	f	f
@@ -24493,6 +24140,8 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1306857001	admindb	1306857001	admindb	-1	8	4de50adf0000	1000	0	start	MIN(#0.start)		f	f	f
 1306857001	admindb	1306857001	admindb	-1	9	4de50adf0000	1000	0	end	MAX(#0.start)		f	f	f
 1534144660	admindb	1534144660	admindb	135	13	49b6ce440000	2	0	email	email		f	f	f
+1601458390	admindb	1601458390	admindb	0	9	506572480000	2	0	productnumber	productnumber		t	f	f
+1601458390	admindb	1601458390	admindb	5	10	506572480000	2	0	ordernumber	ordernumber		t	f	f
 1292853492	admindb	1292853492	admindb	-1	0	mne_crmbase_order_history_1	2	0	orderid	CASE WHEN #13.orderid IS NOT NULL THEN #13.orderid WHEN #138.orderid IS NOT NULL THEN #138.orderid WHEN #740.orderid IS NOT NULL THEN #740.orderid ELSE #746.orderid END 		f	f	f
 1292853492	admindb	1292853492	admindb	-1	1	mne_crmbase_order_history_1	2	0	tabname	CASE WHEN #0.tabname = 'order' THEN '#mne_lang#Auftrag' WHEN #0.tabname = 'orderproduct' THEN '#mne_lang#Produkt' WHEN #0.tabname = 'orderproducttime' THEN '#mne_lang#Zeitplannung' WHEN #0.tabname = 'orderproductpart' THEN '#mne_lang#Materialplannung' ELSE '' END		f	f	f
 1292853492	admindb	1292853492	admindb	138	2	mne_crmbase_order_history_1	2	0	productname	productname		f	f	f
@@ -24522,7 +24171,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1534144660	admindb	1534144660	admindb	218	21	49b6ce440000	2	0	owner	loginname		f	t	f
 1534144660	admindb	1534144660	admindb	144	22	49b6ce440000	2	0	ownerid	personid		f	f	f
 1601458335	admindb	1601458335	admindb	-1	24	5065618c0000	1	0	ready	( #0.ready OR COALESCE(#3.ready,false) OR #5.closed )		f	f	f
-1338553823	admindb	1338553823	admindb	0	3	4cfde4fb0000	6	0	unitcost	unitcost	%.2f	f	f	f
 1598603028	admindb	1598603028	admindb	-1	24	54607d0b0000	2	0	haveintereststyle	'person ' || CASE WHEN COALESCE(#3.active,false) = false\n  THEN ''\nELSE CASE\n  WHEN #5.nrank <= #9.nrank\n    THEN 'fetchtrue'\n  WHEN #3.lastsend <> 0\n    THEN 'sendtrue'\n  WHEN #3.active = false OR #6.personid IS NULL\n    THEN '' ELSE 'interesse'\n  END\nEND\n		f	f	f
 1264082018	admindb	1264082018	admindb	-1	3	4b5434b80000	6	0	orderproductcost	mne_crm.orderproductcost(#2.orderproductid)	%.2f	f	f	f
 1380106947	admindb	1380106947	admindb	0	1	49b6b0920000	2	0	firstname	firstname		f	f	f
@@ -24545,8 +24193,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1601458390	admindb	1601458390	admindb	17	6	506572480000	2	1	orderproducttypetext	text		t	f	f
 1601458390	admindb	1601458390	admindb	0	7	506572480000	2	0	productoptid	productoptid		t	t	f
 1601458390	admindb	1601458390	admindb	0	8	506572480000	2	0	productname	productname		t	f	f
-1601458390	admindb	1601458390	admindb	0	9	506572480000	2	0	productnumber	productnumber		t	f	f
-1601458390	admindb	1601458390	admindb	5	10	506572480000	2	0	ordernumber	ordernumber		t	f	f
 1263819456	admindb	1263819456	admindb	-1	1	4b5459440000	6	0	productcost	mne_crm.productcost(#0.productid)	%.2f	f	f	f
 1338553792	admindb	1338553792	admindb	3	5	mne_crmbase_productprice_1	2	0	currencyid	currencyid		f	f	f
 1338553792	admindb	1338553792	admindb	3	6	mne_crmbase_productprice_1	6	0	unitcost	unitcost	%.2f	f	f	f
@@ -24584,6 +24230,7 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1305893645	admindb	1305893645	admindb	0	6	48cfa87a0000	2	0	rcolumn	rcolumn		f	t	f
 1305893645	admindb	1305893645	admindb	0	7	48cfa87a0000	4	0	position	position		f	t	f
 1305893645	admindb	1305893645	admindb	1	8	48cfa87a0000	2	0	text_de	text_de		f	f	f
+1338553823	admindb	1338553823	admindb	0	3	4cfde4fb0000	6	0	unitcost	unitcost	%.2f	f	f	f
 1338553823	admindb	1338553823	admindb	0	4	4cfde4fb0000	4	0	createdate	createdate		f	f	f
 1338553823	admindb	1338553823	admindb	0	5	4cfde4fb0000	2	0	createuser	createuser		f	f	f
 1522155621	admindb	1522155621	admindb	0	0	491822b40000	2	0	name	name		f	f	f
@@ -24672,7 +24319,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1524485514	admindb	1524485514	admindb	-1	0	4de38d7f0000	1000	0	start	MIN(EXTRACT( EPOCH FROM to_timestamp (#0.vfullday, 'DDMMYYYY'))::int4)		f	f	f
 1337850852	admindb	1337850852	admindb	-1	6	4ed354e80000	2	0	part	#9.part || ' ' || #9.parttype		f	f	f
 1311148396	admindb	1311148396	admindb	0	2	4e25256f0000	2	0	email	email		f	f	f
-1288277504	admindb	1288277504	admindb	0	7	4b28e4fb0000	2	0	x	x		f	f	f
 1524485514	admindb	1524485514	admindb	-1	1	4de38d7f0000	1000	0	end	MAX(EXTRACT( EPOCH FROM to_timestamp (#0.vfullday, 'DDMMYYYY'))::int4)		f	f	f
 1524485514	admindb	1524485514	admindb	-1	2	4de38d7f0000	4	0	workdays	mne_catalog.epoch_workday(MIN(#0.vfullday),MAX(#0.vfullday))		f	f	f
 1524485514	admindb	1524485514	admindb	4	3	4de38d7f0000	2	0	firstname	firstname		t	f	f
@@ -24682,6 +24328,7 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1524485514	admindb	1524485514	admindb	1	7	4de38d7f0000	4	0	wtime	wtime		t	t	f
 1524485514	admindb	1524485514	admindb	-1	8	4de38d7f0000	1003	0	duration	SUM(#2.duration)		f	f	f
 1524485514	admindb	1524485514	admindb	-1	9	4de38d7f0000	1003	0	setduration	mne_catalog.epoch_workday(MIN(#0.vfullday),MAX(#0.vfullday)) * #1.wtime		f	f	f
+1337850852	admindb	1337850852	admindb	0	2	4ed354e80000	2	0	purchaseinvoiceid	purchaseinvoiceid		f	f	f
 1524485514	admindb	1524485514	admindb	-1	10	4de38d7f0000	1003	0	diff	SUM(#2.duration) - mne_catalog.epoch_workday(MIN(#0.vfullday),MAX(#0.vfullday)) * #1.wtime		f	f	f
 1524485514	admindb	1524485514	admindb	1	11	4de38d7f0000	2	0	personid	personid		t	t	f
 1524485514	admindb	1524485514	admindb	-1	12	4de38d7f0000	4	0	-starttime	EXTRACT( EPOCH FROM to_timestamp (#0.vfullday, 'DDMMYYYY'))::int4		f	f	f
@@ -24748,7 +24395,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1338554043	admindb	1338554043	admindb	1	11	4d0256d00000	2	0	currency	currency		f	f	f
 1337850852	admindb	1337850852	admindb	0	0	4ed354e80000	2	0	purchaseinvoicedeliveryid	purchaseinvoicedeliveryid		f	f	f
 1337850852	admindb	1337850852	admindb	0	1	4ed354e80000	2	0	purchasedeliveryid	purchasedeliveryid		f	f	f
-1337850852	admindb	1337850852	admindb	0	2	4ed354e80000	2	0	purchaseinvoiceid	purchaseinvoiceid		f	f	f
 1337850852	admindb	1337850852	admindb	6	3	4ed354e80000	2	0	ordernumber	ordernumber		f	t	f
 1306422839	admindb	1306422839	admindb	-1	8	4b573fe30000	6	0	count	CAST(NULL AS FLOAT8)	%20g	f	f	f
 1306422839	admindb	1306422839	admindb	-1	9	4b573fe30000	6	0	actcount	CAST(NULL AS FLOAT8)	%20g	f	f	f
@@ -24983,7 +24629,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1479483507	admindb	1479483507	admindb	-1	30	5065c79d0000	2	0	powner	null		f	f	f
 1479483507	admindb	1479483507	admindb	-1	31	5065c79d0000	2	0	pownercompany	null		f	f	f
 1479483531	admindb	1479483531	admindb	-1	0	5065c9a30000	2	0	sorting	1		f	f	f
-1479483531	admindb	1479483531	admindb	-1	1	5065c9a30000	2	0	rowtyp	2		f	f	f
 1479483531	admindb	1479483531	admindb	0	2	5065c9a30000	4	0	position	position		f	f	f
 1479483531	admindb	1479483531	admindb	-1	3	5065c9a30000	2	0	materialid	'0'		f	f	f
 1449571160	admindb	1449571160	admindb	-1	3	4ff3f1700000	2	0	quarter	CAST ( NULL AS INT )		f	f	f
@@ -25051,8 +24696,11 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1449570781	admindb	1449570781	admindb	1	8	4ff170aa0000	2	0	loginname	loginname		t	t	f
 1449570781	admindb	1449570781	admindb	-1	9	4ff170aa0000	2	0	fullname	#4.firstname || ' ' || #4.lastname		t	f	f
 1449570781	admindb	1449570781	admindb	-1	10	4ff170aa0000	1003	0	duration	SUM(#2.duration)		f	f	f
+1603966398	admindb	1603966398	admindb	3	22	5f9a8b180000	2	0	skillid	skillid		f	f	f
 1449570781	admindb	1449570781	admindb	-1	11	4ff170aa0000	5	0	dduration	CAST ( SUM(#2.duration) / 3600.0 AS FLOAT8)		f	f	f
 1449570781	admindb	1449570781	admindb	-1	12	4ff170aa0000	2	0	-start	EXTRACT( EPOCH FROM to_timestamp (#0.vfullday, 'DDMMYYYY'))::int4		f	f	f
+1449571160	admindb	1449571160	admindb	-1	0	4ff3f1700000	2	0	sortcol	1		f	f	f
+1449571160	admindb	1449571160	admindb	-1	1	4ff3f1700000	2	0	timetyp	2		f	f	f
 1449571160	admindb	1449571160	admindb	-1	2	4ff3f1700000	2	0	starttime	'#mne_lang#Gesamt'		f	f	f
 1449571160	admindb	1449571160	admindb	-1	4	4ff3f1700000	2	0	vquater	CAST( NULL AS INT )		f	f	f
 1449571160	admindb	1449571160	admindb	-1	5	4ff3f1700000	2	0	vyear	CAST ( NULL AS INT )		f	f	f
@@ -25076,21 +24724,11 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1449582738	admindb	1449582738	admindb	-1	10	4ff3f05c0000	1003	0	duration	SUM(#2.duration)		f	f	f
 1449582738	admindb	1449582738	admindb	-1	11	4ff3f05c0000	5	0	dduration	CAST ( SUM(#2.duration) / 3600.0 AS FLOAT8)		f	f	f
 1449582738	admindb	1449582738	admindb	-1	12	4ff3f05c0000	2	0	-start	EXTRACT( EPOCH FROM to_timestamp (#0.vfullday, 'DDMMYYYY'))::int4		f	f	f
-1459515687	admindb	1459515687	admindb	0	0	56fcfd960000	2	0	certcaid	certcaid		f	f	f
-1459515687	admindb	1459515687	admindb	0	1	56fcfd960000	2	0	country	country		f	f	f
-1459515687	admindb	1459515687	admindb	0	2	56fcfd960000	2	0	state	state		f	f	f
-1459515687	admindb	1459515687	admindb	0	5	56fcfd960000	2	0	orgunit	orgunit		f	f	f
-1459515687	admindb	1459515687	admindb	0	6	56fcfd960000	2	0	email	email		f	f	f
-1459515687	admindb	1459515687	admindb	-1	7	56fcfd960000	2	0	passwd	''		f	f	f
-1459515687	admindb	1459515687	admindb	0	8	56fcfd960000	4	0	createdate	createdate		f	f	f
-1459515687	admindb	1459515687	admindb	0	9	56fcfd960000	2	0	createuser	createuser		f	f	f
-1459515687	admindb	1459515687	admindb	0	10	56fcfd960000	4	0	modifydate	modifydate		f	f	f
-1459515687	admindb	1459515687	admindb	0	11	56fcfd960000	2	0	modifyuser	modifyuser		f	f	f
-1459515687	admindb	1459515687	admindb	-1	12	56fcfd960000	1	0	overwrite	''		f	f	f
 1479483531	admindb	1479483531	admindb	-1	30	5065c9a30000	2	0	powner	null		f	f	f
 1479483531	admindb	1479483531	admindb	-1	31	5065c9a30000	2	0	pownercompany	null		f	f	f
 1534144680	admindb	1534144680	admindb	0	21	49b6d0d20000	2	0	tosign	sign		f	f	f
 1534144680	admindb	1534144680	admindb	1	22	49b6d0d20000	2	0	addressid	addressid		f	f	f
+1601276219	admindb	1601276219	admindb	0	9	5065a2b90000	2	0	productid	productid		f	t	f
 1534144680	admindb	1534144680	admindb	-1	23	49b6d0d20000	2	0	cityid	( CASE WHEN #1.addressid isnull THEN #106.cityid ELSE #39.cityid END)		f	f	f
 1534144680	admindb	1534144680	admindb	-1	24	49b6d0d20000	2	0	letterlastname	UPPER(SUBSTRING(#0.lastname from 1 for 1))		f	f	f
 1534144680	admindb	1534144680	admindb	217	25	49b6d0d20000	2	0	owner	loginname		f	t	f
@@ -25154,7 +24792,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1601276219	admindb	1601276219	admindb	0	6	5065a2b90000	2	0	offerproductid	offerproductid		f	f	f
 1601276219	admindb	1601276219	admindb	4	7	5065a2b90000	2	0	offerproducttimeid	offerproducttimeid		f	f	f
 1601276219	admindb	1601276219	admindb	-1	8	5065a2b90000	2	0	rofferproducttimeid	'##' || '##' || '##' || '##' || '##' || '##' || '##' || '##'		f	f	f
-1601276219	admindb	1601276219	admindb	0	9	5065a2b90000	2	0	productid	productid		f	t	f
 1601276219	admindb	1601276219	admindb	9	10	5065a2b90000	2	0	producttimeid	producttimeid		f	f	f
 1601276219	admindb	1601276219	admindb	0	11	5065a2b90000	2	0	productoptid	productoptid		f	t	f
 1601276219	admindb	1601276219	admindb	0	12	5065a2b90000	2	0	offerproducttype	offerproducttype		f	f	f
@@ -25182,12 +24819,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1512555690	admindb	1512555690	admindb	1	6	48e8bb150000	2	0	text_de	text_de		f	f	f
 1512555690	admindb	1512555690	admindb	1	7	48e8bb150000	2	0	text_en	text_en		f	f	f
 1512555690	admindb	1512555690	admindb	1	8	48e8bb150000	1	0	custom	custom		f	f	f
-1473783246	admindb	1473783246	admindb	0	0	556831b90000	2	0	sharesid	sharesid		f	f	f
-1473783246	admindb	1473783246	admindb	0	1	556831b90000	2	0	folderid	folderid		f	f	f
-1473783246	admindb	1473783246	admindb	0	2	556831b90000	2	0	personid	personid		f	f	f
-1473783246	admindb	1473783246	admindb	0	3	556831b90000	1	0	readwrite	readwrite		f	f	f
-1473783246	admindb	1473783246	admindb	1	4	556831b90000	2	0	location	location		f	f	f
-1473783246	admindb	1473783246	admindb	1	5	556831b90000	2	0	name	name		f	f	f
 1601276219	admindb	1601276219	admindb	13	20	5065a2b90000	2	1	skilltext	text		f	f	f
 1601276219	admindb	1601276219	admindb	9	21	5065a2b90000	4	0	step	step		f	f	f
 1601276219	admindb	1601276219	admindb	-1	22	5065a2b90000	2	0	steptext	'#mne_lang#Produkt Schritt' || ' ' || COALESCE(#9.step,'0')  || '  - ' || COALESCE(NULLIF(#9.description,''),#0.productname)		f	f	f
@@ -25196,20 +24827,12 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1601276219	admindb	1601276219	admindb	-1	25	5065a2b90000	2	0	description	COALESCE(#9.description,#0.productname)		f	f	f
 1603966398	admindb	1603966398	admindb	0	20	5f9a8b180000	6	0	count	count	%20g	f	f	f
 1603966398	admindb	1603966398	admindb	-1	21	5f9a8b180000	1003	0	setdurationsum	CAST ( #3.setduration * #0.count AS INT4)		f	f	f
-1603966398	admindb	1603966398	admindb	3	22	5f9a8b180000	2	0	skillid	skillid		f	f	f
 1603966398	admindb	1603966398	admindb	16	23	5f9a8b180000	2	1	skilltext	text		f	f	f
 1603966398	admindb	1603966398	admindb	-1	24	5f9a8b180000	1	0	ready	( #0.ready OR COALESCE(#3.ready,false) OR #5.closed )		f	f	f
 1603966398	admindb	1603966398	admindb	5	25	5f9a8b180000	1	0	open	open		f	f	f
 1603966398	admindb	1603966398	admindb	-1	26	5f9a8b180000	2	0	refname	CASE WHEN #10.companyid IS NULL THEN #14.firstname || ' ' || #14.lastname ELSE #10.name END		f	f	f
 1603966398	admindb	1603966398	admindb	-1	27	5f9a8b180000	6	0	timecostsumset	( ( #3.setduration / 3600.0 ) * #16.unitcost * #0.count )	%.2f	f	f	f
 1603966398	admindb	1603966398	admindb	18	28	5f9a8b180000	2	0	timecurrency	currency		f	f	f
-1473783246	admindb	1473783246	admindb	1	6	556831b90000	2	0	description	description		f	f	f
-1473783246	admindb	1473783246	admindb	2	7	556831b90000	2	0	firstname	firstname		f	f	f
-1473783246	admindb	1473783246	admindb	2	8	556831b90000	2	0	lastname	lastname		f	f	f
-1473783246	admindb	1473783246	admindb	-1	9	556831b90000	2	0	fullname	#2.firstname || ' ' || #2.lastname		f	f	f
-1473783246	admindb	1473783246	admindb	11	10	556831b90000	2	0	company	name		f	f	f
-1473783246	admindb	1473783246	admindb	-1	11	556831b90000	1	0	havedav	#31.group IS NOT NULL		f	f	f
-1473783246	admindb	1473783246	admindb	-1	12	556831b90000	1	0	havesmb	#32.group IS NOT NULL		f	f	f
 1605166928	admindb	1605166928	admindb	27	33	5af0208d0000	2	1	skill	text		f	f	f
 1605166928	admindb	1605166928	admindb	52	34	5af0208d0000	2	0	productnumber	productnumber		f	f	f
 1605166928	admindb	1605166928	admindb	52	35	5af0208d0000	2	0	productname	productname		f	f	f
@@ -25250,17 +24873,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1599036250	admindb	1599036250	admindb	19	16	52f114af0000	2	0	personemailemail	email		f	f	f
 1599036250	admindb	1599036250	admindb	18	17	52f114af0000	2	0	persondataemail	email		f	f	f
 1512988543	admindb	1512988543	admindb	0	0	4923eaa30000	2	0	addressid	addressid		f	f	f
-1478018905	admindb	1478018905	admindb	0	0	5502b8300000	2	0	personid	personid		f	t	f
-1478018905	admindb	1478018905	admindb	0	1	5502b8300000	2	0	loginname	loginname		f	t	f
-1478018905	admindb	1478018905	admindb	0	2	5502b8300000	4	0	validuntil	validuntil		f	t	f
-1478018905	admindb	1478018905	admindb	-1	3	5502b8300000	2	0	passwd1	'********'		f	f	f
-1478018905	admindb	1478018905	admindb	-1	4	5502b8300000	2	0	passwd2	'********'		f	f	f
-1478018905	admindb	1478018905	admindb	1	5	5502b8300000	2	0	firstname	firstname		f	f	f
-1478018905	admindb	1478018905	admindb	1	6	5502b8300000	2	0	lastname	lastname		f	f	f
-1478018905	admindb	1478018905	admindb	-1	7	5502b8300000	2	0	fullname	#1.firstname || ' ' || #1.lastname		f	f	f
-1478018905	admindb	1478018905	admindb	10	8	5502b8300000	2	0	refname	name		f	f	f
-1478018905	admindb	1478018905	admindb	-1	9	5502b8300000	1	0	havedav	#23.group IS NOT NULL		f	f	f
-1478018905	admindb	1478018905	admindb	-1	10	5502b8300000	2	0	havesmb	#22.group IS NOT NULL		f	f	f
 1512988543	admindb	1512988543	admindb	0	1	4923eaa30000	2	0	refid	refid		f	f	f
 1512988543	admindb	1512988543	admindb	0	2	4923eaa30000	2	0	addresstypid	addresstypid		f	f	f
 1512988543	admindb	1512988543	admindb	1	3	4923eaa30000	2	1	addresstyp	addresstyp		f	f	f
@@ -25279,6 +24891,7 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1512988543	admindb	1512988543	admindb	0	16	4923eaa30000	2	0	modifyuser	modifyuser		f	f	f
 1513321985	admindb	1513321985	admindb	0	0	5416f25c0000	2	0	id	personid		f	f	f
 1513321985	admindb	1513321985	admindb	21	1	5416f25c0000	2	0	userid	userid		f	f	f
+1601276275	admindb	1601276275	admindb	4	7	5065a2cd0000	2	0	offerproducttimeid	offerproducttimeid		f	f	f
 1513321985	admindb	1513321985	admindb	-1	2	5416f25c0000	1	0	noactive	( #21.userid IS NOT NULL AND #21.noactive )		f	f	f
 1513321985	admindb	1513321985	admindb	0	3	5416f25c0000	2	0	firstname	firstname		f	f	f
 1513321985	admindb	1513321985	admindb	0	4	5416f25c0000	2	0	lastname	lastname		f	f	f
@@ -25347,7 +24960,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1534144736	admindb	1534144736	admindb	135	12	49b6d07f0000	2	0	telephonoffice	telephonoffice		f	f	f
 1534144736	admindb	1534144736	admindb	135	13	49b6d07f0000	2	0	email	email		f	f	f
 1534144736	admindb	1534144736	admindb	217	14	49b6d07f0000	2	0	loginname	loginname		f	t	f
-1601276275	admindb	1601276275	admindb	4	7	5065a2cd0000	2	0	offerproducttimeid	offerproducttimeid		f	f	f
 1601276275	admindb	1601276275	admindb	4	8	5065a2cd0000	2	0	rofferproducttimeid	offerproducttimeid		f	f	f
 1601276275	admindb	1601276275	admindb	0	9	5065a2cd0000	2	0	productid	productid		f	t	f
 1601276275	admindb	1601276275	admindb	-1	10	5065a2cd0000	2	0	producttimeid	null		f	f	f
@@ -25439,7 +25051,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1608112642	admindb	1608112642	admindb	0	8	4cd7f2720000	2	0	pos	treename		f	f	f
 1608112642	admindb	1608112642	admindb	2	9	4cd7f2720000	2	0	partoutgoingid	partoutgoingid		f	t	f
 1608112642	admindb	1608112642	admindb	-1	10	4cd7f2720000	2	0	typ	CASE WHEN NULLIF(#0.partid,'') IS NULL THEN '' ELSE 'leaf' END		f	f	f
-1534140126	admindb	1534140126	admindb	-1	8	49b68e9c0000	2	0	country	( CASE WHEN #1.addressid isnull THEN #108.name_#mne_langid#  ELSE #41.name_#mne_langid# END)		f	f	f
 1608112642	admindb	1608112642	admindb	-1	11	4cd7f2720000	2	0	action	CASE WHEN NULLIF(#0.partid,'') IS NULL\nTHEN '{ "action": "submenu", "parameter" : [ "", "", { "menuid" : "' || #0.treeid || '" } ] } '\nELSE\n'{ "action" : "show",\n"parameter" : [ "", "", { "parentid" : "' || COALESCE(#0.parentid,'') || '", "menuid" : "' || #0.treeid || '", "partoutgoingid" : "' || #2.partoutgoingid || '"} ] }'\nEND\n\n		f	f	f
 1472214992	admindb	1472214992	admindb	11	0	4ff3fba70000	2	0	orderid	orderid		t	f	f
 1472214992	admindb	1472214992	admindb	11	1	4ff3fba70000	2	0	ordernumber	ordernumber		t	f	f
@@ -25503,17 +25114,11 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1534140126	admindb	1534140126	admindb	0	2	49b68e9c0000	2	0	lastname	lastname		f	f	f
 1534140126	admindb	1534140126	admindb	-1	3	49b68e9c0000	2	0	name	(#0.firstname || ' ' ||  #0.lastname )		f	f	f
 1534140126	admindb	1534140126	admindb	-1	4	49b68e9c0000	2	0	street	( CASE WHEN #1.addressid isnull THEN #37.street ELSE #1.street END)		f	f	f
+1608125748	admindb	1608125748	admindb	-1	23	4b84e2b50000	2	0	partname	#70.part || ' ' || #70.parttype		f	f	f
 1534140126	admindb	1534140126	admindb	-1	5	49b68e9c0000	2	0	postbox	( CASE WHEN #1.addressid isnull THEN #37.postbox ELSE #1.postbox END)		f	f	f
 1534140126	admindb	1534140126	admindb	-1	6	49b68e9c0000	2	0	city	( CASE WHEN #1.addressid isnull THEN #106.name ELSE #39.name END)		f	f	f
 1534140126	admindb	1534140126	admindb	-1	7	49b68e9c0000	2	0	postcode	( CASE WHEN #1.addressid isnull THEN #106.postcode ELSE #39.postcode END)		f	f	f
-1477551618	admindb	1477551618	admindb	0	0	5811a5ad0000	2	0	mailaliasid	mailaliasid		f	f	f
-1477551618	admindb	1477551618	admindb	0	1	5811a5ad0000	2	0	alias	alias		f	f	f
-1477551618	admindb	1477551618	admindb	9	2	5811a5ad0000	2	0	loginname	loginname		f	f	f
-1477551618	admindb	1477551618	admindb	0	3	5811a5ad0000	2	0	personid	personid		f	f	f
-1477551618	admindb	1477551618	admindb	0	4	5811a5ad0000	4	0	createdate	createdate		f	f	f
-1477551618	admindb	1477551618	admindb	0	5	5811a5ad0000	2	0	createuser	createuser		f	f	f
-1477551618	admindb	1477551618	admindb	0	6	5811a5ad0000	4	0	modifydate	modifydate		f	f	f
-1477551618	admindb	1477551618	admindb	0	7	5811a5ad0000	2	0	modifyuser	modifyuser		f	f	f
+1534140126	admindb	1534140126	admindb	-1	8	49b68e9c0000	2	0	country	( CASE WHEN #1.addressid isnull THEN #108.name_#mne_langid#  ELSE #41.name_#mne_langid# END)		f	f	f
 1605166974	admindb	1605166974	admindb	-1	0	4f6c77750000	4	0	rownum	rank() OVER (ORDER BY #0.start)		f	f	f
 1605166974	admindb	1605166974	admindb	0	1	4f6c77750000	2	0	timeid	timeid		t	f	f
 1605166974	admindb	1605166974	admindb	0	2	4f6c77750000	1000	0	starttime	start		t	f	f
@@ -25641,54 +25246,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1545403743	admindb	1545403743	admindb	8	28	4a4b280f0000	2	0	ordernumber	ordernumber		f	f	f
 1545403743	admindb	1545403743	admindb	-1	29	4a4b280f0000	2	0	refname	CASE WHEN #14.companyid IS NULL THEN #18.firstname || ' ' || #18.lastname ELSE #14.name END		f	f	f
 1545403743	admindb	1545403743	admindb	-1	30	4a4b280f0000	2	0	laststep	''		f	f	f
-1553165612	admindb	1553165612	admindb	0	0	57ee0c130000	2	0	folderid	folderid		t	f	f
-1553165612	admindb	1553165612	admindb	0	1	57ee0c130000	2	0	location	location		t	f	f
-1553165612	admindb	1553165612	admindb	0	2	57ee0c130000	2	0	hostname	hostname		f	f	f
-1553165612	admindb	1553165612	admindb	0	3	57ee0c130000	2	0	name	name		t	f	f
-1553165612	admindb	1553165612	admindb	0	4	57ee0c130000	2	0	description	description		t	f	f
-1553165612	admindb	1553165612	admindb	-1	5	57ee0c130000	4	0	sharecount	count(#1.sharesid)		f	f	f
-1553165612	admindb	1553165612	admindb	0	6	57ee0c130000	4	0	createdate	createdate		t	f	f
-1553165612	admindb	1553165612	admindb	0	7	57ee0c130000	2	0	createuser	createuser		t	f	f
-1553165612	admindb	1553165612	admindb	0	8	57ee0c130000	4	0	modifydate	modifydate		t	f	f
-1553165612	admindb	1553165612	admindb	0	9	57ee0c130000	2	0	modifyuser	modifyuser		t	f	f
-1553754877	admindb	1553754877	admindb	0	0	569f95b30000	2	0	apachemodid	apachemodid		f	f	f
-1553754877	admindb	1553754877	admindb	0	1	569f95b30000	2	0	hostname	hostname		f	f	f
-1553754877	admindb	1553754877	admindb	0	2	569f95b30000	1	0	enabled	enabled		f	f	f
-1553754877	admindb	1553754877	admindb	0	3	569f95b30000	4	0	createdate	createdate		f	f	f
-1553754877	admindb	1553754877	admindb	0	4	569f95b30000	2	0	createuser	createuser		f	f	f
-1553754877	admindb	1553754877	admindb	0	5	569f95b30000	4	0	modifydate	modifydate		f	f	f
-1553754877	admindb	1553754877	admindb	0	6	569f95b30000	2	0	modifyuser	modifyuser		f	f	f
-1553755649	admindb	1553755649	admindb	0	0	56a78aed0000	2	0	apachesiteid	apachesiteid		f	f	f
-1553755649	admindb	1553755649	admindb	0	1	56a78aed0000	1	0	enabled	enabled		f	f	f
-1553755649	admindb	1553755649	admindb	0	2	56a78aed0000	2	0	hostname	hostname		f	f	f
-1553755649	admindb	1553755649	admindb	0	3	56a78aed0000	2	0	domain	domain		f	f	f
-1553755649	admindb	1553755649	admindb	0	4	56a78aed0000	2	0	alias	alias		f	f	f
-1553755649	admindb	1553755649	admindb	0	5	56a78aed0000	2	0	documentroot	documentroot		f	f	f
-1553755649	admindb	1553755649	admindb	0	6	56a78aed0000	2	0	email	email		f	f	f
-1553755649	admindb	1553755649	admindb	0	7	56a78aed0000	1	0	httpsonly	httpsonly		f	f	f
-1553755649	admindb	1553755649	admindb	0	8	56a78aed0000	2	0	conftext	conftext		f	f	f
-1553755649	admindb	1553755649	admindb	0	9	56a78aed0000	4	0	lastread	lastread		f	t	f
-1553755649	admindb	1553755649	admindb	-1	10	56a78aed0000	1	0	renewcert	''		f	f	f
-1553755649	admindb	1553755649	admindb	-1	11	56a78aed0000	2	0	passwd	''		f	f	f
-1553755649	admindb	1553755649	admindb	0	12	56a78aed0000	4	0	createdate	createdate		f	f	f
-1553755649	admindb	1553755649	admindb	0	13	56a78aed0000	2	0	createuser	createuser		f	f	f
-1553755649	admindb	1553755649	admindb	0	14	56a78aed0000	4	0	modifydate	modifydate		f	f	f
-1553755649	admindb	1553755649	admindb	0	15	56a78aed0000	2	0	modifyuser	modifyuser		f	f	f
-1553755649	admindb	1553755649	admindb	1	16	56a78aed0000	3	0	port	port		f	f	f
-1553755649	admindb	1553755649	admindb	1	17	56a78aed0000	3	0	sport	sport		f	f	f
-1553766118	admindb	1553766118	admindb	0	0	580a19280000	2	0	sogoid	sogoid		f	f	f
-1553766118	admindb	1553766118	admindb	-1	1	580a19280000	2	0	certok	#3.certcaid IS NOT NULL		f	f	f
-1553766118	admindb	1553766118	admindb	-1	2	580a19280000	2	0	domainok	#4.typ = 'primary' OR #4.typ = 'second'		f	f	f
-1553766118	admindb	1553766118	admindb	0	3	580a19280000	1	0	mailcanonical	mailcanonical		f	f	f
-1553766118	admindb	1553766118	admindb	0	4	580a19280000	2	0	mailrelay	mailrelay		f	f	f
-1553766118	admindb	1553766118	admindb	0	5	580a19280000	2	0	mailrelayuser	mailrelayuser		f	f	f
-1553766118	admindb	1553766118	admindb	-1	6	580a19280000	2	0	mailrelaypassword	''		f	f	f
-1553766118	admindb	1553766118	admindb	-1	7	580a19280000	2	0	passwd	''		f	f	f
-1553766118	admindb	1553766118	admindb	0	8	580a19280000	4	0	createdate	createdate		f	f	f
-1553766118	admindb	1553766118	admindb	0	9	580a19280000	2	0	createuser	createuser		f	f	f
-1579620562	admindb	1579620562	admindb	0	6	57da3e460000	2	0	typ	typ		f	t	f
-1553766118	admindb	1553766118	admindb	0	10	580a19280000	4	0	modifydate	modifydate		f	f	f
-1553766118	admindb	1553766118	admindb	0	11	580a19280000	2	0	modifyuser	modifyuser		f	f	f
 1601276304	admindb	1601276304	admindb	-1	23	5065a4600000	2	0	longdesc	null		f	f	f
 1601276304	admindb	1601276304	admindb	-1	24	5065a4600000	2	0	xlongdesc	null		f	f	f
 1601276304	admindb	1601276304	admindb	-1	25	5065a4600000	2	0	description	null		f	f	f
@@ -25730,96 +25287,17 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1608125748	admindb	1608125748	admindb	5	17	4b84e2b50000	2	0	orderproductname	productname		f	f	f
 1608125748	admindb	1608125748	admindb	9	18	4b84e2b50000	2	0	ordernumber	ordernumber		f	f	f
 1608125748	admindb	1608125748	admindb	9	19	4b84e2b50000	2	0	orderdescription	description		f	f	f
-1579620562	admindb	1579620562	admindb	0	14	57da3e460000	2	0	addr	addr		f	f	f
-1579620562	admindb	1579620562	admindb	0	15	57da3e460000	2	0	addr6	addr6		f	f	f
-1579620562	admindb	1579620562	admindb	0	16	57da3e460000	4	0	createdate	createdate		f	f	f
-1579620562	admindb	1579620562	admindb	0	17	57da3e460000	2	0	createuser	createuser		f	f	f
-1579620562	admindb	1579620562	admindb	0	18	57da3e460000	4	0	modifydate	modifydate		f	f	f
-1579620562	admindb	1579620562	admindb	0	19	57da3e460000	2	0	modifyuser	modifyuser		f	f	f
-1579620644	admindb	1579620644	admindb	0	0	5dfa2c070000	2	0	netparamid	netparamid		f	f	f
-1579620644	admindb	1579620644	admindb	-1	1	5dfa2c070000	2	0	domain	COALESCE(#1.domain, #0.domain)		f	f	f
-1579620644	admindb	1579620644	admindb	-1	2	5dfa2c070000	2	0	search	CASE WHEN #1.typ = 'standalone' THEN #0.search ELSE #1.dnssearch END		f	f	f
-1579620644	admindb	1579620644	admindb	0	3	5dfa2c070000	2	0	gw	gw		f	f	f
-1579620644	admindb	1579620644	admindb	-1	4	5dfa2c070000	2	0	nameserver	CASE WHEN #1.typ = 'standalone' THEN #0.nameserver ELSE COALESCE(NULLIF(#2.addr6,''),NULLIF(#2.addr,''),'127.0.0.1') END		f	f	f
-1579620644	admindb	1579620644	admindb	0	5	5dfa2c070000	4	0	createdate	createdate		f	f	f
-1579620644	admindb	1579620644	admindb	0	6	5dfa2c070000	2	0	createuser	createuser		f	f	f
-1579620644	admindb	1579620644	admindb	0	7	5dfa2c070000	4	0	modifydate	modifydate		f	f	f
-1579620644	admindb	1579620644	admindb	0	8	5dfa2c070000	2	0	modifyuser	modifyuser		f	f	f
 1608125748	admindb	1608125748	admindb	70	20	4b84e2b50000	2	0	partid	partid		f	f	f
 1608125748	admindb	1608125748	admindb	70	21	4b84e2b50000	2	0	part	part		f	f	f
 1608125748	admindb	1608125748	admindb	70	22	4b84e2b50000	2	0	parttype	parttype		f	f	f
-1608125748	admindb	1608125748	admindb	-1	23	4b84e2b50000	2	0	partname	#70.part || ' ' || #70.parttype		f	f	f
 1608125748	admindb	1608125748	admindb	66	24	4b84e2b50000	1001	0	deliverydate	deliverydate		f	f	f
 1608125748	admindb	1608125748	admindb	31	25	4b84e2b50000	2	0	storage	description		f	f	f
 1608125748	admindb	1608125748	admindb	18	26	4b84e2b50000	2	0	storagelocationid	storagelocationid		f	f	f
-1579620562	admindb	1579620562	admindb	-1	7	57da3e460000	2	0	nameserver	CASE WHEN #2.typ = 'standalone' THEN #0.nameserver ELSE COALESCE(NULLIF(#3.addr6,''),NULLIF(#3.addr,''),'127.0.0.1') END		f	f	f
 1608125748	admindb	1608125748	admindb	18	27	4b84e2b50000	2	0	storagelocationname	name		f	f	f
 1608125748	admindb	1608125748	admindb	-1	28	4b84e2b50000	2	0	storagelocation	#31.xname || ' ' || #18.x || COALESCE ( ', ' || #31.yname ||  ' ' || #18.y, '' ) || COALESCE (', ' || #31.zname || ' ' || #18.z , '' )		f	f	f
 1608125748	admindb	1608125748	admindb	27	29	4b84e2b50000	2	0	outstorageid	storageid		f	f	f
 1608125748	admindb	1608125748	admindb	27	30	4b84e2b50000	2	0	outstorage	description		f	f	f
 1608125748	admindb	1608125748	admindb	24	31	4b84e2b50000	2	0	outstoragelocationid	storagelocationid		f	f	f
-1578380726	admindb	1578380726	admindb	0	0	581c7c020000	2	0	dnsaddressid	dnsaddressid		f	f	f
-1578380726	admindb	1578380726	admindb	0	1	581c7c020000	2	0	name	name		f	f	f
-1578380726	admindb	1578380726	admindb	0	2	581c7c020000	2	0	address	address		f	f	f
-1578380726	admindb	1578380726	admindb	0	3	581c7c020000	2	0	record	record		f	f	f
-1578380726	admindb	1578380726	admindb	0	4	581c7c020000	1	0	fix	fix		f	f	f
-1578380726	admindb	1578380726	admindb	0	5	581c7c020000	2	0	mac	mac		f	f	f
-1578380726	admindb	1578380726	admindb	0	6	581c7c020000	2	0	comment	comment		f	f	f
-1578380726	admindb	1578380726	admindb	0	7	581c7c020000	4	0	createdate	createdate		f	f	f
-1578380726	admindb	1578380726	admindb	0	8	581c7c020000	2	0	createuser	createuser		f	f	f
-1578380726	admindb	1578380726	admindb	0	9	581c7c020000	4	0	modifydate	modifydate		f	f	f
-1578380726	admindb	1578380726	admindb	0	10	581c7c020000	2	0	modifyuser	modifyuser		f	f	f
-1578480576	admindb	1578480576	admindb	-1	0	57da3e520000	2	0	networkid	''		f	f	f
-1578480576	admindb	1578480576	admindb	-1	1	57da3e520000	3	0	ownnetwork	1		f	f	f
-1578480576	admindb	1578480576	admindb	-1	2	57da3e520000	2	0	networkidname	'#mne_lang#keine'		f	f	f
-1578480576	admindb	1578480576	admindb	-1	3	57da3e520000	2	0	hostname	''		f	f	f
-1578480576	admindb	1578480576	admindb	-1	4	57da3e520000	2	0	available	'0'		f	f	f
-1578480576	admindb	1578480576	admindb	-1	5	57da3e520000	2	0	search	''		f	f	f
-1578480576	admindb	1578480576	admindb	-1	6	57da3e520000	2	0	typ	'static'		f	f	f
-1578480576	admindb	1578480576	admindb	-1	7	57da3e520000	2	0	nameserver	''		f	f	f
-1578480576	admindb	1578480576	admindb	-1	8	57da3e520000	2	0	mask	''		f	f	f
-1578480576	admindb	1578480576	admindb	-1	9	57da3e520000	2	0	mask6	''		f	f	f
-1578480576	admindb	1578480576	admindb	-1	10	57da3e520000	2	0	gateway	''		f	f	f
-1578480576	admindb	1578480576	admindb	-1	11	57da3e520000	2	0	domain	''		f	f	f
-1578480576	admindb	1578480576	admindb	-1	12	57da3e520000	2	0	configured	true		f	f	f
-1578480576	admindb	1578480576	admindb	-1	13	57da3e520000	2	0	broadcast	''		f	f	f
-1578480576	admindb	1578480576	admindb	-1	14	57da3e520000	2	0	addr	''		f	f	f
-1578480576	admindb	1578480576	admindb	-1	15	57da3e520000	2	0	addr6	''		f	f	f
-1578480576	admindb	1578480576	admindb	-1	16	57da3e520000	2	0	createdate	0		f	f	f
-1578480576	admindb	1578480576	admindb	-1	17	57da3e520000	2	0	createuser	'admindb'		f	f	f
-1578480576	admindb	1578480576	admindb	-1	18	57da3e520000	2	0	modifydate	0		f	f	f
-1578480576	admindb	1578480576	admindb	-1	19	57da3e520000	2	0	modifyuser	'admindb'		f	f	f
-1578499160	admindb	1578499160	admindb	0	0	57d910560000	2	0	domainid	domainid		f	f	f
-1578499160	admindb	1578499160	admindb	0	1	57d910560000	2	0	domain	domain		f	f	f
-1578499160	admindb	1578499160	admindb	0	2	57d910560000	2	0	typ	typ		f	f	f
-1578499160	admindb	1578499160	admindb	0	3	57d910560000	2	0	workgroup	workgroup		f	f	f
-1578499160	admindb	1578499160	admindb	0	4	57d910560000	2	0	description	description		f	f	f
-1578499160	admindb	1578499160	admindb	0	5	57d910560000	2	0	netdevice	netdevice		f	t	f
-1578499160	admindb	1578499160	admindb	0	6	57d910560000	2	0	primaryname	primaryname		f	f	f
-1578499160	admindb	1578499160	admindb	0	7	57d910560000	2	0	primaryaddr	primaryaddr		f	f	f
-1578499160	admindb	1578499160	admindb	0	8	57d910560000	2	0	dnsforwarder	dnsforwarder		f	f	f
-1578499160	admindb	1578499160	admindb	0	9	57d910560000	2	0	dnssearch	dnssearch		f	f	f
-1578499160	admindb	1578499160	admindb	-1	10	57d910560000	2	0	admin	''		f	f	f
-1578499160	admindb	1578499160	admindb	-1	11	57d910560000	2	0	adminpassword	''		f	f	f
-1578499160	admindb	1578499160	admindb	-1	12	57d910560000	2	0	adminpassword2	''		f	f	f
-1578499160	admindb	1578499160	admindb	0	13	57d910560000	2	0	dhcpstart	dhcpstart		f	f	f
-1578499160	admindb	1578499160	admindb	0	14	57d910560000	2	0	dhcpend	dhcpend		f	f	f
-1578499160	admindb	1578499160	admindb	0	15	57d910560000	2	0	dhcp6start	dhcp6start		f	f	f
-1578499160	admindb	1578499160	admindb	0	16	57d910560000	2	0	dhcp6end	dhcp6end		f	f	f
-1578499160	admindb	1578499160	admindb	0	17	57d910560000	4	0	createdate	createdate		f	f	f
-1578499160	admindb	1578499160	admindb	0	18	57d910560000	2	0	createuser	createuser		f	f	f
-1578499160	admindb	1578499160	admindb	0	19	57d910560000	4	0	modifydate	modifydate		f	f	f
-1578499160	admindb	1578499160	admindb	0	20	57d910560000	2	0	modifyuser	modifyuser		f	f	f
-1579620562	admindb	1579620562	admindb	0	0	57da3e460000	2	0	networkid	networkid		f	f	f
-1579620562	admindb	1579620562	admindb	-1	1	57da3e460000	3	0	ownnetwork	CASE WHEN #1.serverid = #0.hostname THEN 1 ELSE 0 END		f	f	f
-1579620562	admindb	1579620562	admindb	0	2	57da3e460000	2	0	networkidname	networkid		f	f	f
-1579620562	admindb	1579620562	admindb	0	3	57da3e460000	2	0	hostname	hostname		f	f	f
-1579620562	admindb	1579620562	admindb	-1	4	57da3e460000	2	0	available	CASE WHEN #0.available THEN '1' ELSE '0' END		f	f	f
-1579620562	admindb	1579620562	admindb	-1	5	57da3e460000	2	0	search	CASE WHEN #2.typ = 'standalone' THEN #0.search ELSE #2.dnssearch END		f	f	f
-1579620562	admindb	1579620562	admindb	0	10	57da3e460000	2	0	gateway	gateway		f	f	f
-1579620562	admindb	1579620562	admindb	-1	11	57da3e460000	2	0	domain	COALESCE(#2.domain, #0.domain)		f	f	f
-1579620562	admindb	1579620562	admindb	0	12	57da3e460000	1	0	configured	configured		f	f	f
-1579620562	admindb	1579620562	admindb	0	13	57da3e460000	2	0	broadcast	broadcast		f	f	f
 1601276319	admindb	1601276319	admindb	0	15	5266cf620000	2	0	productnumber	productnumber		t	f	f
 1608125748	admindb	1608125748	admindb	24	32	4b84e2b50000	2	0	outstoragelocationname	name		f	f	f
 1608125748	admindb	1608125748	admindb	-1	33	4b84e2b50000	2	0	outstoragelocation	#27.xname || ' ' || #24.x || COALESCE ( ', ' || #27.yname ||  ' ' || #24.y, '' ) || COALESCE (', ' || #27.zname || ' ' || #24.z , '' )		f	f	f
@@ -25931,6 +25409,7 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1600179117	admindb	1600179117	admindb	-1	13	mne_crmbase_offer_detail_1	2	0	contactname	CASE WHEN #110.personid IS NULL THEN CASE WHEN #15.personid IS NULL THEN ' ' ELSE #15.firstname || ' ' || #15.lastname END END		f	f	f
 1600179117	admindb	1600179117	admindb	-1	14	mne_crmbase_offer_detail_1	2	0	offername	#0.offernumber || ' - ' || #0.version		f	f	f
 1600179117	admindb	1600179117	admindb	-1	15	mne_crmbase_offer_detail_1	2	0	company	CASE WHEN #110.personid IS NULL THEN #1.name ELSE #110.firstname || ' ' || #110.lastname END		f	f	f
+1597903782	admindb	1597903782	admindb	0	3	55361bf70000	2	0	menuid	letterid		f	f	f
 1600179117	admindb	1600179117	admindb	-1	16	mne_crmbase_offer_detail_1	2	0	postbox	CASE WHEN NOT #110.personid IS NULL THEN CASE WHEN NOT #117.addressid IS NULL THEN #117.postbox ELSE #187.postbox END ELSE CASE WHEN NOT #16.addressid IS NULL THEN #16.postbox WHEN NOT #80.addressid IS NULL THEN #80.postbox ELSE #93.postbox END END		f	f	f
 1600179117	admindb	1600179117	admindb	-1	17	mne_crmbase_offer_detail_1	2	0	street	CASE WHEN NOT #110.personid IS NULL THEN CASE WHEN NOT #117.addressid IS NULL THEN #117.street ELSE #187.street END ELSE CASE WHEN NOT #16.addressid IS NULL THEN #16.street WHEN NOT #80.addressid IS NULL THEN #80.street ELSE #93.street END END		f	f	f
 1591700988	admindb	1591700988	admindb	3	9	mne_crmbase_company_detail_1	2	0	postcode	postcode		f	f	f
@@ -25945,6 +25424,8 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1600179117	admindb	1600179117	admindb	-1	19	mne_crmbase_offer_detail_1	2	0	postcode	CASE WHEN NOT #110.personid IS NULL THEN CASE WHEN NOT #117.addressid IS NULL THEN #119.postcode ELSE #189.postcode END ELSE CASE WHEN NOT #16.addressid IS NULL THEN #18.postcode  WHEN NOT #80.addressid IS NULL THEN #82.postcode ELSE #95.postcode END END		f	f	f
 1600179117	admindb	1600179117	admindb	-1	20	mne_crmbase_offer_detail_1	2	0	country	CASE WHEN NOT #110.personid IS NULL THEN CASE WHEN NOT #117.addressid IS NULL THEN CASE WHEN (select countrycarcode from mne_settings) <> #121.countrycarcode THEN #121.name_#mne_langid# ELSE '' END ELSE CASE WHEN (select countrycarcode from mne_settings) <> #191.countrycarcode THEN #191.name_#mne_langid# ELSE '' END END ELSE CASE WHEN NOT #16.addressid IS NULL THEN CASE WHEN (select countrycarcode from mne_settings) <> #86.countrycarcode THEN #86.name_#mne_langid# ELSE '' END WHEN NOT #80.addressid IS NULL THEN CASE WHEN (select countrycarcode from mne_settings) <> #91.countrycarcode THEN #91.name_#mne_langid# ELSE '' END ELSE CASE WHEN (select countrycarcode from mne_settings) <> #109.countrycarcode THEN #109.name_#mne_langid# ELSE '' END END END		f	f	f
 1600179117	admindb	1600179117	admindb	-1	21	mne_crmbase_offer_detail_1	2	0	countrycarcode	CASE WHEN NOT #110.personid IS NULL THEN CASE WHEN NOT #117.addressid IS NULL THEN CASE WHEN (select countrycarcode from mne_settings) <> #121.countrycarcode THEN #121.countrycarcode ELSE '' END ELSE CASE WHEN (select countrycarcode from mne_settings) <> #191.countrycarcode THEN #191.countrycarcode ELSE '' END END ELSE CASE WHEN NOT #16.addressid IS NULL THEN CASE WHEN (select countrycarcode from mne_settings) <> #86.countrycarcode THEN #86.countrycarcode ELSE '' END WHEN NOT #80.addressid IS NULL THEN CASE WHEN (select countrycarcode from mne_settings) <> #91.countrycarcode THEN #91.countrycarcode ELSE '' END ELSE CASE WHEN (select countrycarcode from mne_settings) <> #109.countrycarcode THEN #109.countrycarcode ELSE '' END END END		f	f	f
+1600179117	admindb	1600179117	admindb	381	47	mne_crmbase_offer_detail_1	2	0	uownpostcode	postcode		f	f	f
+1600179117	admindb	1600179117	admindb	385	48	mne_crmbase_offer_detail_1	2	0	uownphoneprefix	phoneprefix		f	f	f
 1600179117	admindb	1600179117	admindb	-1	22	mne_crmbase_offer_detail_1	2	0	continent	CASE WHEN NOT #110.personid IS NULL THEN CASE WHEN NOT #117.addressid IS NULL THEN CASE WHEN (select countrycarcode from mne_settings) <> #121.countrycarcode THEN #121.continent_#mne_langid# ELSE '' END ELSE CASE WHEN (select countrycarcode from mne_settings) <> #191.countrycarcode THEN #191.continent_#mne_langid# ELSE '' END END ELSE CASE WHEN NOT #16.addressid IS NULL THEN CASE WHEN (select countrycarcode from mne_settings) <> #86.countrycarcode THEN #86.continent_#mne_langid# ELSE '' END WHEN NOT #80.addressid IS NULL THEN CASE WHEN (select countrycarcode from mne_settings) <> #91.countrycarcode THEN #91.continent_#mne_langid# ELSE '' END ELSE CASE WHEN (select countrycarcode from mne_settings) <> #109.countrycarcode THEN #109.continent_#mne_langid# ELSE '' END END END		f	f	f
 1600179117	admindb	1600179117	admindb	0	23	mne_crmbase_offer_detail_1	2	0	language	language		f	f	f
 1600179117	admindb	1600179117	admindb	-1	24	mne_crmbase_offer_detail_1	2	0	tosign	CASE WHEN #110.personid IS NULL THEN #15.sign ELSE #110.sign END		f	f	f
@@ -25965,7 +25446,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1597903782	admindb	1597903782	admindb	4	0	55361bf70000	2	0	menuname	personid		f	f	f
 1597903782	admindb	1597903782	admindb	0	1	55361bf70000	2	0	refid	refid		f	t	f
 1597903782	admindb	1597903782	admindb	-1	2	55361bf70000	2	0	parentid	''		f	f	f
-1597903782	admindb	1597903782	admindb	0	3	55361bf70000	2	0	menuid	letterid		f	f	f
 1597903782	admindb	1597903782	admindb	0	4	55361bf70000	2	0	item	name		f	f	f
 1597903782	admindb	1597903782	admindb	-1	5	55361bf70000	2	0	parentname	''		f	f	f
 1597903782	admindb	1597903782	admindb	-1	6	55361bf70000	2	0	pos	''		f	f	f
@@ -25997,8 +25477,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1600179117	admindb	1600179117	admindb	366	44	mne_crmbase_offer_detail_1	2	0	uownpostbox	postbox		f	f	f
 1600179117	admindb	1600179117	admindb	366	45	mne_crmbase_offer_detail_1	2	0	uownstreet	street		f	f	f
 1600179117	admindb	1600179117	admindb	381	46	mne_crmbase_offer_detail_1	2	0	uowncity	name		f	f	f
-1600179117	admindb	1600179117	admindb	381	47	mne_crmbase_offer_detail_1	2	0	uownpostcode	postcode		f	f	f
-1600179117	admindb	1600179117	admindb	385	48	mne_crmbase_offer_detail_1	2	0	uownphoneprefix	phoneprefix		f	f	f
 1600179117	admindb	1600179117	admindb	385	49	mne_crmbase_offer_detail_1	2	0	uowncountrycarcode	countrycarcode		f	f	f
 1600179117	admindb	1600179117	admindb	385	50	mne_crmbase_offer_detail_1	2	0	uowncountryname_de	name_de		f	f	f
 1600179117	admindb	1600179117	admindb	385	51	mne_crmbase_offer_detail_1	2	0	uowncountryname_en	name_en		f	f	f
@@ -26056,6 +25534,7 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1603345954	admindb	1603345954	admindb	929	25	mne_finance_invoice_detail_1	2	0	uowncity	name		f	f	f
 1603345954	admindb	1603345954	admindb	260	26	mne_finance_invoice_detail_1	2	0	company	name		f	f	f
 1603345954	admindb	1603345954	admindb	707	27	mne_finance_invoice_detail_1	1001	0	secondreminderdate	reminder2		f	t	f
+1603345954	admindb	1603345954	admindb	919	31	mne_finance_invoice_detail_1	1010	0	uownemail	email		f	f	f
 1603345954	admindb	1603345954	admindb	-1	28	mne_finance_invoice_detail_1	2	0	contrycarcode	NULLIF( CASE WHEN #738.personid  IS NOT NULL THEN CASE WHEN #783.addressid IS NOT NULL THEN #886.countrycarcode ELSE #888.countrycarcode END WHEN #737.companyid IS NOT NULL THEN #890.countrycarcode WHEN #420.personid IS NOT NULL THEN CASE WHEN #768.addressid IS NOT NULL THEN #892.countrycarcode ELSE #492.countrycarcode END ELSE #694.countrycarcode END, ( SELECT countrycarcode FROM mne_settings ))		f	f	f
 1608125748	admindb	1608125748	admindb	-1	38	4b84e2b50000	2	0	partoutgoing	''		f	f	f
 1599140602	admindb	1599140602	admindb	0	0	5f50be7f0000	2	0	personowndataid	personowndataid		f	f	f
@@ -26082,7 +25561,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1593692423	admindb	1593692423	admindb	-1	7	4b1cfad30000	2	0	typ	''		f	f	f
 1593692423	admindb	1593692423	admindb	-1	8	4b1cfad30000	2	0	action	'{ "action" : "submenu", "parameter" : "" }'		f	f	f
 1593692431	admindb	1593692431	admindb	-1	0	4b1d00050000	2	0	menuname	COALESCE(#2.companyid, #11.companyid,'')		f	f	f
-1593692431	admindb	1593692431	admindb	0	1	4b1d00050000	2	0	refid	refid		f	t	f
 1593692431	admindb	1593692431	admindb	-1	2	4b1d00050000	2	0	parentid	CASE WHEN NOT #2.companyid IS NULL THEN '#mne_lang#Firma' WHEN NOT #3.personid IS NULL THEN '#mne_lang#Person' ELSE '#mne_lang#Vorlage' END		f	f	f
 1593692431	admindb	1593692431	admindb	-1	3	4b1d00050000	2	0	menuid	COALESCE(#0.refid,'vorlage')		f	f	f
 1593692431	admindb	1593692431	admindb	-1	4	4b1d00050000	2	0	item	COALESCE(#2.name, #3.firstname || ' ' || #3.lastname,'Volage')		f	f	f
@@ -26172,7 +25650,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1591372373	admindb	1591372373	admindb	7	10	4ce24d130000	2	0	parentname	itemname		f	f	f
 1603345954	admindb	1603345954	admindb	-1	29	mne_finance_invoice_detail_1	2	0	ownername	#139.firstname || ' ' || #139.lastname		f	f	f
 1603345954	admindb	1603345954	admindb	906	30	mne_finance_invoice_detail_1	2	0	uowncompanyownprefix	prefix		f	f	f
-1603345954	admindb	1603345954	admindb	919	31	mne_finance_invoice_detail_1	1010	0	uownemail	email		f	f	f
 1603345954	admindb	1603345954	admindb	-1	32	mne_finance_invoice_detail_1	2	0	watermark	CASE WHEN #707.invoiced = true THEN '' ELSE '#mne_lang#Entwurf#' END		f	f	f
 1603345954	admindb	1603345954	admindb	906	33	mne_finance_invoice_detail_1	2	0	uownblz	blz		f	f	f
 1603345954	admindb	1603345954	admindb	-1	34	mne_finance_invoice_detail_1	2	0	invoicecompany	CASE WHEN #738.personid IS NOT NULL THEN #787.name WHEN #737.companyid IS NOT NULL THEN #737.name WHEN #420.personid IS NOT NULL THEN '' ELSE #260.name END		f	f	f
@@ -26225,6 +25702,7 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1603345954	admindb	1603345954	admindb	0	55	mne_finance_invoice_detail_1	2	0	contactid	contactid		f	t	f
 1603345954	admindb	1603345954	admindb	0	56	mne_finance_invoice_detail_1	2	0	modifyuser	modifyuser		f	f	f
 1603345954	admindb	1603345954	admindb	-1	57	mne_finance_invoice_detail_1	1	0	secondreminder	( #707.invoiced AND NOT #707.paid ) AND ( #707.reminder2 IS NULL ) AND ((((( #707.invoicetime + ( #361.paytime + 14 )* 86400 )  - (CAST(FLOOR(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP)) AS INTEGER)))) / 86400 + 1) < 0)  AND NOT #707.paid		f	f	f
+1607510241	admindb	1607510241	admindb	-1	16	mne_crmbase_order_detail_1	2	0	contactname	CASE WHEN #147.personid IS NULL THEN #47.firstname || ' ' || #47.lastname ELSE '' END		f	f	f
 1603345954	admindb	1603345954	admindb	-1	58	mne_finance_invoice_detail_1	2	0	country	NULLIF( CASE WHEN #738.personid  IS NOT NULL THEN CASE WHEN #783.addressid IS NOT NULL THEN #886.name_#mne_langid# ELSE #888.name_#mne_langid# END WHEN #737.companyid IS NOT NULL THEN #890.name_#mne_langid# WHEN #420.personid IS NOT NULL THEN CASE WHEN #768.addressid IS NOT NULL THEN #892.name_#mne_langid# ELSE #492.name_#mne_langid# END ELSE #694.name_#mne_langid# END, ( SELECT tt0.name_#mne_langid# FROM mne_crm.country tt0, mne_settings tt1 WHERE tt0.countrycarcode = tt1.countrycarcode ))		f	f	f
 1608188280	admindb	1608188280	admindb	0	1	4ed76db80000	2	0	purchaseid	purchaseid		f	f	f
 1600249799	admindb	1600249799	admindb	0	0	49c0e8ea0000	2	0	offerproductid	offerproductid		f	f	f
@@ -26347,7 +25825,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1603358746	admindb	1603358746	admindb	0	1	mne_finance_invoice_all_1	4	0	num	num		f	f	f
 1603358746	admindb	1603358746	admindb	396	2	mne_finance_invoice_all_1	1	0	invoiced	invoiced		f	f	f
 1603358746	admindb	1603358746	admindb	396	3	mne_finance_invoice_all_1	1001	0	invoicetime	invoicetime		f	t	f
-1607510241	admindb	1607510241	admindb	-1	16	mne_crmbase_order_detail_1	2	0	contactname	CASE WHEN #147.personid IS NULL THEN #47.firstname || ' ' || #47.lastname ELSE '' END		f	f	f
 1607510241	admindb	1607510241	admindb	-1	17	mne_crmbase_order_detail_1	2	0	company	CASE WHEN #147.personid IS NULL THEN #33.name ELSE #147.firstname || ' ' || #147.lastname END		f	f	f
 1607510241	admindb	1607510241	admindb	-1	18	mne_crmbase_order_detail_1	2	0	postbox	CASE WHEN NOT #147.personid IS NULL THEN CASE WHEN NOT #154.addressid IS NULL THEN #154.postbox ELSE #224.postbox END ELSE CASE WHEN NOT #78.addressid IS NULL THEN #78.postbox WHEN NOT #104.addressid IS NULL THEN #104.postbox ELSE #129.postbox END END		f	f	f
 1601467884	admindb	1601467884	admindb	-1	19	4ae805a70000	1003	0	setdurationsum	CAST ( #3.setduration * #0.count AS INT4)		f	f	f
@@ -26384,7 +25861,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1603455292	admindb	1603455292	admindb	-1	2	4a408c3d0000	2	0	ntyp	1		f	f	f
 1597667024	admindb	1597667024	admindb	-1	13	491c1fab0000	2	0	lettercountry	upper(substring(#0.name_#mne_langid# from 1 for 1))		f	f	f
 1597667024	admindb	1597667024	admindb	-1	14	491c1fab0000	2	0	lettercontinent	upper(substring(#0.continent_#mne_langid# from 1 for 1))		f	f	f
-1600870103	admindb	1600870103	admindb	4	26	4b4f17c00000	1000	0	modifydate	modifydate		f	f	f
 1597667024	admindb	1597667024	admindb	-1	15	491c1fab0000	2	0	ucontinent	COALESCE(NULLIF(continent_#mne_langid#,''), '#mne_lang#unbekannt')		f	f	f
 1603358746	admindb	1603358746	admindb	-1	4	mne_finance_invoice_all_1	2	0	invoiceyear	CASE WHEN #396.invoicetime = 0 THEN '#mne_lang#nicht in Rechnung gestellt#' ELSE mne_catalog.epoch_format(COALESCE(#396.invoicetime,mne_catalog.acttime()), 'YYYY') END		f	f	f
 1603358746	admindb	1603358746	admindb	396	5	mne_finance_invoice_all_1	1001	0	invoiceauto	invoiceauto		f	t	f
@@ -26447,7 +25923,7 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1600870103	admindb	1600870103	admindb	15	23	4b4f17c00000	2	0	currency	currency		f	f	f
 1600870103	admindb	1600870103	admindb	4	24	4b4f17c00000	1000	0	createdate	createdate		f	f	f
 1600870103	admindb	1600870103	admindb	4	25	4b4f17c00000	2	0	createuser	createuser		f	f	f
-1382375860	admindb	1382375860	admindb	-1	40	50659ba10000	2	0	powner	null		f	f	f
+1600870103	admindb	1600870103	admindb	4	26	4b4f17c00000	1000	0	modifydate	modifydate		f	f	f
 1600870103	admindb	1600870103	admindb	4	27	4b4f17c00000	2	0	modifyuser	modifyuser		f	f	f
 1600870188	admindb	1600870188	admindb	-1	0	4b4ae78d0000	2	0	timetypid	'1'		f	f	f
 1603358746	admindb	1603358746	admindb	-1	14	mne_finance_invoice_all_1	2	0	numref	CAST(#0.num AS VARCHAR) || ' ' || CASE WHEN #395.personid IS NOT NULL THEN #395.firstname || ' ' || #395.lastname ELSE #253.name END 		f	f	f
@@ -26538,7 +26014,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1601366439	admindb	1601366439	admindb	10	17	4b4f6c350000	2	0	partcurrency	currency		f	f	f
 1601366439	admindb	1601366439	admindb	10	18	4b4f6c350000	2	0	partcurrencysum	currency		f	f	f
 1601366439	admindb	1601366439	admindb	9	19	4b4f6c350000	2	0	partid	partid		f	t	f
-1601366439	admindb	1601366439	admindb	17	20	4b4f6c350000	2	0	part	part		f	f	f
 1601366439	admindb	1601366439	admindb	17	21	4b4f6c350000	2	0	parttype	parttype		f	f	f
 1601366439	admindb	1601366439	admindb	-1	22	4b4f6c350000	2	0	partname	#17.part || ' ' || #17.parttype		f	f	f
 1601366439	admindb	1601366439	admindb	5	23	4b4f6c350000	1000	0	createdate	createdate		f	f	f
@@ -26575,7 +26050,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1603455292	admindb	1603455292	admindb	1	3	4a408c3d0000	2	0	invoiceid	invoiceid		f	f	f
 1603455292	admindb	1603455292	admindb	0	4	4a408c3d0000	1001	0	date	reminder1		f	t	f
 1603455292	admindb	1603455292	admindb	1	5	4a408c3d0000	4	0	invoicenum	num		f	f	f
-1603093595	admindb	1603093595	admindb	0	7	4e09ae250000	2	0	name	name		f	f	f
 1603455292	admindb	1603455292	admindb	-1	6	4a408c3d0000	2	0	refname	CASE WHEN #8.name IS NOT NULL THEN #8.name ELSE #12.firstname || ' ' || #12.lastname END		f	f	f
 1603455292	admindb	1603455292	admindb	5	7	4a408c3d0000	2	0	description	description		f	f	f
 1603455295	admindb	1603455295	admindb	-1	0	4a408c8d0000	2	0	typ	'#mne_lang#2.Mahnung'		f	f	f
@@ -26895,6 +26369,7 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1382375860	admindb	1382375860	admindb	-1	37	50659ba10000	2	0	fixturetype	null		f	f	f
 1382375860	admindb	1382375860	admindb	-1	38	50659ba10000	2	0	unit	null		f	f	f
 1382375860	admindb	1382375860	admindb	-1	39	50659ba10000	2	0	pownerid	null		f	f	f
+1382375860	admindb	1382375860	admindb	-1	40	50659ba10000	2	0	powner	null		f	f	f
 1382375860	admindb	1382375860	admindb	-1	41	50659ba10000	2	0	pownercompany	null		f	f	f
 1382376260	admindb	1382376260	admindb	-1	0	5065566d0000	4	0	sorting	1		f	f	f
 1382376260	admindb	1382376260	admindb	-1	1	5065566d0000	2	0	rowtyp	1		f	f	f
@@ -27121,7 +26596,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1377236436	admindb	1377236436	admindb	-1	10	506055be0000	1003	0	clocktime	mne_catalog.epoch_time(COALESCE(#0.start, #1.start))		f	f	f
 1377236436	admindb	1377236436	admindb	-1	11	506055be0000	1003	0	clocktimeend	mne_catalog.epoch_time(COALESCE(#0.start + #0.duration, #0.start + #1.duration, #1.start + #0.duration, #1.start + #1.duration))		f	f	f
 1377236436	admindb	1377236436	admindb	-1	12	506055be0000	2	0	daytext	mne_catalog.epoch_dayname(COALESCE(#0.start, #1.start))		f	f	f
-1377236436	admindb	1377236436	admindb	1	13	506055be0000	2	0	comment	comment		f	t	f
 1377236436	admindb	1377236436	admindb	3	14	506055be0000	2	0	firstname	firstname		f	f	f
 1377236436	admindb	1377236436	admindb	3	15	506055be0000	2	0	lastname	lastname		f	f	f
 1377236436	admindb	1377236436	admindb	-1	16	506055be0000	2	0	fullname	#3.firstname || ' ' || #3.lastname		f	f	f
@@ -27215,7 +26689,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1601384868	admindb	1601384868	admindb	0	14	49c241590000	6	0	actcount	actcount	%20g	f	f	f
 1601384868	admindb	1601384868	admindb	-1	16	49c241590000	4	0	nproductnumber	CAST ( to_number(#0.productnumber,'FM9999999999999999999') AS INT4 )		f	f	f
 1379692102	admindb	1382438809	admindb	-1	3	52399af10000	2	0	secondrefname	'#mne_lang#Angebot#' || ': ' || #0.offernumber || ' - ' || #0.version		f	f	f
-1603093595	admindb	1603093595	admindb	0	8	4e09ae250000	2	0	description	description		f	f	f
 1379692111	admindb	1382438815	admindb	-1	3	52399af40000	2	0	secondrefname	'#mne_lang#Angebot#' || ': ' || #0.offernumber || ' - ' || #0.version		f	f	f
 1601384868	admindb	1601384868	admindb	0	17	49c241590000	2	0	productnumber	productnumber		f	f	f
 1601384868	admindb	1601384868	admindb	0	18	49c241590000	4	0	position	position		f	f	f
@@ -27285,6 +26758,9 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1603093595	admindb	1603093595	admindb	0	4	4e09ae250000	2	0	datatype	datatype		f	f	f
 1603093595	admindb	1603093595	admindb	0	5	4e09ae250000	2	0	typ	typ		f	f	f
 1603093595	admindb	1603093595	admindb	2	6	4e09ae250000	2	1	typname	text		f	f	f
+1603093595	admindb	1603093595	admindb	0	7	4e09ae250000	2	0	name	name		f	f	f
+1603093595	admindb	1603093595	admindb	0	8	4e09ae250000	2	0	description	description		f	f	f
+1603093595	admindb	1603093595	admindb	0	9	4e09ae250000	2	0	uid	uid		f	t	f
 1603093595	admindb	1603093595	admindb	0	10	4e09ae250000	2	0	source	source	x	f	t	f
 1603093595	admindb	1603093595	admindb	0	11	4e09ae250000	2	0	xsource	source		f	t	f
 1603093595	admindb	1603093595	admindb	0	12	4e09ae250000	2	0	author	author		f	f	f
@@ -27311,13 +26787,8 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1607510648	admindb	1607510648	admindb	6	13	53fafc520000	2	1	skilltext	text		f	f	f
 1598603028	admindb	1598603028	admindb	4	11	54607d0b0000	4	0	createdate	createdate		f	f	f
 1607510648	admindb	1607510648	admindb	4	14	53fafc520000	2	0	productname	productname		f	f	f
-1607510648	admindb	1607510648	admindb	2	15	53fafc520000	4	0	step	step		f	f	f
 1607510648	admindb	1607510648	admindb	2	16	53fafc520000	2	0	steptext	description		f	t	f
 1607510648	admindb	1607510648	admindb	12	17	53fafc520000	2	0	orderid	orderid		f	f	f
-1605541710	admindb	1605541710	admindb	0	0	50ff99780000	2	0	rolname	rolname		f	t	f
-1605541710	admindb	1605541710	admindb	1	1	50ff99780000	2	0	group	rolname		f	t	f
-1605541710	admindb	1605541710	admindb	-1	2	50ff99780000	4	0	ismember	CASE WHEN #3.member IS NULL THEN 0 ELSE 1 END		f	f	f
-1605541710	admindb	1605541710	admindb	-1	3	50ff99780000	2	0	groupname	COALESCE(#4.text_#mne_langid#, #1.rolname)		f	f	f
 1607510648	admindb	1607510648	admindb	12	18	53fafc520000	2	0	ordernumber	ordernumber		f	f	f
 1607510648	admindb	1607510648	admindb	12	19	53fafc520000	2	0	description	description		f	f	f
 1607510648	admindb	1607510648	admindb	-1	20	53fafc520000	1020	0	color	CASE WHEN #0.timetyp = 0 THEN COALESCE(NULLIF(#12.color,''),mne_catalog.color(0)) ELSE mne_catalog.color(1) END		f	f	f
@@ -27378,6 +26849,7 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1410267797	admindb	1410267797	admindb	-1	6	mne_finance_invoiceproductlist_2	6	0	netprice	SUM(#2.count * (#3.productprice * COALESCE(#11.rate_purchase,1.0))) / COALESCE(#9.count,1.0)	%.2f	f	f	t
 1534144660	admindb	1534144660	admindb	145	31	49b6ce440000	2	0	todate	todate		f	f	f
 1410267797	admindb	1410267797	admindb	-1	7	mne_finance_invoiceproductlist_2	6	0	fullnetprice	SUM(#2.count * (#3.productprice * COALESCE(#11.rate_purchase,1.0)))	%.2f	f	f	t
+1598603028	admindb	1598603028	admindb	10	15	54607d0b0000	2	0	firstname	firstname		f	f	f
 1410267797	admindb	1410267797	admindb	-1	8	mne_finance_invoiceproductlist_2	6	0	resvat	SUM(#4.withvat * (COALESCE(#3.productvat, (select vat from mne_crm.productdefault))))	%.2f	f	f	t
 1410267797	admindb	1410267797	admindb	-1	9	mne_finance_invoiceproductlist_2	6	0	resabsvat	SUM(#4.withvat * (COALESCE(#3.productvat, (select vat from mne_crm.productdefault))) / 100 *  #2.count * (#3.productprice * COALESCE(#11.rate_purchase,1.0))) / COALESCE(#9.count,1.0)	%.2f	f	f	t
 1410267797	admindb	1410267797	admindb	-1	10	mne_finance_invoiceproductlist_2	6	0	grossprice	SUM((1 + #4.withvat * (COALESCE(#3.productvat, (select vat from mne_crm.productdefault))) / 100) *  #2.count * (#3.productprice * COALESCE(#11.rate_purchase,1.0))) / COALESCE(#9.count,1.0)	%.2f	f	f	t
@@ -27400,7 +26872,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1410267797	admindb	1410267797	admindb	28	16	mne_finance_invoiceproductlist_2	6	0	-invoicepaysum	paysum		t	f	f
 1410267797	admindb	1410267797	admindb	31	17	mne_finance_invoiceproductlist_2	1	0	-invoicepaid	paid		t	f	f
 1601458335	admindb	1601458335	admindb	-1	0	5065618c0000	2	0	sorting	01		f	f	f
-1601458335	admindb	1601458335	admindb	-1	1	5065618c0000	2	0	rowtyp	1		f	f	f
 1534144660	admindb	1534144660	admindb	145	24	49b6ce440000	2	0	lettername	name		f	f	f
 1410271098	admindb	1410271098	admindb	-1	16	mne_finance_invoiceproductlist_1	2	0	grossprice	SUM((1 + #4.withvat * (COALESCE(#3.productvat, (select vat from mne_crm.productdefault))) / 100) *  #2.count * #3.productprice* COALESCE(#5.rate_purchase,10)) / COALESCE(#10.count,1.0)	%.2f	f	f	t
 1410271098	admindb	1410271098	admindb	-1	17	mne_finance_invoiceproductlist_1	6	0	fullgrossprice	SUM((1 + #4.withvat * (COALESCE(#3.productvat, (select vat from mne_crm.productdefault))) / 100) *  #2.count * #3.productprice* COALESCE(#5.rate_purchase,10))	%.2f	f	f	t
@@ -27433,7 +26904,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1534144660	admindb	1534144660	admindb	-1	29	49b6ce440000	2	0	fromsign	(select sign from mne_crm.person p, mne_crm.personowndata d where p.personid = d.personid and d.loginname = session_user )		f	f	f
 1534144660	admindb	1534144660	admindb	145	30	49b6ce440000	2	0	fromdate	fromdate		f	f	f
 1534144680	admindb	1534144680	admindb	0	0	49b6d0d20000	2	0	personid	personid		f	f	f
-1598603028	admindb	1598603028	admindb	10	15	54607d0b0000	2	0	firstname	firstname		f	f	f
 1598603028	admindb	1598603028	admindb	10	16	54607d0b0000	2	0	lastname	lastname		f	f	f
 1598603028	admindb	1598603028	admindb	-1	17	54607d0b0000	2	0	fullname	#10.firstname || ' ' || #10.lastname		f	f	f
 1598603028	admindb	1598603028	admindb	9	18	54607d0b0000	2	0	sendrank	rank		f	t	f
@@ -27543,19 +27013,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1603794803	admindb	1603794803	admindb	0	16	5c18a8bf0000	2	0	wval	wval		f	f	f
 1603794803	admindb	1603794803	admindb	0	17	5c18a8bf0000	2	0	weblet	weblet		f	f	f
 1603794803	admindb	1603794803	admindb	0	18	5c18a8bf0000	2	0	type	type		f	f	f
-1607611275	admindb	1607611275	admindb	-1	0	4bb0ff6b0000	2	0	menuname	'main'		f	f	f
-1607611275	admindb	1607611275	admindb	-1	1	4bb0ff6b0000	2	0	parentid	COALESCE(#0.parentid,'')		f	f	f
-1607611275	admindb	1607611275	admindb	0	2	4bb0ff6b0000	2	0	menuid	treeid		f	f	f
-1607611275	admindb	1607611275	admindb	0	3	4bb0ff6b0000	2	0	item	treename		f	f	f
-1607611275	admindb	1607611275	admindb	2	4	4bb0ff6b0000	2	0	parentname	treename		f	f	f
-1607611275	admindb	1607611275	admindb	-1	5	4bb0ff6b0000	2	0	treepath	 mne_catalog.path('mne_warehouse.parttree',#0.treeid)		f	f	f
-1607611275	admindb	1607611275	admindb	0	6	4bb0ff6b0000	2	0	pos	treename		f	f	f
-1607611275	admindb	1607611275	admindb	0	7	4bb0ff6b0000	2	0	partid	partid		f	t	f
-1607611275	admindb	1607611275	admindb	-1	8	4bb0ff6b0000	2	0	typ	CASE WHEN NULLIF(#0.partid,'') IS NULL THEN '' ELSE 'leaf' END		f	f	f
-1607611275	admindb	1607611275	admindb	-1	9	4bb0ff6b0000	2	0	action	CASE WHEN NULLIF(#0.partid,'') IS NULL\nTHEN '{ "action": "submenu", "parameter" : [ "", "", { "menuid" : "' || #0.treeid || '" } ] } '\nELSE\n'{ "action" : "show",\n"parameter" : [ "", "", { "parentid" : "' || COALESCE(#0.parentid,'') || '", "menuid" : "' || #0.treeid || '", "partid" : "' || #0.partid || '", "partname" : "' || #3.part || ' ' || #3.parttype ||  '", "rescount" : "' || CASE WHEN (#9.mincount - #16.sum - COALESCE(#20.sum,0)) < 0 THEN 0 ELSE (#9.mincount - #16.sum - COALESCE(#20.sum,0)) END || '"} ] }'\nEND		f	f	f
-1607611275	admindb	1607611275	admindb	9	10	4bb0ff6b0000	4	0	mincount	mincount		f	f	f
-1607611275	admindb	1607611275	admindb	-1	11	4bb0ff6b0000	2	0	sum	#16.sum - COALESCE(#20.sum,0)		f	f	f
-1607611275	admindb	1607611275	admindb	-1	12	4bb0ff6b0000	1	0	needorder	mne_warehouse.parttree_needpurchase(t0.treeid)		f	f	f
 1607680016	admindb	1607680016	admindb	0	0	4bb1c1150000	2	0	purchaseid	purchaseid		f	f	f
 1607680016	admindb	1607680016	admindb	0	1	4bb1c1150000	1	0	auto	auto		f	f	f
 1607680016	admindb	1607680016	admindb	0	2	4bb1c1150000	2	0	partid	partid		f	f	f
@@ -27575,13 +27032,11 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1607680016	admindb	1607680016	admindb	0	16	4bb1c1150000	2	0	crmorderid	crmorderid		f	t	f
 1607680016	admindb	1607680016	admindb	8	17	4bb1c1150000	2	0	crmordernumber	ordernumber		f	f	f
 1607680016	admindb	1607680016	admindb	8	18	4bb1c1150000	2	0	crmorder	description		f	f	f
-1607680016	admindb	1607680016	admindb	1	19	4bb1c1150000	2	0	part	part		f	f	f
 1607680016	admindb	1607680016	admindb	1	20	4bb1c1150000	2	0	parttype	parttype		f	f	f
 1607680016	admindb	1607680016	admindb	-1	21	4bb1c1150000	2	0	partname	#1.part || ' ' || #1.parttype		f	f	f
 1607680016	admindb	1607680016	admindb	-1	22	4bb1c1150000	2	0	vendorname	COALESCE(#4.name,'#mne_lang#kein Lieferant')		f	f	f
 1607680016	admindb	1607680016	admindb	-1	23	4bb1c1150000	2	0	vendorid	COALESCE(#4.companyid,'')		f	f	f
 1607680016	admindb	1607680016	admindb	-1	24	4bb1c1150000	4	0	deliverycount	COALESCE(#6.sum,0)		f	f	f
-1611060658	admindb	1611060658	admindb	3	14	4925b94f0000	1020	0	color	color		f	t	f
 1607680016	admindb	1607680016	admindb	-1	25	4bb1c1150000	2	0	delivered	CASE WHEN #0.deliverydate IS NULL THEN null ELSE 'x' END		f	f	f
 1607680016	admindb	1607680016	admindb	-1	26	4bb1c1150000	1	0	force	CAST ( 0 AS BOOL )		f	f	f
 1607680016	admindb	1607680016	admindb	0	27	4bb1c1150000	1000	0	createdate	createdate		f	f	f
@@ -27646,6 +27101,7 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1611060658	admindb	1611060658	admindb	-1	11	4925b94f0000	2	0	cstartweblet	'{ appl : "erp", weblet : "' ||  #0.startweblet || '" }'		f	f	f
 1611060658	admindb	1611060658	admindb	59	12	4925b94f0000	2	1	startwebletname	label		f	f	f
 1611060658	admindb	1611060658	admindb	0	13	4925b94f0000	4	0	debug	debug		f	f	f
+1611060658	admindb	1611060658	admindb	3	14	4925b94f0000	1020	0	color	color		f	t	f
 1611060658	admindb	1611060658	admindb	3	15	4925b94f0000	2	0	personid	personid		f	t	f
 1611060658	admindb	1611060658	admindb	-1	16	4925b94f0000	2	0	fullname	#4.firstname || ' ' || #4.lastname		f	f	f
 1611060658	admindb	1611060658	admindb	29	17	4925b94f0000	2	0	uowncompanyownprefix	prefix		f	f	f
@@ -27691,6 +27147,29 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1611062059	admindb	1611062059	admindb	1	16	mne_application_table_cols_1	2	0	regexp	regexp		f	t	f
 1611062059	admindb	1611062059	admindb	1	17	mne_application_table_cols_1	2	0	regexphelp	regexphelp		f	t	f
 1611062059	admindb	1611062059	admindb	-1	18	mne_application_table_cols_1	2	0	custom	CASE WHEN #1.custom THEN 1 ELSE 0 END		f	f	f
+1611328172	admindb	1611328172	admindb	0	0	4b41e9050000	2	0	username	usename		f	t	f
+1611328172	admindb	1611328172	admindb	-1	1	4b41e9050000	1	0	systemuser	substring(#0.usename from 1 for 4) = 'mne_' OR #0.usename = 'postgres'		f	f	f
+1616399206	admindb	1616399206	admindb	-1	0	4bb0ff6b0000	2	0	menuname	'main'		f	f	f
+1616399206	admindb	1616399206	admindb	-1	1	4bb0ff6b0000	2	0	parentid	COALESCE(#0.parentid,'')		f	f	f
+1616399206	admindb	1616399206	admindb	0	2	4bb0ff6b0000	2	0	menuid	treeid		f	f	f
+1616399206	admindb	1616399206	admindb	0	3	4bb0ff6b0000	2	0	item	treename		f	f	f
+1616399206	admindb	1616399206	admindb	2	4	4bb0ff6b0000	2	0	parentname	treename		f	f	f
+1616399206	admindb	1616399206	admindb	-1	5	4bb0ff6b0000	2	0	treepath	 mne_catalog.path('mne_warehouse.parttree',#0.treeid)		f	f	f
+1616399206	admindb	1616399206	admindb	0	6	4bb0ff6b0000	2	0	pos	treename		f	f	f
+1616399206	admindb	1616399206	admindb	0	7	4bb0ff6b0000	2	0	partid	partid		f	t	f
+1616399206	admindb	1616399206	admindb	3	8	4bb0ff6b0000	2	0	part	part		f	f	f
+1616399206	admindb	1616399206	admindb	3	9	4bb0ff6b0000	2	0	parttype	parttype		f	f	f
+1616399206	admindb	1616399206	admindb	-1	10	4bb0ff6b0000	2	0	partname	#3.part || ' ' || #3.parttype		f	f	f
+1616399206	admindb	1616399206	admindb	-1	11	4bb0ff6b0000	2	0	typ	CASE WHEN NULLIF(#0.partid,'') IS NULL THEN '' ELSE 'leaf' END		f	f	f
+1616399206	admindb	1616399206	admindb	-1	12	4bb0ff6b0000	2	0	action	CASE WHEN NULLIF(#0.partid,'') IS NULL\nTHEN '{ "action": "submenu", "parameter" : [ "", "", { "menuid" : "' || #0.treeid || '" } ] } '\nELSE\n'{ "action" : "show",\n"parameter" : [ "", "", { "parentid" : "' || COALESCE(#0.parentid,'') || '", "menuid" : "' || #0.treeid || '", "partid" : "' || #0.partid || '", "partname" : "' || #3.part || ' ' || #3.parttype ||  '", "rescount" : "' || CASE WHEN (#9.mincount - #16.sum - COALESCE(#20.sum,0)) < 0 THEN 0 ELSE (#9.mincount - #16.sum - COALESCE(#20.sum,0)) END || '"} ] }'\nEND		f	f	f
+1616399206	admindb	1616399206	admindb	9	13	4bb0ff6b0000	4	0	mincount	mincount		f	f	f
+1616399206	admindb	1616399206	admindb	-1	14	4bb0ff6b0000	2	0	sum	#16.sum - COALESCE(#20.sum,0)		f	f	f
+1616399206	admindb	1616399206	admindb	-1	15	4bb0ff6b0000	1	0	needorder	mne_warehouse.parttree_needpurchase(t0.treeid)		f	f	f
+1617712917	admindb	1617712917	admindb	0	0	4b39feaa0000	2	0	group	rolname		f	t	f
+1617713076	admindb	1617713076	admindb	0	0	50ff99780000	2	0	rolname	rolname		f	t	f
+1617713076	admindb	1617713076	admindb	1	1	50ff99780000	2	0	group	rolname		f	t	f
+1617713076	admindb	1617713076	admindb	-1	2	50ff99780000	4	0	ismember	CASE WHEN #3.member IS NULL THEN 0 ELSE 1 END		f	f	f
+1617713076	admindb	1617713076	admindb	-1	3	50ff99780000	2	0	groupname	COALESCE(#4.text_#mne_langid#, #1.rolname)		f	f	f
 \.
 
 
@@ -27699,10 +27178,11 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 --
 
 COPY mne_application.queryname (createdate, createuser, modifydate, modifyuser, selectdistinct, unionall, queryid, unionnum, query, schema) FROM stdin;
-1603093595	admindb	1603093595	admindb	f	f	4e09ae250000	1	file	mne_crm
+1608043083	admindb	1608043083	admindb	t	t	4b6adbe10000	1	partingoing	mne_warehouse
 1598603028	admindb	1598603028	admindb	f	f	54607d0b0000	1	filedata_interests	mne_repository
 1599036250	admindb	1599036250	admindb	t	t	52f114af0000	1	fileinterests	mne_repository
 1601384868	admindb	1601384868	admindb	t	t	49c241590000	1	orderproduct	mne_crm
+1603093595	admindb	1603093595	admindb	f	f	4e09ae250000	1	file	mne_crm
 1591780988	admindb	1591780988	admindb	t	f	4a447d3a0000	1	continent	mne_crm
 1603703327	admindb	1603703327	admindb	f	f	4d95f8250000	1	persontime_day	mne_personnal
 1594387076	admindb	1594387076	admindb	t	t	49aba30e0000	1	letter	mne_base
@@ -27716,7 +27196,6 @@ COPY mne_application.queryname (createdate, createuser, modifydate, modifyuser, 
 1607510241	admindb	1607510241	admindb	t	t	mne_crmbase_order_detail_1	1	order_detail	mne_crm
 1605278963	admindb	1605278963	admindb	f	f	57befec30000	1	personowndata	mne_personnal
 1607510648	admindb	1607510648	admindb	t	t	53fafc520000	1	persontimemanagement	mne_personnal
-1605541710	admindb	1605541710	admindb	t	t	50ff99780000	1	usergroup	mne_application
 1607510788	admindb	1607510788	admindb	t	t	4a8fe3910000	1	orderproducttimemanagement	mne_personnal
 1607927232	admindb	1607927232	admindb	t	t	4bb49a0a0000	1	purchaseletter	mne_warehouse
 1607941971	admindb	1607941971	admindb	t	t	4af286640000	1	parttree	mne_warehouse
@@ -27744,9 +27223,7 @@ COPY mne_application.queryname (createdate, createuser, modifydate, modifyuser, 
 1606809629	admindb	1606809629	admindb	t	t	4ae811ef0000	1	orderproducttimemanagement_sum	mne_personnal
 1599140602	admindb	1599140602	admindb	f	f	5f50be7f0000	1	personowndata	mne_crm
 1601467884	admindb	1601467884	admindb	t	t	4ae805a70000	1	orderproducttime	mne_personnal
-1607611275	admindb	1607611275	admindb	t	t	4bb0ff6b0000	1	parttree_needpurchase	mne_warehouse
 1608018842	admindb	1608018842	admindb	t	t	4b62b7ca0000	1	relocation	mne_warehouse
-1608043083	admindb	1608043083	admindb	t	t	4b6adbe10000	1	partingoing	mne_warehouse
 1600070874	admindb	1600070874	admindb	t	t	4b4f39c70000	2	producttime_list	mne_personnal
 1600070885	admindb	1600070885	admindb	t	t	4b4f399f0000	1	producttime_list	mne_personnal
 1600072309	admindb	1600072309	admindb	f	f	5ecf4d5f0000	1	test	public
@@ -27859,7 +27336,6 @@ COPY mne_application.queryname (createdate, createuser, modifydate, modifyuser, 
 1323353550	admindb	1323353550	admindb	t	t	4ee0c53e0000	1	purchasedelivery	mne_fixture
 1324461797	admindb	1324461797	admindb	t	t	4bceb0630000	1	order_costsum	mne_crm
 1603345954	admindb	1603345954	admindb	t	t	mne_finance_invoice_detail_1	1	invoice_detail	mne_shipment
-1393496771	admindb	1393496771	admindb	t	t	4b41e9050000	1	loginuser	mne_application
 1407337526	admindb	1407337526	admindb	t	t	4b8ce6330000	1	part_vendor	mne_warehouse
 1603794803	admindb	1603794803	admindb	f	f	5c18a8bf0000	1	weblet_select	mne_application
 1410251426	admindb	1410251426	admindb	t	t	540eb7210000	2	invoiceproduct_list	mne_shipment
@@ -27896,15 +27372,11 @@ COPY mne_application.queryname (createdate, createuser, modifydate, modifyuser, 
 1422262545	admindb	1422262545	admindb	t	t	52d50ec90000	1	repository	mne_repository
 1449582738	admindb	1449582738	admindb	t	t	4ff3f05c0000	2	ordertime_quarter	mne_personnal
 1431940072	admindb	1431940072	admindb	t	t	524412020000	1	personowndatapublic	mne_personnal
-1459515687	admindb	1459515687	admindb	f	f	56fcfd960000	1	certca	mne_system
 1465828121	admindb	1465828121	admindb	t	t	48b3b18a0001	1	weblet	mne_application
 1465828142	admindb	1465828142	admindb	t	t	48b3b18a0000	1	weblet_all	mne_application
 1597848117	admindb	1597848117	admindb	f	f	5f3d389b0000	1	personorder	mne_crm
 1472214992	admindb	1472214992	admindb	t	t	4ff3fba70000	1	timeorder_single	mne_personnal
 1600179117	admindb	1600179117	admindb	t	t	mne_crmbase_offer_detail_1	1	offer_detail	mne_crm
-1473783246	admindb	1473783246	admindb	f	f	556831b90000	1	shares	mne_system
-1477551618	admindb	1477551618	admindb	f	f	5811a5ad0000	1	mailalias	mne_system
-1478018905	admindb	1478018905	admindb	f	f	5502b8300000	1	personsharepasswd	mne_system
 1608125748	admindb	1608125748	admindb	t	t	4b84e2b50000	1	partoutgoing	mne_warehouse
 1479483372	admindb	1479483372	admindb	t	t	50655e4c0000	2	orderproductpart_list	mne_warehouse
 1479483507	admindb	1479483507	admindb	f	f	5065c79d0000	3	offerproductpart_list	mne_warehouse
@@ -27917,7 +27389,6 @@ COPY mne_application.queryname (createdate, createuser, modifydate, modifyuser, 
 1513321993	admindb	1513321993	admindb	t	t	555da43f0000	2	cardsactive	mne_crm
 1515748505	admindb	1515748505	admindb	t	t	4a89446e0000	1	personskill	mne_personnal
 1515764924	admindb	1515764924	admindb	t	t	4c85f5440000	1	weblet_detail	mne_application
-1516204173	admindb	1516204173	admindb	t	t	4b39feaa0000	1	group	mne_application
 1521214450	admindb	1521214450	admindb	t	t	5aabe3ab0000	5	personowner	mne_crm
 1521214633	admindb	1521214633	admindb	t	t	5aabe45c0000	6	personowner	mne_crm
 1521215261	admindb	1521215261	admindb	t	t	5aabe6db0000	8	personowner	mne_crm
@@ -27948,18 +27419,9 @@ COPY mne_application.queryname (createdate, createuser, modifydate, modifyuser, 
 1545060987	admindb	1545060987	admindb	t	t	5aabe1f10000	1	personowner	mne_crm
 1545300951	admindb	1545300951	admindb	f	f	5c1b62270000	1	timemax	mne_personnal
 1545403743	admindb	1545403743	admindb	t	t	4a4b280f0000	1	time	mne_personnal
-1553165612	admindb	1553165612	admindb	t	t	57ee0c130000	1	folder	mne_application
-1553754877	admindb	1553754877	admindb	f	f	569f95b30000	1	apachemod	mne_system
 1593692423	admindb	1593692423	admindb	t	t	4b1cfad30000	1	lettertree	mne_base
 1593692431	admindb	1593692431	admindb	t	t	4b1d00050000	2	lettertree	mne_base
-1553755649	admindb	1553755649	admindb	f	f	56a78aed0000	1	apachesite	mne_system
-1553766118	admindb	1553766118	admindb	t	t	580a19280000	1	sogo	mne_system
 1608188280	admindb	1608188280	admindb	t	t	4ed76db80000	1	purchasedelivery_invoice	mne_warehouse
-1578380726	admindb	1578380726	admindb	f	f	581c7c020000	1	dnsaddress	mne_system
-1578480576	admindb	1578480576	admindb	t	t	57da3e520000	2	network	mne_system
-1578499160	admindb	1578499160	admindb	t	t	57d910560000	1	domain	mne_system
-1579620562	admindb	1579620562	admindb	t	t	57da3e460000	1	network	mne_system
-1579620644	admindb	1579620644	admindb	f	f	5dfa2c070000	1	netparam	mne_system
 1601276219	admindb	1601276219	admindb	t	f	5065a2b90000	1	offerproducttime_list	mne_personnal
 1601276275	admindb	1601276275	admindb	t	f	5065a2cd0000	2	offerproducttime_list	mne_personnal
 1593694262	admindb	1593694262	admindb	t	t	4b1cfe080000	3	lettertree	mne_base
@@ -27981,6 +27443,10 @@ COPY mne_application.queryname (createdate, createuser, modifydate, modifyuser, 
 1610519462	admindb	1610519462	admindb	t	t	48cec6760000	1	table_checks	mne_application
 1611060658	admindb	1611060658	admindb	t	t	4925b94f0000	1	userpref	mne_application
 1611062059	admindb	1611062059	admindb	t	t	mne_application_table_cols_1	1	table_cols	mne_application
+1611328172	admindb	1611328172	admindb	t	t	4b41e9050000	1	loginuser	mne_application
+1616399206	admindb	1616399206	admindb	t	t	4bb0ff6b0000	1	parttree_needpurchase	mne_warehouse
+1617712917	admindb	1617712917	admindb	t	t	4b39feaa0000	1	group	mne_application
+1617713076	admindb	1617713076	admindb	t	t	50ff99780000	1	usergroup	mne_application
 \.
 
 
@@ -27992,8 +27458,10 @@ COPY mne_application.querytables (createdate, createuser, modifydate, modifyuser
 1600072309	admindb	1600072309	admindb	0	0	0	0	5ecf4d5f0000				public	test	\N
 1597848117	admindb	1597848117	admindb	0	0	0	0	5f3d389b0000				mne_crm	personorder	\N
 1601276319	admindb	1601276319	admindb	0	1	0	0	5266cf620000				mne_crm	offerproduct	\N
+1544598880	admindb	1544598880	admindb	0	1	0	0	4f0e98480000				mne_warehouse	purchasedelivery	\N
 1216810623	admindb	1216810623	admindb	0	1	0	0	test_1				public	test	\N
-1216811481	admindb	1216811481	admindb	0	1	0	0	48870fa10000_1				public	test	\N
+1347869187	admindb	1347869187	admindb	0	1	0	0	5056d0e30000				mne_application	usertables	\N
+1513321993	admindb	1513321993	admindb	0	1	0	0	555da43f0000				mne_crm	company	\N
 1600070874	admindb	1600070874	admindb	0	1	0	0	4b4f39c70000				mne_personnal	producttime	\N
 1512555690	admindb	1512555690	admindb	0	1	0	0	48e8bb150000				mne_catalog	table_index_column	\N
 1603114650	admindb	1603114650	admindb	0	1	0	0	504f4c000000				mne_hoai	order	\N
@@ -28198,7 +27666,6 @@ COPY mne_application.querytables (createdate, createuser, modifydate, modifyuser
 1600076712	admindb	1600076712	admindb	4	1	2	3	505ad0e70000		#1.prefix = ''		mne_crm	companyown	\N
 1608018842	admindb	1608018842	admindb	0	1	0	0	4b62b7ca0000				mne_warehouse	relocation	\N
 1608018842	admindb	1608018842	admindb	1	1	1	1	4b62b7ca0000	personid	=	personid	mne_crm	person	4b6692380000
-1603345954	admindb	1603345954	admindb	283	1	3	15	mne_finance_invoice_detail_1	ownerid	=	personid	mne_crm	person	\N
 1608018842	admindb	1608018842	admindb	2	1	1	2	4b62b7ca0000	partstoragelocationid	=	partstoragelocationid	mne_warehouse	partstoragelocation	4b6695a00000
 1608018842	admindb	1608018842	admindb	4	1	2	3	4b62b7ca0000	partid	=	partid	mne_warehouse	part	4b1825910000
 1608018842	admindb	1608018842	admindb	5	1	2	4	4b62b7ca0000	storagelocationid	=	storagelocationid	mne_warehouse	storagelocation	4b18259f0000
@@ -28231,6 +27698,7 @@ COPY mne_application.querytables (createdate, createuser, modifydate, modifyuser
 1598444276	admindb	1598444276	admindb	1	1	1	1	52ef5b4d0000	repositoryid,filename,repdate	=,=,=	repositoryid,filename,repdate	mne_repository	filedata_rank	5316c6890000
 1608043083	admindb	1608043083	admindb	33	1	3	10	4b6adbe10000	partid	=	partid	mne_warehouse	part	4cd3afac0000
 1603345954	admindb	1603345954	admindb	0	1	0	0	mne_finance_invoice_detail_1				mne_shipment	invoice	\N
+1603703341	admindb	1603703341	admindb	0	1	0	0	4d9979dd0000				mne_crm	person	\N
 1603345954	admindb	1603345954	admindb	361	1	1	1	mne_finance_invoice_detail_1	condid	=	invoicecondid	mne_shipment	invoicecond	4a3b82b00000
 1603345954	admindb	1603345954	admindb	360	1	1	2	mne_finance_invoice_detail_1	textid	=	invoicecondid	mne_shipment	invoicecond	4a3b82960000
 1603345954	admindb	1603345954	admindb	284	1	1	3	mne_finance_invoice_detail_1	contactid	=	personid	mne_crm	person	\N
@@ -28251,6 +27719,7 @@ COPY mne_application.querytables (createdate, createuser, modifydate, modifyuser
 1603345954	admindb	1603345954	admindb	768	1	4	12	mne_finance_invoice_detail_1		/* rechnung */  ( #1.refid = #0.personid AND CAST ( #1.addresstypid AS INTEGER ) = ( SELECT MAX(CAST( addresstypid AS INTEGER )) FROM mne_crm.address a WHERE refid = #1.refid AND CAST(a.addresstypid AS INTEGER ) IN (1,40) ))		mne_crm	address	44d6df220000
 1603345954	admindb	1603345954	admindb	855	1	5	13	mne_finance_invoice_detail_1	cityid	=	cityid	mne_crm	city	41b9907b0004
 1603345954	admindb	1603345954	admindb	892	1	6	14	mne_finance_invoice_detail_1	countryid	=	countryid	mne_crm	country	4368c58a0003
+1603345954	admindb	1603345954	admindb	283	1	3	15	mne_finance_invoice_detail_1	ownerid	=	personid	mne_crm	person	\N
 1600179117	admindb	1600179117	admindb	0	1	0	0	mne_crmbase_offer_detail_1				mne_crm	offer	\N
 1600179117	admindb	1600179117	admindb	110	1	1	1	mne_crmbase_offer_detail_1	refid	=	personid	mne_crm	person	44c4a6580000
 1600179117	admindb	1600179117	admindb	180	1	2	2	mne_crmbase_offer_detail_1	refid	=	companyid	mne_crm	company	4219bca00001
@@ -28385,7 +27854,6 @@ COPY mne_application.querytables (createdate, createuser, modifydate, modifyuser
 1603703327	admindb	1603703327	admindb	0	1	0	0	4d95f8250000				mne_crm	person	\N
 1603703327	admindb	1603703327	admindb	16	1	1	1	4d95f8250000	personid	=	userid	mne_personnal	time	4d95f7830000
 1603703327	admindb	1603703327	admindb	35	1	1	2	4d95f8250000	personid	=	personid	mne_personnal	personowndatapublic	5242a6700000
-1603703341	admindb	1603703341	admindb	0	1	0	0	4d9979dd0000				mne_crm	person	\N
 1603703341	admindb	1603703341	admindb	16	1	1	1	4d9979dd0000	personid	=	userid	mne_personnal	time	4d95f7830000
 1603703341	admindb	1603703341	admindb	35	1	1	2	4d9979dd0000	personid	=	personid	mne_personnal	personowndatapublic	5242a6700000
 1603446263	admindb	1603446263	admindb	0	1	0	0	4a41dda90000				mne_shipment	invoicecond	\N
@@ -28580,7 +28048,6 @@ COPY mne_application.querytables (createdate, createuser, modifydate, modifyuser
 1607510241	admindb	1607510241	admindb	320	1	4	20	mne_crmbase_order_detail_1		/* haupt */ #0.companyid = #1.refid AND #1.addresstypid = '000000000001'		mne_crm	address	43b9480d0001
 1607510241	admindb	1607510241	admindb	335	1	5	21	mne_crmbase_order_detail_1	cityid	=	cityid	mne_crm	city	41b9907b0004
 1607510241	admindb	1607510241	admindb	339	1	6	22	mne_crmbase_order_detail_1	countryid	=	countryid	mne_crm	country	4368c58a0003
-1607510648	admindb	1607510648	admindb	6	1	2	6	53fafc520000	skillid	=	skillid	mne_personnal	skill	4b4392280000
 1607510241	admindb	1607510241	admindb	325	1	4	23	mne_crmbase_order_detail_1	companyid	=	companydataid	mne_crm	companydata	422dacce0001
 1607510241	admindb	1607510241	admindb	359	1	2	24	mne_crmbase_order_detail_1	personid	=	personid	mne_personnal	personowndatapublic	5242a6700000
 1607510241	admindb	1607510241	admindb	33	1	1	25	mne_crmbase_order_detail_1	refid	=	companyid	mne_crm	company	43d0bd2d0000
@@ -28637,6 +28104,7 @@ COPY mne_application.querytables (createdate, createuser, modifydate, modifyuser
 1352985807	admindb	1352985807	admindb	1	1	1	1	4c64cc090000	productid	=	productid	mne_crm	product	4c64cbc90000
 1604300501	admindb	1604300501	admindb	24	1	1	2	4dc932260000		#1.userid = #t2.personid AND #0.vfullday = mne_catalog.epoch_format(#1.start, 'DDMMYYYY') 		mne_personnal	time	\N
 1607510648	admindb	1607510648	admindb	46	1	4	5	53fafc520000	refid	=	personid	mne_crm	person	44c5c6770000
+1607510648	admindb	1607510648	admindb	6	1	2	6	53fafc520000	skillid	=	skillid	mne_personnal	skill	4b4392280000
 1607510648	admindb	1607510648	admindb	18	1	1	7	53fafc520000	personid	=	personid	mne_crm	person	4a8bb7a60000
 1607510648	admindb	1607510648	admindb	39	1	2	8	53fafc520000	personid	=	personid	mne_personnal	personowndatapublic	5242a6700000
 1607510648	admindb	1607510648	admindb	48	1	1	9	53fafc520000		#1.name = 'timetyp' AND #0.timetyp = CAST ( #1.value AS INT )		mne_application	selectlist	5c330fe60000
@@ -28666,17 +28134,7 @@ COPY mne_application.querytables (createdate, createuser, modifydate, modifyuser
 1607608514	admindb	1607608514	admindb	0	1	0	0	4bb47f4c0000				mne_warehouse	parttree	\N
 1607608514	admindb	1607608514	admindb	2	1	1	1	4bb47f4c0000	parentid	=	treeid	mne_warehouse	parttree	4af2850e0000
 1607608514	admindb	1607608514	admindb	8	0	1	2	4bb47f4c0000	treeid	=	treeid	mne_warehouse	parttree_r	4cf387270000
-1605541710	admindb	1605541710	admindb	0	1	0	0	50ff99780000				pg_catalog	pg_roles	\N
-1605541710	admindb	1605541710	admindb	1	1	1	1	50ff99780000		#0.rolcanlogin = true AND ( #1.rolcanlogin = false OR #1.rolname = 'admindb' ) AND substring(#1.rolname FROM 1 FOR 5 ) != 'login' 		pg_catalog	pg_roles	\N
-1605541710	admindb	1605541710	admindb	3	1	2	2	50ff99780000		#0.oid = #1.roleid AND #t0.oid = #1.member		pg_catalog	pg_auth_members	\N
-1605541710	admindb	1605541710	admindb	4	1	2	3	50ff99780000		#0.rolname = #1.id		mne_application	translate	\N
 1607608514	admindb	1607608514	admindb	9	1	2	3	4bb47f4c0000	partid	=	partid	mne_warehouse	purchase	4cf387b40000
-1607611275	admindb	1607611275	admindb	0	1	0	0	4bb0ff6b0000				mne_warehouse	parttree	\N
-1607611275	admindb	1607611275	admindb	2	1	1	1	4bb0ff6b0000	parentid	=	treeid	mne_warehouse	parttree	4af2850e0000
-1607611275	admindb	1607611275	admindb	3	1	1	2	4bb0ff6b0000	partid	=	partid	mne_warehouse	part	4af285420000
-1607611275	admindb	1607611275	admindb	9	1	2	3	4bb0ff6b0000	partid	=	partid	mne_warehouse	partstoragemasterdata	4b0260320000
-1607611275	admindb	1607611275	admindb	16	1	2	4	4bb0ff6b0000	partid	=	partid	mne_warehouse	part_sum	4bb105a20000
-1607611275	admindb	1607611275	admindb	20	1	2	5	4bb0ff6b0000	partid	=	partid	mne_warehouse	partoutgoing_sum	4cc8f9890000
 1608112642	admindb	1608112642	admindb	0	1	0	0	4cd7f2720000				mne_warehouse	parttree	\N
 1608112642	admindb	1608112642	admindb	2	0	1	1	4cd7f2720000	treeid	=	treeid	mne_warehouse	partoutgoing_tree	4cd7f2270000
 1608112642	admindb	1608112642	admindb	3	1	1	2	4cd7f2720000	parentid	=	treeid	mne_warehouse	parttree	4af2850e0000
@@ -28703,7 +28161,6 @@ COPY mne_application.querytables (createdate, createuser, modifydate, modifyuser
 1608125748	admindb	1608125748	admindb	44	1	2	12	4b84e2b50000	personid	=	personid	mne_crm	person	4b6692380000
 1608125748	admindb	1608125748	admindb	59	1	1	13	4b84e2b50000	partingoingid	=	partingoingid	mne_warehouse	partingoing	4b84e21c0000
 1608125748	admindb	1608125748	admindb	66	1	2	14	4b84e2b50000	purchasedeliveryid	=	purchasedeliveryid	mne_warehouse	purchasedelivery	4cd403040000
-1545060987	admindb	1545060987	admindb	0	1	0	0	5aabe1f10000				mne_crm	person	\N
 1608125748	admindb	1608125748	admindb	69	1	3	15	4b84e2b50000	purchaseid	=	purchaseid	mne_warehouse	purchase	4cd280810000
 1608125748	admindb	1608125748	admindb	70	1	4	16	4b84e2b50000	partid	=	partid	mne_warehouse	part	4cd3afac0000
 1605598310	admindb	1605598310	admindb	0	1	0	0	5aabe21a0000				mne_crm	person	\N
@@ -28774,7 +28231,6 @@ COPY mne_application.querytables (createdate, createuser, modifydate, modifyuser
 1348750874	admindb	1348750874	admindb	16	1	3	3	5063f6ec0000	deliverynoteid	=	deliverynoteid	mne_shipment	deliverynote	50630b9c0000
 1348750874	admindb	1348750874	admindb	19	1	4	4	5063f6ec0000	invoiceid	=	invoiceid	mne_shipment	invoice	44d72c470000
 1348750874	admindb	1348750874	admindb	23	1	5	5	5063f6ec0000	invoiceid	=	invoicemanagementid	mne_shipment	invoicemanagement	4a36c0090000
-1544598880	admindb	1544598880	admindb	0	1	0	0	4f0e98480000				mne_warehouse	purchasedelivery	\N
 1544598880	admindb	1544598880	admindb	1	1	1	1	4f0e98480000	purchaseid	=	purchaseid	mne_warehouse	purchase	4cd280810000
 1544598880	admindb	1544598880	admindb	2	1	2	2	4f0e98480000	partid	=	partid	mne_warehouse	part	4cd3afac0000
 1544598880	admindb	1544598880	admindb	3	1	2	3	4f0e98480000	partvendorid	=	partvendorid	mne_warehouse	partvendor	4cd413150000
@@ -28816,6 +28272,7 @@ COPY mne_application.querytables (createdate, createuser, modifydate, modifyuser
 1417532783	admindb	1417532783	admindb	2	1	1	1	5064474d0000	orderid	=	orderid	mne_crm	orderproduct	4448d1800000
 1417532783	admindb	1417532783	admindb	14	1	2	2	5064474d0000	orderproductid	=	orderproductid	mne_shipment	deliverynoteproduct	50630adc0000
 1417532783	admindb	1417532783	admindb	16	1	3	3	5064474d0000	deliverynoteid	=	deliverynoteid	mne_shipment	deliverynote	50630b9c0000
+1545060987	admindb	1545060987	admindb	0	1	0	0	5aabe1f10000				mne_crm	person	\N
 1351145892	admindb	1351145892	admindb	1	1	1	1	mne_crmbase_orderproduct_list_2	orderid	=	orderid	mne_crm	order	443a91ad0000
 1417532783	admindb	1417532783	admindb	19	1	4	4	5064474d0000	invoiceid	=	invoiceid	mne_shipment	invoice	44d72c470000
 1417532783	admindb	1417532783	admindb	23	1	5	5	5064474d0000	invoiceid	=	invoicemanagementid	mne_shipment	invoicemanagement	4a36c0090000
@@ -28975,7 +28432,6 @@ COPY mne_application.querytables (createdate, createuser, modifydate, modifyuser
 1382373501	admindb	1382373501	admindb	47	1	4	22	4b54bab80000	refid	=	companyid	mne_crm	company	4219bca00001
 1382373501	admindb	1382373501	admindb	9	1	1	53	4b54bab80000		#0.orderproducttype = #1.value AND #1.name = 'orderproducttype'		mne_application	selectlist	4b54c6d10000
 1382471096	admindb	1382471096	admindb	5	1	1	4	5065ca950000	offerproductid	=	offerproductid	mne_warehouse	offerproductpart	4b4f6a810000
-1382376260	admindb	1382376260	admindb	0	1	0	0	5065566d0000				mne_crm	orderproduct	\N
 1382471096	admindb	1382471096	admindb	11	1	1	5	5065ca950000		#0.offerproducttype = #1.value AND #1.name = 'offerproducttype'		mne_application	selectlist	4b4f7ee00000
 1263887600	admindb	1263887600	admindb	0	1	0	0	mne_finance_deliverynoteproduct_list_1				mne_shipment	deliverynoteproduct	\N
 1258634723	admindb	1258634723	admindb	8	1	3	8	4b0265c50000	parentid	=	treeid	mne_warehouse	parttree	\N
@@ -28993,6 +28449,7 @@ COPY mne_application.querytables (createdate, createuser, modifydate, modifyuser
 1263290412	admindb	1263290412	admindb	1	1	1	1	4b4c2fc50000		#0.probability = CAST (#1.value AS INTEGER) AND #1.name = 'offerprobability'		mne_application	selectlist	4b4c31f80000
 1382375860	admindb	1382375860	admindb	9	1	1	7	50659ba10000		#0.orderproducttype = #1.value AND #1.name = 'orderproducttype'		mne_application	selectlist	4b54c6d10000
 1264759887	admindb	1264759887	admindb	0	1	0	0	4b62b3e60000				mne_warehouse	storage	\N
+1431940072	admindb	1431940072	admindb	11	1	2	2	524412020000	refid	=	companyid	mne_crm	company	4219bca00001
 1264759887	admindb	1264759887	admindb	2	1	1	2	4b62b3e60000		#0.storageid = #1.storageid OR #1.storageid IS NULL		mne_warehouse	storagepersonnal	4b62b3bc0000
 1264759887	admindb	1264759887	admindb	4	1	2	3	4b62b3e60000	personid	=	personid	mne_crm	person	4b61f2630000
 1400224141	admindb	1400224141	admindb	0	1	0	0	4af3f7630000				mne_warehouse	storage	\N
@@ -29033,6 +28490,7 @@ COPY mne_application.querytables (createdate, createuser, modifydate, modifyuser
 1264082018	admindb	1264082018	admindb	2	1	1	1	4b5434b80000	orderid	=	orderid	mne_crm	orderproduct	4448d1800000
 1291366311	admindb	1291366311	admindb	0	1	0	0	4b51d1db0000				mne_crm	offer	\N
 1291366311	admindb	1291366311	admindb	3	1	1	1	4b51d1db0000	offerid	=	offerid	mne_crm	offerproduct	4b4c4b6a0000
+1382376260	admindb	1382376260	admindb	0	1	0	0	5065566d0000				mne_crm	orderproduct	\N
 1382376260	admindb	1382376260	admindb	8	0	1	1	5065566d0000	orderproductid	=	orderproductid	mne_warehouse	orderproductpart	\N
 1382376260	admindb	1382376260	admindb	10	1	2	2	5065566d0000		#1.prefix = ''		mne_crm	companyown	\N
 1382376260	admindb	1382376260	admindb	11	1	2	3	5065566d0000	orderproductid	=	orderproductid	mne_crm	orderproduct	4b84e3180000
@@ -29056,6 +28514,7 @@ COPY mne_application.querytables (createdate, createuser, modifydate, modifyuser
 1288277504	admindb	1288277504	admindb	1	1	1	1	4b28e4fb0000	storagelocationid	=	storagelocationid	mne_warehouse	partstoragelocation	4b28db9e0000
 1288277504	admindb	1288277504	admindb	2	1	1	2	4b28e4fb0000	storageid	=	storageid	mne_warehouse	storage	4b18e5250000
 1382376260	admindb	1382376260	admindb	9	1	1	14	5065566d0000		#0.orderproducttype = #1.value AND #1.name = 'orderproducttype'		mne_application	selectlist	4b54c6d10000
+1216811481	admindb	1216811481	admindb	0	1	0	0	48870fa10000_1				public	test	\N
 1347537029	admindb	1347537029	admindb	0	1	0	0	48e65ec40000				pg_catalog	pg_roles	\N
 1128001062	admindb	1128001062	admindb	0	1	0	0	mne_crmbase_address_detail_1				mne_crm	address	\N
 1107183325	admindb	1107183325	admindb	1	1	1	1	mne_dbadmin_menu_1	itemname	=	id	mne_application	translate	475563520000
@@ -29090,7 +28549,6 @@ COPY mne_application.querytables (createdate, createuser, modifydate, modifyuser
 1134650009	admindb	1134650009	admindb	2	1	2	2	mne_crmbase_product_detail_1	parentid	=	treeid	mne_crm	producttree	43a17ba60004
 1236853382	admindb	1236853382	admindb	0	1	0	0	mne_crmbase_companyperson_list_1				mne_crm	person	\N
 1236853383	admindb	1236853383	admindb	35	1	4	8	mne_crmbase_companyperson_list_1	countryid	=	countryid	mne_crm	country	4368c58a0003
-1258634723	admindb	1258634723	admindb	0	1	0	0	4b0265c50000				mne_warehouse	partsubpart	\N
 1236853382	admindb	1236853382	admindb	24	1	1	4	mne_crmbase_companyperson_list_1	refid	=	companyid	mne_crm	company	4219bca00001
 1236853382	admindb	1236853382	admindb	69	1	2	5	mne_crmbase_companyperson_list_1	companyid	=	companydataid	mne_crm	companydata	422dacce0001
 1236853383	admindb	1236853383	admindb	25	1	2	6	mne_crmbase_companyperson_list_1		#0.companyid = #1.refid AND #1.addresstypid = '000000000001'		mne_crm	address	\N
@@ -29146,6 +28604,7 @@ COPY mne_application.querytables (createdate, createuser, modifydate, modifyuser
 1323080248	admindb	1323080248	admindb	3	1	1	1	4ecf91b30000	companyid	=	companyid	mne_crm	company	4ed754270000
 1323080248	admindb	1323080248	admindb	4	1	1	2	4ecf91b30000	purchaseinvoiceid	=	purchaseinvoiceid	mne_warehouse	purchaseinvoicepay	4ed8cb030000
 1311055999	admindb	1311055999	admindb	1	1	1	1	4e25207f0000	companyid	=	companyid	mne_crm	company	4e2520520000
+1258634723	admindb	1258634723	admindb	0	1	0	0	4b0265c50000				mne_warehouse	partsubpart	\N
 1410251426	admindb	1410251426	admindb	3	1	3	3	540eb7210000	orderproductid	=	orderproductid	mne_crm	orderproduct	\N
 1410251426	admindb	1410251426	admindb	5	1	4	4	540eb7210000	productcurrencyid	=	currencyid	mne_base	currency	443a94370000
 1410251426	admindb	1410251426	admindb	4	1	4	5	540eb7210000	orderid	=	orderid	mne_crm	order	\N
@@ -29169,7 +28628,6 @@ COPY mne_application.querytables (createdate, createuser, modifydate, modifyuser
 1333377612	admindb	1333377612	admindb	12	1	2	3	49b93cdb0000	refid	=	companyid	mne_crm	company	\N
 1333377757	admindb	1333377757	admindb	0	1	0	0	mne_crmbase_company_history_1				mne_base	history	\N
 1333377757	admindb	1333377757	admindb	2	1	1	1	mne_crmbase_company_history_1	schema,tabname,colname	=,=,=	schema,tab,colname	mne_application	tablecolnames	4291c7290001
-1347869187	admindb	1347869187	admindb	0	1	0	0	5056d0e30000				mne_application	usertables	\N
 1338553773	admindb	1338553773	admindb	0	1	0	0	mne_crmbase_orderproduct_sum_1				mne_crm	orderproduct	\N
 1338553773	admindb	1338553773	admindb	1	1	1	1	mne_crmbase_orderproduct_sum_1	orderid	=	orderid	mne_crm	order	443a91ad0000
 1338553773	admindb	1338553773	admindb	3	1	2	2	mne_crmbase_orderproduct_sum_1	refid	=	companyid	mne_crm	company	43d0bd2d0000
@@ -29215,7 +28673,6 @@ COPY mne_application.querytables (createdate, createuser, modifydate, modifyuser
 1377235964	admindb	1377235964	admindb	13	1	3	3	50893bd00000	skillid	=	skillid	mne_personnal	skill	4b43925d0000
 1377235964	admindb	1377235964	admindb	15	1	4	4	50893bd00000		#1.prefix = ''		mne_crm	companyown	505963290000
 1377235964	admindb	1377235964	admindb	4	1	1	5	50893bd00000	offerproductid	=	offerproductid	mne_personnal	offerproducttime	4b4ae6ca0000
-1379692122	admindb	1379692122	admindb	0	1	0	0	52399af70000				mne_crm	order	\N
 1377235964	admindb	1377235964	admindb	14	1	1	6	50893bd00000		#0.offerproducttype = #1.value AND #1.name = 'offerproducttype'		mne_application	selectlist	4b4f7ee00000
 1377235972	admindb	1377235972	admindb	0	1	0	0	50893bee0000				mne_crm	offerproduct	\N
 1377235972	admindb	1377235972	admindb	4	0	1	1	50893bee0000	offerproductid	=	offerproductid	mne_personnal	offerproducttime	\N
@@ -29267,13 +28724,12 @@ COPY mne_application.querytables (createdate, createuser, modifydate, modifyuser
 1410162428	admindb	1410162428	admindb	67	1	1	10	4ca1871f0000	invoiceid,invoicerefid	=,=	invoiceid,invoicerefid	mne_shipment	invoicepaid	540d58960000
 1391607496	admindb	1391607496	admindb	0	1	0	0	4e27c0a80000				mne_crm	personemail	\N
 1391607496	admindb	1391607496	admindb	1	1	1	1	4e27c0a80000	personid	=	personid	mne_crm	person	4e2676ed0000
-1393496771	admindb	1393496771	admindb	0	1	0	0	4b41e9050000				pg_catalog	pg_user	\N
-1393496771	admindb	1393496771	admindb	1	1	1	1	4b41e9050000	usename	=	role	mne_catalog	dbaccessgroup	5052f3a00000
 1379692091	admindb	1379692091	admindb	0	1	0	0	52399aed0000				mne_crm	offer	\N
 1379692102	admindb	1379692102	admindb	0	1	0	0	52399af10000				mne_crm	offer	\N
 1379692102	admindb	1379692102	admindb	6	0	1	1	52399af10000	refid	=	personid	mne_crm	person	\N
 1379692111	admindb	1379692111	admindb	0	1	0	0	52399af40000				mne_crm	offer	\N
 1379692111	admindb	1379692111	admindb	11	0	1	1	52399af40000	contactid	=	personid	mne_crm	person	\N
+1379692122	admindb	1379692122	admindb	0	1	0	0	52399af70000				mne_crm	order	\N
 1379692122	admindb	1379692122	admindb	1	0	1	1	52399af70000	refid	=	companyid	mne_crm	company	\N
 1379692130	admindb	1379692130	admindb	0	1	0	0	52399afa0000				mne_crm	order	\N
 1379692130	admindb	1379692130	admindb	5	0	1	1	52399afa0000	refid	=	personid	mne_crm	person	\N
@@ -29296,7 +28752,6 @@ COPY mne_application.querytables (createdate, createuser, modifydate, modifyuser
 1410256508	admindb	1410256508	admindb	9	1	2	2	4f756c120000		#0.relowner = #1.oid		pg_catalog	pg_roles	\N
 1410256508	admindb	1410256508	admindb	10	1	2	3	4f756c120000		#0.relnamespace = #1.oid		pg_catalog	pg_namespace	48cf6e440000
 1400488426	admindb	1400488426	admindb	0	1	0	0	4cc83b060000				mne_warehouse	partstoragelocation	\N
-1478018905	admindb	1478018905	admindb	10	1	2	2	5502b8300000	refid	=	companyid	mne_crm	company	4219bca00001
 1400488426	admindb	1400488426	admindb	9	1	1	1	4cc83b060000		#0.storagelocationid <> #1.storagelocationid AND ( #1.storagelocationtypid = 'universal' OR  #1.storagelocationtypid IS NULL )		mne_warehouse	storagelocation	\N
 1400488426	admindb	1400488426	admindb	12	1	2	2	4cc83b060000	storagelocationid	=	storagelocationid	mne_warehouse	partstorageloction_sum	4b8ec0e60000
 1400488426	admindb	1400488426	admindb	31	1	2	3	4cc83b060000		#0.storageid = #1.storageid		mne_warehouse	storage	\N
@@ -29317,26 +28772,18 @@ COPY mne_application.querytables (createdate, createuser, modifydate, modifyuser
 1422262545	admindb	1422262545	admindb	0	1	0	0	52d50ec90000				mne_repository	repository	\N
 1422262545	admindb	1422262545	admindb	1	1	1	1	52d50ec90000	refid	=	orderid	mne_crm	order	52d50e820000
 1422262545	admindb	1422262545	admindb	3	1	1	2	52d50ec90000	repositoryid	=	repositoryid	mne_repository	fileinterests	530f2f080000
-1534140496	admindb	1534140496	admindb	98	1	2	2	mne_crmbase_letter_ref_1	refid	=	companyid	mne_crm	company	4219bca00001
 1422262545	admindb	1422262545	admindb	7	1	2	3	52d50ec90000	repositoryid,filename	=,=	repositoryid,filename	mne_repository	filedata_maxdate	53102f0a0000
 1422262545	admindb	1422262545	admindb	8	1	1	4	52d50ec90000	refid	=	companyid	mne_crm	company	54c5fedf0000
 1422262545	admindb	1422262545	admindb	9	1	1	5	52d50ec90000	refid	=	offerid	mne_crm	offer	54c5fef30000
 1422262545	admindb	1422262545	admindb	10	1	1	6	52d50ec90000	refid	=	personid	mne_crm	person	54c5febe0000
 1534140126	admindb	1534140126	admindb	41	1	3	8	49b68e9c0000	countryid	=	countryid	mne_crm	country	4368c58a0003
-1478018905	admindb	1478018905	admindb	0	1	0	0	5502b8300000				mne_system	personsharepasswdpublic	\N
-1478018905	admindb	1478018905	admindb	1	1	1	1	5502b8300000	personid	=	personid	mne_crm	person	55031ae80000
-1478018905	admindb	1478018905	admindb	17	1	2	3	5502b8300000	personid	=	personid	mne_crm	personowndata	57c550a30000
-1478018905	admindb	1478018905	admindb	22	1	3	4	5502b8300000		#0.loginname = #1.member AND #1.group = 'erpsmb'		mne_catalog	accessgroup	\N
-1478018905	admindb	1478018905	admindb	23	1	3	5	5502b8300000		#0.loginname = #1.member AND #1.group = 'erpdav'		mne_catalog	accessgroup	\N
 1513321985	admindb	1513321985	admindb	21	1	1	1	5416f25c0000		#0.personid = #1.id AND #1.userid = session_user		mne_crm	cardsinactive	\N
-1513321993	admindb	1513321993	admindb	0	1	0	0	555da43f0000				mne_crm	company	\N
 1513321993	admindb	1513321993	admindb	21	1	1	1	555da43f0000		#0.companyid = #1.id AND #1.userid = session_user		mne_crm	cardsinactive	\N
 1534140126	admindb	1534140126	admindb	0	1	0	0	49b68e9c0000				mne_crm	person	\N
 1534140126	admindb	1534140126	admindb	135	1	1	1	49b68e9c0000	personid	=	persondataid	mne_crm	persondata	422c08300001
 1534140126	admindb	1534140126	admindb	23	1	1	2	49b68e9c0000	refid	=	companyid	mne_crm	company	4219bca00001
 1431940072	admindb	1431940072	admindb	0	1	0	0	524412020000				mne_personnal	personowndatapublic	\N
 1431940072	admindb	1431940072	admindb	1	1	1	1	524412020000	personid	=	personid	mne_crm	person	\N
-1431940072	admindb	1431940072	admindb	11	1	2	2	524412020000	refid	=	companyid	mne_crm	company	4219bca00001
 1431940072	admindb	1431940072	admindb	28	1	3	3	524412020000	companyid	=	companyid	mne_crm	companyown	4bceb3c10000
 1431940072	admindb	1431940072	admindb	34	1	2	5	524412020000		#0.usename = #1.role AND #1.dbname = current_database() AND connect = true		mne_catalog	dbaccessgroup	\N
 1431940072	admindb	1431940072	admindb	35	1	1	6	524412020000		#0.loginname = #1.member AND #1.group = 'dav'		mne_catalog	accessgroup	\N
@@ -29364,7 +28811,6 @@ COPY mne_application.querytables (createdate, createuser, modifydate, modifyuser
 1449571160	admindb	1449571160	admindb	8	1	2	4	4ff3f1700000	orderproducttimeid	=	orderproducttimeid	mne_personnal	orderproducttime	4b2b41d80000
 1449571160	admindb	1449571160	admindb	10	1	3	5	4ff3f1700000	orderproductid	=	orderproductid	mne_crm	orderproduct	4a8e9b1a0000
 1449571160	admindb	1449571160	admindb	18	2	4	6	4ff3f1700000		#0.orderid = #1.orderid OR #0.orderid IS NULL		mne_crm	order	\N
-1459515687	admindb	1459515687	admindb	0	1	0	0	56fcfd960000				mne_system	certca	\N
 1449582738	admindb	1449582738	admindb	0	1	0	0	4ff3f05c0000				mne_application	yearday	\N
 1449582738	admindb	1449582738	admindb	1	1	1	1	4ff3f05c0000		true		mne_personnal	personowndatapublic	\N
 1449582738	admindb	1449582738	admindb	4	1	2	2	4ff3f05c0000	personid	=	personid	mne_crm	person	4ddcf1280000
@@ -29374,6 +28820,7 @@ COPY mne_application.querytables (createdate, createuser, modifydate, modifyuser
 1449582738	admindb	1449582738	admindb	18	2	4	6	4ff3f05c0000		#0.orderid = #1.orderid OR #0.orderid IS NULL		mne_crm	order	\N
 1534140496	admindb	1534140496	admindb	0	1	0	0	mne_crmbase_letter_ref_1				mne_base	letter	\N
 1534140496	admindb	1534140496	admindb	23	1	1	1	mne_crmbase_letter_ref_1	refid	=	personid	mne_crm	person	44c470730000
+1534140496	admindb	1534140496	admindb	98	1	2	2	mne_crmbase_letter_ref_1	refid	=	companyid	mne_crm	company	4219bca00001
 1534140496	admindb	1534140496	admindb	105	1	3	3	mne_crmbase_letter_ref_1		#0.companyid = #1.refid AND #1.addresstypid = '000000000001'		mne_crm	address	\N
 1534140496	admindb	1534140496	admindb	107	1	4	4	mne_crmbase_letter_ref_1	cityid	=	cityid	mne_crm	city	41b9907b0004
 1534140496	admindb	1534140496	admindb	109	1	5	5	mne_crmbase_letter_ref_1	countryid	=	countryid	mne_crm	country	4368c58a0003
@@ -29448,22 +28895,11 @@ COPY mne_application.querytables (createdate, createuser, modifydate, modifyuser
 1534144736	admindb	1534144736	admindb	199	1	2	10	49b6d07f0000	personid	=	personid	mne_personnal	personowndatapublic	5242a6700000
 1534144736	admindb	1534144736	admindb	145	0	1	11	49b6d07f0000	personid	=	refid	mne_base	letter	44c717d60000
 1534144736	admindb	1534144736	admindb	217	1	1	12	49b6d07f0000	personid	=	personid	mne_personnal	personowndatapublic	5242a6700000
-1477551618	admindb	1477551618	admindb	0	1	0	0	5811a5ad0000				mne_system	mailalias	\N
-1477551618	admindb	1477551618	admindb	1	1	1	1	5811a5ad0000	personid	=	personid	mne_crm	person	5811a5bf0000
-1477551618	admindb	1477551618	admindb	9	1	2	9	5811a5ad0000	personid	=	personid	mne_crm	personowndata	57c550a30000
 1484289997	admindb	1484289997	admindb	0	1	0	0	57c846280000				mne_crm	personowndata	\N
 1542875263	admindb	1542875263	admindb	0	1	0	0	4c5107570000				mne_hoai	feename	\N
 1542875263	admindb	1542875263	admindb	1	1	1	1	4c5107570000		#0.feenameid = #1.law AND #1.zone = 1		mne_hoai	fee	4c5108130000
 1542875263	admindb	1542875263	admindb	2	1	1	2	4c5107570000	feenameid	=	law	mne_hoai	fee	4c5107ef0000
 1542875263	admindb	1542875263	admindb	3	1	1	3	4c5107570000		#0.feenameid = #1.law AND #1.zone = 2		mne_hoai	fee	4c5108b70000
-1473783246	admindb	1473783246	admindb	0	1	0	0	556831b90000				mne_system	shares	\N
-1473783246	admindb	1473783246	admindb	1	1	1	1	556831b90000	folderid	=	folderid	mne_application	folder	5568312a0000
-1473783246	admindb	1473783246	admindb	2	1	1	2	556831b90000	personid	=	personid	mne_crm	person	556831170000
-1473783246	admindb	1473783246	admindb	11	1	2	3	556831b90000	refid	=	companyid	mne_crm	company	4219bca00001
-1473783246	admindb	1473783246	admindb	18	1	2	10	556831b90000	personid	=	personid	mne_crm	personowndata	57c550a30000
-1473783246	admindb	1473783246	admindb	25	1	3	13	556831b90000	loginname	=	rolname	pg_catalog	pg_roles	57c7c4d80000
-1473783246	admindb	1473783246	admindb	31	1	4	18	556831b90000		#0.rolname = #1.member AND #1.group = 'erpdav'		mne_catalog	accessgroup	57d825690000
-1473783246	admindb	1473783246	admindb	32	1	4	19	556831b90000		#0.rolname = #1.member AND #1.group = 'erpsmb'		mne_catalog	accessgroup	57d825820000
 1479483372	admindb	1479483372	admindb	0	1	0	0	50655e4c0000				mne_crm	orderproduct	\N
 1479483372	admindb	1479483372	admindb	8	0	1	1	50655e4c0000	orderproductid	=	orderproductid	mne_warehouse	orderproductpart	\N
 1479483372	admindb	1479483372	admindb	11	1	2	3	50655e4c0000	orderproductid	=	orderproductid	mne_crm	orderproduct	4b84e3180000
@@ -29501,7 +28937,6 @@ COPY mne_application.querytables (createdate, createuser, modifydate, modifyuser
 1544428762	admindb	1544428762	admindb	9	1	1	1	49ad9b890000	refid	=	companyid	mne_crm	company	4219bca00001
 1544428827	admindb	1544428827	admindb	0	1	0	0	54c5f8760000				mne_crm	order	\N
 1544428827	admindb	1544428827	admindb	1	1	1	1	54c5f8760000	refid	=	companyid	mne_crm	company	43d0bd2d0000
-1516204173	admindb	1516204173	admindb	0	1	0	0	4b39feaa0000				pg_catalog	pg_roles	\N
 1521214450	admindb	1521214450	admindb	0	1	0	0	5aabe3ab0000				mne_crm	person	\N
 1521214450	admindb	1521214450	admindb	37	0	1	14	5aabe3ab0000	personid	=	ownerid	mne_fixture	fixture	5aaba8230000
 1521214633	admindb	1521214633	admindb	0	1	0	0	5aabe45c0000				mne_crm	person	\N
@@ -29515,24 +28950,6 @@ COPY mne_application.querytables (createdate, createuser, modifydate, modifyuser
 1521216061	admindb	1521216061	admindb	0	1	0	0	5aabe6700000				mne_crm	person	\N
 1521216061	admindb	1521216061	admindb	72	0	1	1	5aabe6700000	personid	=	ownerid	mne_shipment	invoice	5aabd4660000
 1522155621	admindb	1522155621	admindb	0	1	0	0	491822b40000				mne_application	selectlist	\N
-1553165612	admindb	1553165612	admindb	0	1	0	0	57ee0c130000				mne_application	folder	\N
-1553165612	admindb	1553165612	admindb	1	1	1	1	57ee0c130000	folderid	=	folderid	mne_system	shares	57ee0c2e0000
-1553754877	admindb	1553754877	admindb	0	1	0	0	569f95b30000				mne_system	apachemod	\N
-1553755649	admindb	1553755649	admindb	0	1	0	0	56a78aed0000				mne_system	apachesite	\N
-1553755649	admindb	1553755649	admindb	1	1	1	1	56a78aed0000	hostname	=	apacheid	mne_system	apache	\N
-1553766118	admindb	1553766118	admindb	0	1	0	0	580a19280000				mne_system	sogo	\N
-1553766118	admindb	1553766118	admindb	3	1	1	2	580a19280000	sogoid	=	certcaid	mne_system	certca	5c9c96780000
-1553766118	admindb	1553766118	admindb	4	1	1	3	580a19280000	sogoid	=	domainid	mne_system	domain	5c9c96d10000
-1578380726	admindb	1578380726	admindb	0	1	0	0	581c7c020000				mne_system	dnsaddress	\N
-1578480576	admindb	1578480576	admindb	0	1	0	0	57da3e520000				mne_system	network	\N
-1578499160	admindb	1578499160	admindb	0	1	0	0	57d910560000				mne_system	domain	\N
-1579620562	admindb	1579620562	admindb	0	1	0	0	57da3e460000				mne_system	network	\N
-1579620562	admindb	1579620562	admindb	1	1	1	1	57da3e460000		true		mne_application	server	5ddb7b920000
-1579620562	admindb	1579620562	admindb	2	1	1	2	57da3e460000	hostname	=	domainid	mne_system	domain	5df8aa4a0000
-1579620562	admindb	1579620562	admindb	3	1	2	3	57da3e460000	domainid,netdevice	=,=	hostname,networkid	mne_system	network	5e2716ec0000
-1579620644	admindb	1579620644	admindb	0	1	0	0	5dfa2c070000				mne_system	netparam	\N
-1579620644	admindb	1579620644	admindb	1	1	1	1	5dfa2c070000	netparamid	=	domainid	mne_system	domain	5dfa2c5e0000
-1579620644	admindb	1579620644	admindb	2	1	2	2	5dfa2c070000	domainid,netdevice	=,=	hostname,networkid	mne_system	network	5e2716ec0000
 1610369005	admindb	1610369005	admindb	0	1	0	0	mne_application_menu_1				mne_application	menu	\N
 1610369005	admindb	1610369005	admindb	1	1	1	1	mne_application_menu_1	itemname	=	id	mne_application	translate	475563520000
 1610369005	admindb	1610369005	admindb	2	1	1	2	mne_application_menu_1	ugroup	=	rolname	pg_catalog	pg_roles	4b459ba10000
@@ -29571,6 +28988,19 @@ COPY mne_application.querytables (createdate, createuser, modifydate, modifyuser
 1611060658	admindb	1611060658	admindb	61	1	1	15	4925b94f0000		true		mne_catalog	uuid	5ab12e460000
 1611062059	admindb	1611062059	admindb	0	1	0	0	mne_application_table_cols_1				information_schema	columns	\N
 1611062059	admindb	1611062059	admindb	1	1	1	1	mne_application_table_cols_1	table_schema,table_name,column_name	=,=,=	schema,tab,colname	mne_application	tablecolnames	48c0f8a40000
+1611328172	admindb	1611328172	admindb	0	1	0	0	4b41e9050000				pg_catalog	pg_user	\N
+1611328172	admindb	1611328172	admindb	1	1	1	1	4b41e9050000	usename	=	role	mne_catalog	dbaccessgroup	5052f3a00000
+1616399206	admindb	1616399206	admindb	0	1	0	0	4bb0ff6b0000				mne_warehouse	parttree	\N
+1616399206	admindb	1616399206	admindb	2	1	1	1	4bb0ff6b0000	parentid	=	treeid	mne_warehouse	parttree	4af2850e0000
+1616399206	admindb	1616399206	admindb	3	1	1	2	4bb0ff6b0000	partid	=	partid	mne_warehouse	part	4af285420000
+1616399206	admindb	1616399206	admindb	9	1	2	3	4bb0ff6b0000	partid	=	partid	mne_warehouse	partstoragemasterdata	4b0260320000
+1616399206	admindb	1616399206	admindb	16	1	2	4	4bb0ff6b0000	partid	=	partid	mne_warehouse	part_sum	4bb105a20000
+1616399206	admindb	1616399206	admindb	20	1	2	5	4bb0ff6b0000	partid	=	partid	mne_warehouse	partoutgoing_sum	4cc8f9890000
+1617712917	admindb	1617712917	admindb	0	1	0	0	4b39feaa0000				pg_catalog	pg_roles	\N
+1617713076	admindb	1617713076	admindb	0	1	0	0	50ff99780000				pg_catalog	pg_roles	\N
+1617713076	admindb	1617713076	admindb	1	1	1	1	50ff99780000		#0.rolcanlogin = true AND ( #1.rolcanlogin = false OR #1.rolname = 'admindb' ) AND substring(#1.rolname FROM 1 FOR 5 ) != 'login' 		pg_catalog	pg_roles	\N
+1617713076	admindb	1617713076	admindb	3	1	2	2	50ff99780000		#0.oid = #1.roleid AND #t0.oid = #1.member		pg_catalog	pg_auth_members	\N
+1617713076	admindb	1617713076	admindb	4	1	2	3	50ff99780000		#0.rolname = #1.id		mne_application	translate	\N
 \.
 
 
@@ -29579,25 +29009,21 @@ COPY mne_application.querytables (createdate, createuser, modifydate, modifyuser
 --
 
 COPY mne_application.querywheres (createdate, createuser, modifydate, modifyuser, notoperator, leftbrace, rightbrace, lefttab, righttab, booloperator, wherecol, queryid, leftvalue, rightvalue, operator) FROM stdin;
+1603197205	admindb	1603197205	admindb	f	t	t	0		OR	0	48b44ed00000	ugroup		=
 1601458335	admindb	1601458335	admindb	f	f	f			AND	0	5065618c0000	#0.productnumber	'pauschal'	!=
 1601458390	admindb	1601458390	admindb	f	f	f			AND	0	506572480000	#0.productnumber	'pauschal'	!=
 1601458426	admindb	1601458426	admindb	f	f	f			AND	0	506574930000	#0.productnumber	'pauschal'	!=
 1601276219	admindb	1601276219	admindb	f	f	f	4		AND	0	5065a2b90000	offerproducttimeid		isnull
 1601276219	admindb	1601276219	admindb	t	f	f	9		AND	1	5065a2b90000	producttimeid		isnull
 1601276304	admindb	1601276304	admindb	f	f	f	4		AND	0	5065a4600000	offerproducttimeid		isnull
-1603197205	admindb	1603197205	admindb	f	t	t	0		OR	0	48b44ed00000	ugroup		=
 1603197205	admindb	1603197205	admindb	f	t	t	6		OR	1	48b44ed00000	rolname	session_user	=
 1603197205	admindb	1603197205	admindb	f	t	t	0		OR	2	48b44ed00000	ugroup	session_user	=
 1603197205	admindb	1603197205	admindb	f	t	t				3	48b44ed00000	'admindb'	session_user	=
-1311148418	admindb	1311148418	admindb	f	f	f	0		AND	1	4e1ecfbb0000	email		!=
 1311148349	admindb	1311148349	admindb	t	f	f	0		AND	0	4e1ed04b0000	email		isnull
 1601276304	admindb	1601276304	admindb	t	f	f	9		AND	1	5065a4600000	producttimeid		isnull
 1603703327	admindb	1603703327	admindb	t	t	t	35		AND	0	4d95f8250000	loginname		isnull
 1603703341	admindb	1603703341	admindb	t	t	t	35		AND	0	4d9979dd0000	loginname		isnull
 1603966398	admindb	1603966398	admindb	f	f	f			AND	0	5f9a8b180000	#0.productnumber	'pauschal'	!=
-1605541710	admindb	1605541710	admindb	f	f	f			OR	0	50ff99780000	substring(#1.rolname,1,5)	'admin'	=
-1605541710	admindb	1605541710	admindb	f	f	f			OR	1	50ff99780000	substring(#1.rolname,1,3)	'erp'	=
-1605541710	admindb	1605541710	admindb	f	f	f				2	50ff99780000	substring(#1.rolname,1,4)	'show'	=
 1607510788	admindb	1607510788	admindb	t	f	f	11			0	4a8fe3910000	timemanagementid		isnull
 1601467884	admindb	1601467884	admindb	f	f	f			AND	0	4ae805a70000	#0.productnumber	'pauschal'	!=
 1604299995	admindb	1604299995	admindb	f	f	f				0	4dc8eb0f0000	(trim(to_char(#0.vyear,'0000'))  || trim(to_char(#0.vmonth,'00')) || trim(to_char(#0.vday,'00')))	to_char(CURRENT_TIMESTAMP, 'YYYYMMDD')	<=
@@ -29632,8 +29058,6 @@ COPY mne_application.querywheres (createdate, createuser, modifydate, modifyuser
 1608047769	admindb	1608047769	admindb	f	f	t	0	34	AND	4	4cc822170000	partid	partid	=
 1608047769	admindb	1608047769	admindb	f	t	f	33		OR	5	4cc822170000	partid		isnull
 1608047769	admindb	1608047769	admindb	f	f	t	0	33		6	4cc822170000	partid	partid	=
-1393496771	admindb	1393496771	admindb	f	f	f			AND	0	4b41e9050000	#1.dbname	current_database()	=
-1393496771	admindb	1393496771	admindb	f	f	f	1		AND	1	4b41e9050000	connect	true	=
 1400488426	admindb	1400488426	admindb	f	t	f	9		AND	0	4cc83b060000	storagelocationtypid		isnull
 1400488426	admindb	1400488426	admindb	f	f	t	31		OR	1	4cc83b060000	storagelocationtypid	universal	=
 1400488426	admindb	1400488426	admindb	f	f	f	9		AND	2	4cc83b060000	storagelocationtypid	universal	=
@@ -29656,6 +29080,7 @@ COPY mne_application.querywheres (createdate, createuser, modifydate, modifyuser
 1288277504	admindb	1288277504	admindb	f	f	t	2		AND	3	4b28e4fb0000	storagelocationtypid	universal	=
 1311148349	admindb	1311148349	admindb	f	f	f	0			1	4e1ed04b0000	email		!=
 1311148418	admindb	1311148418	admindb	t	f	f	0		AND	0	4e1ecfbb0000	email		isnull
+1311148418	admindb	1311148418	admindb	f	f	f	0		AND	1	4e1ecfbb0000	email		!=
 1333377757	admindb	1333377757	admindb	f	t	f	0		OR	0	mne_crmbase_company_history_1	tabname	company	=
 1333377757	admindb	1333377757	admindb	f	f	t	0		AND	1	mne_crmbase_company_history_1	tabname	companydata	=
 1333377757	admindb	1333377757	admindb	f	f	f	0		AND	2	mne_crmbase_company_history_1	schema	mne_crm	=
@@ -29712,14 +29137,19 @@ COPY mne_application.querywheres (createdate, createuser, modifydate, modifyuser
 1479483507	admindb	1479483507	admindb	t	f	f	9		AND	1	5065c79d0000	productpartid		isnull
 1513321985	admindb	1513321985	admindb	t	f	f	21			0	5416f25c0000	id		isnull
 1513321993	admindb	1513321993	admindb	t	f	f	21			0	555da43f0000	id		isnull
-1516204173	admindb	1516204173	admindb	f	f	f	0		AND	0	4b39feaa0000	rolcanlogin	false	=
-1516204173	admindb	1516204173	admindb	f	t	f			OR	1	4b39feaa0000	substring(#0.rolname FROM 1 FOR 3 )	'erp'	=
-1516204173	admindb	1516204173	admindb	f	f	f			OR	2	4b39feaa0000	substring(#0.rolname FROM 1 FOR 4 )	'show'	=
-1516204173	admindb	1516204173	admindb	f	f	t				3	4b39feaa0000	substring(#0.rolname FROM 1 FOR 5 )	'admin'	=
 1542875263	admindb	1542875263	admindb	f	f	t	6		AND	9	4c5107570000	cost		isnull
 1598603028	admindb	1598603028	admindb	t	f	f	0		AND	0	54607d0b0000	filename	%/.gitignore	like
 1610519462	admindb	1610519462	admindb	f	f	f	0		AND	0	48cec6760000	contype	c	=
 1610519462	admindb	1610519462	admindb	f	f	f	0		AND	1	48cec6760000	conrelid	0	!=
+1611328172	admindb	1611328172	admindb	f	f	f			AND	0	4b41e9050000	#1.dbname	current_database()	=
+1611328172	admindb	1611328172	admindb	f	f	f	1		AND	1	4b41e9050000	connect	true	=
+1617712917	admindb	1617712917	admindb	f	f	f	0		AND	0	4b39feaa0000	rolcanlogin	false	=
+1617712917	admindb	1617712917	admindb	f	t	f			OR	1	4b39feaa0000	substring(#0.rolname FROM 1 FOR 3 )	'erp'	=
+1617712917	admindb	1617712917	admindb	f	f	f			OR	2	4b39feaa0000	substring(#0.rolname FROM 1 FOR 4 )	'show'	=
+1617712917	admindb	1617712917	admindb	f	f	t				3	4b39feaa0000	substring(#0.rolname FROM 1 FOR 6 )	'admerp'	=
+1617713076	admindb	1617713076	admindb	f	f	f			OR	0	50ff99780000	substring(#1.rolname,1,6)	'admerp'	=
+1617713076	admindb	1617713076	admindb	f	f	f			OR	1	50ff99780000	substring(#1.rolname,1,3)	'erp'	=
+1617713076	admindb	1617713076	admindb	f	f	f				2	50ff99780000	substring(#1.rolname,1,4)	'show'	=
 \.
 
 
@@ -30034,21 +29464,53 @@ COPY mne_application.selectlist (createdate, createuser, modifydate, modifyuser,
 
 
 --
--- Data for Name: server; Type: TABLE DATA; Schema: mne_application; Owner: admindb
---
-
-COPY mne_application.server (createdate, createuser, modifydate, modifyuser, serverid, pwd) FROM stdin;
-\.
-
-
---
 -- Data for Name: tablecolnames; Type: TABLE DATA; Schema: mne_application; Owner: admindb
 --
 
 COPY mne_application.tablecolnames (createdate, createuser, modifydate, modifyuser, schema, tab, colname, text_en, text_de, dpytype, showhistory, regexp, regexphelp, custom, regexpmod) FROM stdin;
-1110288395	admindb	1597672659	admindb	mne_crm	persondata	createuser	\N	\N	-1	t	\N	\N	f	\N
+1257837142	admindb	1265032375	admindb	mne_warehouse	storagelocationtyp	text_en	storage location typ	Lagerplatztyp	-1	t	\N	\N	f	\N
+1391530914	admindb	1413881118	admindb	mne_repository	fileinterests	filename	\N	Dateiname	-1	f	\N	\N	f	\N
+1391416170	admindb	1415345995	admindb	mne_repository	filedata	shortrev	version	Version	-1	f	\N	\N	f	\N
+1394001441	admindb	1415346410	admindb	mne_repository	filedata_rank	repdate	\N	\N	1000	f	\N	\N	f	\N
+1415346472	admindb	1415346472	admindb	mne_repository	filedata_rank	resrank	Version	Version	-1	f	\N	\N	f	\N
+1394607007	admindb	1415346536	admindb	mne_repository	filedata_rank	rank	iversion	IVersion	-1	f	\N	\N	f	\N
+1415347216	admindb	1415347216	admindb	mne_repository	filedata_rank	filename	file	Datei	-1	f	\N	\N	f	\N
+1415347248	admindb	1415347248	admindb	mne_repository	filedata_maxdate	filename	file	Datei	-1	f	\N	\N	f	\N
+1415613242	admindb	1415627758	admindb	mne_repository	filedata_interests	filename	file	Datei	-1	f	\N	\N	f	\N
+1429689284	admindb	1429689284	admindb	mne_application	userpref	debug	\N	Debug	-1	f	\N	\N	f	\N
+1430999929	admindb	1430999929	admindb	mne_sabredav	addressbookchanges	synctoken	\N	\N	1000	f	\N	\N	f	\N
+1110288360	admindb	1432279095	admindb	mne_crm	company	companyid	\N	\N	-1	t	\N	\N	f	\N
+1431086443	admindb	1431086443	admindb	mne_sabredav	addressbooks	synctoken	\N	\N	1000	f	\N	\N	f	\N
+1431098730	admindb	1431098730	admindb	mne_sabredav	calendarchanges	synctoken	\N	\N	1000	f	\N	\N	f	\N
+1245997778	admindb	1432279102	admindb	mne_crm	companydata	mobile	mobile	Mobil	-1	t	\N	\N	f	\N
+1110288365	admindb	1432279102	admindb	mne_crm	companydata	modifydate	\N	\N	1000	t	\N	\N	f	\N
+1110288365	admindb	1432279102	admindb	mne_crm	companydata	modifyuser	\N	\N	-1	t	\N	\N	f	\N
+1431545915	admindb	1433148137	admindb	mne_crm	cardsinactive	id	\N	\N	-1	f	\N	\N	f	\N
+1431545927	admindb	1433148137	admindb	mne_crm	cardsinactive	userid	\N	\N	-1	f	\N	\N	f	\N
+1110200862	admindb	1432279102	admindb	mne_crm	companydata	companydataid	\N	\N	-1	f	\N	\N	f	\N
 1432123495	admindb	1432124145	admindb	mne_catalog	uuid	uuidid	\N	\N	-1	f	\N	\N	f	\N
-1134649107	admindb	1134649107	admindb	mne_crm	producttree	modifydate	\N	\N	1000	t	\N	\N	f	\N
+1431947957	admindb	1432195370	admindb	mne_sabredav	uri2personid	personid	\N	\N	-1	f	\N	\N	f	\N
+1431947935	admindb	1432195370	admindb	mne_sabredav	uri2personid	uri	\N	\N	-1	t	\N	\N	f	\N
+1250670389	admindb	1432279152	admindb	mne_personnal	timemanagement	createdate	\N	\N	1000	f	\N	\N	f	\N
+1110288360	admindb	1432279095	admindb	mne_crm	company	createdate	\N	\N	1000	t	\N	\N	f	\N
+1472131925	admindb	1599127068	admindb	mne_crm	personowndata	color	\N	Farbe	1020	t	\N	\N	f	\N
+1465818092	admindb	1465818092	admindb	mne_application	htmlcompose	htmlcomposeid	\N	\N	-1	f	\N	\N	f	\N
+1449236580	admindb	1522143660	admindb	mne_application	yearday	wday	week day	Wochentag	1004	f	\N	\N	f	\N
+1465819785	admindb	1465819785	admindb	mne_application	htmlcomposetabselect	htmlcomposetabselectid	\N	\N	-1	f	\N	\N	f	\N
+1465823279	admindb	1465823279	admindb	mne_application	htmlcomposetabslider	htmlcomposeid	\N	\N	-1	f	\N	\N	f	\N
+1465818239	admindb	1465827496	admindb	mne_application	htmlcomposenames	htmlcomposeid	\N	\N	-1	f	\N	\N	f	\N
+1465820825	admindb	1465828097	admindb	mne_application	htmlcomposetabnames	htmlcomposetabid	\N	\N	-1	f	\N	\N	f	\N
+1465828245	admindb	1465828245	admindb	mne_application	htmlcomposetabnames	htmlcomposeid	\N	\N	-1	f	\N	\N	f	\N
+1465828753	admindb	1465828753	admindb	mne_application	htmlcomposetabselect	htmlcomposeid	\N	\N	-1	f	\N	\N	f	\N
+1465820501	admindb	1522144234	admindb	mne_application	htmlcomposetab	htmlcomposeid	\N	\N	-1	f	\N	\N	f	\N
+1465818933	admindb	1522144234	admindb	mne_application	htmlcomposetab	htmlcomposetabid	\N	\N	-1	f	\N	\N	f	\N
+1292920226	admindb	1473241176	admindb	mne_personnal	personowndata	unitcost	cost per hour	Kosten/Stunde	-1	f	\N	\N	f	\N
+1301320940	admindb	1473241176	admindb	mne_personnal	personowndata	wtime	workingtime per day	tägliche Arbeitszeit	1003	f	\N	\N	f	\N
+1262636078	admindb	1473241176	admindb	mne_personnal	personowndata	personowndataid	\N	\N	-1	t	\N	\N	f	\N
+1472131908	admindb	1599127068	admindb	mne_crm	personowndata	active	\N	aktiv	-1	t	\N	\N	f	\N
+1472131939	admindb	1599127068	admindb	mne_crm	personowndata	createdate	\N	\N	-1	f	\N	\N	f	\N
+1472131943	admindb	1599127068	admindb	mne_crm	personowndata	createuser	\N	\N	-1	f	\N	\N	f	\N
+1472131947	admindb	1599127068	admindb	mne_crm	personowndata	modifydate	\N	\N	-1	f	\N	\N	f	\N
 1258448005	admindb	1258636816	admindb	mne_warehouse	partsubpart	subpartid	\N	\N	-1	f	\N	\N	f	\N
 1134052250	admindb	1260192031	admindb	mne_base	letter	refid	\N	\N	-1	t	\N	\N	f	\N
 1225400409	admindb	1225400409	admindb	mne_application	tablecolnames	regexphelp	Hilfe	help	-1	f		\N	f	\N
@@ -30079,11 +29541,23 @@ COPY mne_application.tablecolnames (createdate, createuser, modifydate, modifyus
 1110288395	admindb	1597672659	admindb	mne_crm	persondata	createdate	\N	\N	1000	t	\N	\N	f	\N
 1336461843	admindb	1597672659	admindb	mne_crm	persondata	role	\N	Funktion	-1	f	\N	\N	f	\N
 1279712653	admindb	1597672659	admindb	mne_crm	persondata	email	\N	Email	1010	f	email	\N	f	\N
+1110288395	admindb	1597672659	admindb	mne_crm	persondata	createuser	\N	\N	-1	t	\N	\N	f	\N
 1587633325	admindb	1597672645	admindb	public	test	test	only a test	Nur ein Test	-1	f	\N	\N	f	\N
 1110180707	admindb	1597672659	admindb	mne_crm	persondata	birthday	birthday	Geburtstag	1001	t	\N	\N	f	\N
 1245244848	admindb	1597672659	admindb	mne_crm	persondata	language	\N	Sprache	-1	f	\N	\N	f	\N
 1110181487	admindb	1597672659	admindb	mne_crm	persondata	persondataid	\N	\N	-1	f	\N	\N	f	\N
 1598434980	admindb	1598434980	admindb	mne_repository	filedata	origname	original name	Orginal Name	-1	f	\N	\N	f	\N
+1126110968	admindb	1126110968	admindb	mne_base	history	refcol	\N	\N	-1	t	\N	\N	f	\N
+1449469901	admindb	1603714923	admindb	mne_application	yearday	vfullday	date	Datum	1007	f	\N	\N	f	\N
+1272265377	admindb	1479471069	admindb	mne_crm	product	productnumber	product nr.	Produktnr.	-1	f	numoempty	\N	f	\N
+1271678647	admindb	1510223171	admindb	mne_application	userpref	startweblet	start view	Startmaske	-1	f	\N	\N	f	\N
+1134572025	admindb	1522136997	admindb	mne_crm	offer	offernumber	offer number	Angebotsnummer	-1	t	notempty	eine beliebige Zeichenkette bis 16 Zeichen	f	\N
+1522137644	admindb	1522137653	admindb	mne_application	tablecolnames	colname	\N	\N	-1	f	\N	\N	f	\N
+1610360737	admindb	1610360737	admindb	mne_application	applications	applicationsid	\N	\N	-1	t	\N	\N	f	\N
+1610360755	admindb	1610360755	admindb	mne_application	applications	menuname	\N	\N	-1	t	\N	\N	f	\N
+1610464759	admindb	1610464759	admindb	mne_warehouse	part	partdescription	description	Beschreibung	-1	t	\N	\N	f	\N
+1099320384	admindb	1610627938	admindb	mne_crm	city	countryid	\N	\N	-1	f	\N	\N	f	\N
+1611060402	admindb	1611060419	admindb	mne_application	userpref	exportencoding	export encoding	Export Encoding	-1	f	\N	\N	f	\N
 1472131888	admindb	1599127068	admindb	mne_crm	personowndata	loginname	login name	Benutzername	-1	t	alphanumorempty	\N	f	\N
 1472131953	admindb	1599127068	admindb	mne_crm	personowndata	modifyuser	\N	\N	-1	f	\N	\N	f	\N
 1472131958	admindb	1599127068	admindb	mne_crm	personowndata	personid	\N	\N	-1	t	\N	\N	f	\N
@@ -30357,6 +29831,7 @@ COPY mne_application.tablecolnames (createdate, createuser, modifydate, modifyus
 1099320438	admindb	1128081433	admindb	mne_crm	country	countryid			-1	f	\N	\N	f	\N
 1134649107	admindb	1134649107	admindb	mne_crm	producttree	createdate	\N	\N	1000	t	\N	\N	f	\N
 1134649107	admindb	1134649107	admindb	mne_crm	producttree	createuser	\N	\N	-1	t	\N	\N	f	\N
+1134649107	admindb	1134649107	admindb	mne_crm	producttree	modifydate	\N	\N	1000	t	\N	\N	f	\N
 1134649107	admindb	1134649107	admindb	mne_crm	producttree	modifyuser	\N	\N	-1	t	\N	\N	f	\N
 1134649107	admindb	1134649107	admindb	mne_crm	producttree	treeid	\N	\N	-1	t	\N	\N	f	\N
 1134649107	admindb	1134649107	admindb	mne_crm	producttree	treename	\N	\N	-1	t	\N	\N	f	\N
@@ -30473,7 +29948,6 @@ COPY mne_application.tablecolnames (createdate, createuser, modifydate, modifyus
 1132142295	admindb	1132142295	admindb	mne_base	currency	num	\N	\N	-1	t	\N	\N	f	\N
 1257436063	admindb	1479470849	admindb	mne_warehouse	partstoragemasterdata	mincount	mininal count	Mindestbestand	-1	f	numoempty	\N	f	\N
 1124281280	admindb	1548399378	admindb	mne_base	letter	name	\N	\N	-1	t	notempty	\N	f	\N
-1257837142	admindb	1265032375	admindb	mne_warehouse	storagelocationtyp	text_en	storage location typ	Lagerplatztyp	-1	t	\N	\N	f	\N
 1262685248	admindb	1292851629	admindb	mne_crm	orderproduct	productpricecalc	calculated price/unit	kalkulierter Preis/Einheit	-1	f	\N	\N	f	\N
 1257425344	admindb	1292920541	admindb	mne_warehouse	part	parttype	type	Typ	-1	t	\N	\N	f	\N
 1257237167	admindb	1292920541	admindb	mne_warehouse	part	partid	\N	\N	-1	t	notempty	\N	f	\N
@@ -30509,7 +29983,6 @@ COPY mne_application.tablecolnames (createdate, createuser, modifydate, modifyus
 1124280529	admindb	1124280529	admindb	mne_base	letter	modifydate	\N	\N	1000	t	\N	\N	f	\N
 1124280529	admindb	1124280529	admindb	mne_base	letter	modifyuser	\N	\N	-1	t	\N	\N	f	\N
 1124280601	admindb	1124280601	admindb	mne_base	letter	data	\N	\N	-1	t	\N	\N	f	\N
-1126110968	admindb	1126110968	admindb	mne_base	history	refcol	\N	\N	-1	t	\N	\N	f	\N
 1128081227	admindb	1128081227	admindb	mne_application	tablecolnames	showhistory	\N	\N	-1	t	\N	\N	f	\N
 1124283653	admindb	1128081298	admindb	mne_base	letter	letterid			-1	f	\N	\N	f	\N
 1247056491	admindb	1256891617	admindb	mne_personnal	time	duration	duration	Dauer	1003	f	\N	\N	f	\N
@@ -30543,7 +30016,6 @@ COPY mne_application.tablecolnames (createdate, createuser, modifydate, modifyus
 1264076192	admindb	1292939947	admindb	mne_warehouse	orderproductpart	actcount	actual count	Istanzahl	-1	t	\N	\N	f	\N
 1292244881	admindb	1292939947	admindb	mne_warehouse	orderproductpart	fixturetypeid	\N	\N	-1	f	\N	\N	f	\N
 1291123170	admindb	1292851699	admindb	mne_fixture	fixturetype	description	\N	Beschreibung	-1	f	\N	\N	f	\N
-1477547645	admindb	1477553823	admindb	mne_system	mailalias	alias	\N	\N	1010	f	\N	\N	f	\N
 1290514170	admindb	1292851687	admindb	mne_fixture	fixture	fixturenumber	\N	Inventarnummer	-1	f	notempty	\N	f	\N
 1291379041	admindb	1292920551	admindb	mne_warehouse	partcost	partid	\N	\N	-1	f	keyvalue	\N	f	\N
 1290069141	admindb	1292851687	admindb	mne_fixture	fixture	ownerid	\N	\N	-1	f	\N	\N	f	\N
@@ -30654,6 +30126,7 @@ COPY mne_application.tablecolnames (createdate, createuser, modifydate, modifyus
 1263201483	admindb	1347983334	admindb	mne_personnal	offerproducttime	description	activity	Tätigkeit	-1	f	\N	\N	f	\N
 1099320210	admindb	1358245976	admindb	mne_crm	city	name	city	Ort	-1	t	\N	\N	f	\N
 1263479447	admindb	1305630895	admindb	mne_warehouse	productpart	productpartid	\N	\N	-1	t	\N	\N	f	\N
+1347373880	admindb	1347528478	admindb	mne_hoai	order	zeit	\N	Zeithonorar	-1	f	\N	\N	f	\N
 1265028287	admindb	1305891331	admindb	mne_warehouse	partstoragelocationmasterdata	maxcount	max count	Maximale Anzahl	-1	f	num1_num	\N	f	\N
 1306392930	admindb	1306394247	admindb	mne_application	querycolumns	musthaving	\N	\N	-1	f	\N	\N	f	\N
 1134649042	admindb	1306496182	admindb	mne_crm	product	name	product	Produkt	-1	t	\N	\N	f	\N
@@ -30798,7 +30271,6 @@ COPY mne_application.tablecolnames (createdate, createuser, modifydate, modifyus
 1347373756	admindb	1347528478	admindb	mne_hoai	order	law	\N	Gesetz	-1	f	\N	\N	f	\N
 1347373767	admindb	1347528478	admindb	mne_hoai	order	leistung	\N	Leistung	-1	f	\N	\N	f	\N
 1347373785	admindb	1347528478	admindb	mne_hoai	order	neben	\N	Nebenkosten	-1	f	\N	\N	f	\N
-1347373880	admindb	1347528478	admindb	mne_hoai	order	zeit	\N	Zeithonorar	-1	f	\N	\N	f	\N
 1347373892	admindb	1347528478	admindb	mne_hoai	order	zone	\N	Honorarzone	-1	f	\N	\N	f	\N
 1347373916	admindb	1347528478	admindb	mne_hoai	order	zusatz	\N	Zusätzliche Leistungen	-1	f	\N	\N	f	\N
 1347373934	admindb	1347528478	admindb	mne_hoai	order	zuschlag	\N	Zuschlag	-1	f	\N	\N	f	\N
@@ -30900,35 +30372,6 @@ COPY mne_application.tablecolnames (createdate, createuser, modifydate, modifyus
 1410160345	admindb	1410161254	admindb	mne_shipment	invoicepaid	paysum	sum	Summe	-1	f	\N	\N	f	\N
 1410160540	admindb	1410162267	admindb	mne_shipment	invoicepaid	invoicerefid	reference	Referenz	-1	f	\N	\N	f	\N
 1410242666	admindb	1410242666	admindb	mne_shipment	invoicedefault	invoicedefaultid	\N	\N	-1	t	\N	\N	f	\N
-1391530914	admindb	1413881118	admindb	mne_repository	fileinterests	filename	\N	Dateiname	-1	f	\N	\N	f	\N
-1391416170	admindb	1415345995	admindb	mne_repository	filedata	shortrev	version	Version	-1	f	\N	\N	f	\N
-1394001441	admindb	1415346410	admindb	mne_repository	filedata_rank	repdate	\N	\N	1000	f	\N	\N	f	\N
-1415346472	admindb	1415346472	admindb	mne_repository	filedata_rank	resrank	Version	Version	-1	f	\N	\N	f	\N
-1394607007	admindb	1415346536	admindb	mne_repository	filedata_rank	rank	iversion	IVersion	-1	f	\N	\N	f	\N
-1415347216	admindb	1415347216	admindb	mne_repository	filedata_rank	filename	file	Datei	-1	f	\N	\N	f	\N
-1415347248	admindb	1415347248	admindb	mne_repository	filedata_maxdate	filename	file	Datei	-1	f	\N	\N	f	\N
-1415613242	admindb	1415627758	admindb	mne_repository	filedata_interests	filename	file	Datei	-1	f	\N	\N	f	\N
-1429689284	admindb	1429689284	admindb	mne_application	userpref	debug	\N	Debug	-1	f	\N	\N	f	\N
-1422428799	admindb	1432881393	admindb	mne_application	folder	description	\N	Beschreibung	-1	f	\N	\N	f	\N
-1422026470	admindb	1432881393	admindb	mne_application	folder	name	name	Name	-1	t	\N	\N	f	\N
-1426176647	admindb	1432891615	admindb	mne_system	shares	folderid	\N	\N	-1	f	\N	\N	f	\N
-1426176664	admindb	1432891615	admindb	mne_system	shares	personid	\N	\N	-1	f	\N	\N	f	\N
-1426176621	admindb	1432891615	admindb	mne_system	shares	sharesid	\N	\N	-1	t	\N	\N	f	\N
-1430999929	admindb	1430999929	admindb	mne_sabredav	addressbookchanges	synctoken	\N	\N	1000	f	\N	\N	f	\N
-1430431552	admindb	1432891615	admindb	mne_system	shares	readwrite	write access	Schreibzugriff	-1	f	\N	\N	f	\N
-1110288360	admindb	1432279095	admindb	mne_crm	company	companyid	\N	\N	-1	t	\N	\N	f	\N
-1431086443	admindb	1431086443	admindb	mne_sabredav	addressbooks	synctoken	\N	\N	1000	f	\N	\N	f	\N
-1431098730	admindb	1431098730	admindb	mne_sabredav	calendarchanges	synctoken	\N	\N	1000	f	\N	\N	f	\N
-1245997778	admindb	1432279102	admindb	mne_crm	companydata	mobile	mobile	Mobil	-1	t	\N	\N	f	\N
-1110288365	admindb	1432279102	admindb	mne_crm	companydata	modifydate	\N	\N	1000	t	\N	\N	f	\N
-1110288365	admindb	1432279102	admindb	mne_crm	companydata	modifyuser	\N	\N	-1	t	\N	\N	f	\N
-1431545915	admindb	1433148137	admindb	mne_crm	cardsinactive	id	\N	\N	-1	f	\N	\N	f	\N
-1431545927	admindb	1433148137	admindb	mne_crm	cardsinactive	userid	\N	\N	-1	f	\N	\N	f	\N
-1110200862	admindb	1432279102	admindb	mne_crm	companydata	companydataid	\N	\N	-1	f	\N	\N	f	\N
-1431947957	admindb	1432195370	admindb	mne_sabredav	uri2personid	personid	\N	\N	-1	f	\N	\N	f	\N
-1431947935	admindb	1432195370	admindb	mne_sabredav	uri2personid	uri	\N	\N	-1	t	\N	\N	f	\N
-1250670389	admindb	1432279152	admindb	mne_personnal	timemanagement	createdate	\N	\N	1000	f	\N	\N	f	\N
-1110288360	admindb	1432279095	admindb	mne_crm	company	createdate	\N	\N	1000	t	\N	\N	f	\N
 1100625204	admindb	1432279117	admindb	mne_crm	person	lastname	last name	Nachname	-1	t	notempty	\N	f	\N
 1136730328	admindb	1432279117	admindb	mne_crm	person	sign	\N	Kürzel	-1	t	\N	\N	f	\N
 1206023322	admindb	1432279117	admindb	mne_crm	person	ownerid	owner	Betreuer	-1	t	\N	\N	f	\N
@@ -30941,10 +30384,6 @@ COPY mne_application.tablecolnames (createdate, createuser, modifydate, modifyus
 1099320232	admindb	1432279095	admindb	mne_crm	company	name	company	Firma	-1	t	notempty	\N	f	\N
 1100617514	admindb	1432279095	admindb	mne_crm	company	ownerid	owner	Betreuer	-1	t	\N	\N	f	\N
 1106571774	admindb	1432279117	admindb	mne_crm	person	refid	company	Firma	-1	t	\N	\N	f	\N
-1426243394	admindb	1441004451	admindb	mne_system	personsharepasswd	loginname	login name	Loginname	-1	f	\N	\N	f	\N
-1426241415	admindb	1441004451	admindb	mne_system	personsharepasswd	password	\N	Password	-1	f	\N	\N	f	\N
-1426241382	admindb	1441004451	admindb	mne_system	personsharepasswd	personid	\N	\N	-1	t	\N	\N	f	\N
-1426490288	admindb	1441004451	admindb	mne_system	personsharepasswd	validuntil	valid until	Zugriff bis	1001	f	\N	\N	f	\N
 1250670386	admindb	1432279152	admindb	mne_personnal	timemanagement	createuser	\N	\N	-1	f	\N	\N	f	\N
 1248760822	admindb	1432279152	admindb	mne_personnal	timemanagement	duration	\N	Dauer	1003	f	\N	\N	f	\N
 1250670384	admindb	1432279152	admindb	mne_personnal	timemanagement	modifydate	\N	\N	1000	f	\N	\N	f	\N
@@ -30955,128 +30394,9 @@ COPY mne_application.tablecolnames (createdate, createuser, modifydate, modifyus
 1248760239	admindb	1432279152	admindb	mne_personnal	timemanagement	start	\N	Start	1000	f	\N	\N	f	\N
 1248760254	admindb	1432279152	admindb	mne_personnal	timemanagement	timetyp	time type	Zeittyp	-1	f	\N	\N	f	\N
 1248760131	admindb	1432279152	admindb	mne_personnal	timemanagement	timemanagementid	\N	\N	-1	t	\N	\N	f	\N
-1432800645	admindb	1432814930	admindb	mne_system	zpush	addressbookname	display name of address book	Anzeigename des Adressbuches	-1	f	\N	\N	f	\N
-1432800574	admindb	1432814930	admindb	mne_system	zpush	zpushid	\N	\N	-1	t	\N	\N	f	\N
 1262674442	admindb	1473241176	admindb	mne_personnal	personowndata	personid	\N	\N	-1	f	\N	\N	f	\N
-1422026410	admindb	1432881393	admindb	mne_application	folder	location	folder	Verzeichnis	-1	t	\N	\N	f	\N
-1422026388	admindb	1432881393	admindb	mne_application	folder	folderid	\N	\N	-1	t	\N	\N	f	\N
 1433149520	admindb	1433149652	admindb	mne_crm	cardsinactive	noactive	\N	\N	-1	f	\N	\N	f	\N
-1433321193	admindb	1433332640	admindb	mne_system	network	nameserver	\N	Nameserver	-1	f	\N	\N	f	\N
-1433321171	admindb	1433332669	admindb	mne_system	network	search	search domains	Suchdomains	-1	f	\N	\N	f	\N
-1433753245	admindb	1433753245	admindb	mne_system	network	domain	\N	Domain	-1	f	\N	\N	f	\N
 1433766380	admindb	1433766380	admindb	mne_application	tableregexp	regexpmod	\N	\N	-1	f	\N	\N	f	\N
-1433151889	admindb	1433770665	admindb	mne_system	network	addr	address	Adresse	-1	f	ip4addrempty	\N	f	\N
-1433151942	admindb	1433770670	admindb	mne_system	network	broadcast	\N	Broadcast	-1	f	ip4addrempty	\N	f	\N
-1433151927	admindb	1433770674	admindb	mne_system	network	gateway	\N	Gateway	-1	f	ip4addrempty	\N	f	\N
-1433321960	admindb	1433831092	admindb	mne_system	network	typ	type	Typ	-1	f	dhcp|static	\N	f	\N
-1433151831	admindb	1434350922	admindb	mne_system	network	networkid	device	Schnittstelle	-1	t	notempty	\N	f	\N
-1434351099	admindb	1434351099	admindb	mne_system	netparam	domain	\N	Domain	-1	f	\N	\N	f	\N
-1434351106	admindb	1434351106	admindb	mne_system	netparam	nameserver	\N	Nameserver	-1	f	\N	\N	f	\N
-1434351124	admindb	1434351124	admindb	mne_system	netparam	search	domain search	Domain Suche	-1	f	\N	\N	f	\N
-1434350858	admindb	1434351142	admindb	mne_system	netdevice	addr	address	Adresse	-1	f	\N	\N	f	\N
-1434350872	admindb	1434351142	admindb	mne_system	netdevice	broadcast	broadcast	Broadcast	-1	f	\N	\N	f	\N
-1434350881	admindb	1434351142	admindb	mne_system	netdevice	mask	mask	Mask	-1	f	\N	\N	f	\N
-1434350895	admindb	1434351142	admindb	mne_system	netdevice	netdeviceid	device	Schnittstelle	-1	f	\N	\N	f	\N
-1434351421	admindb	1434351439	admindb	mne_system	netdevice	modifydate	readed at	gelesen am	1000	f	\N	\N	f	\N
-1434353230	admindb	1434353230	admindb	mne_system	netparam	gw	gateway	Gateway	-1	f	\N	\N	f	\N
-1453279712	admindb	1453296240	admindb	mne_system	apachemod	enabled	\N	geladen	-1	f	\N	\N	f	\N
-1453279675	admindb	1453299286	admindb	mne_system	apachemod	apachemodid	module	Modul	-1	t	\N	\N	f	\N
-1453734109	admindb	1453734109	admindb	mne_system	apache	apacheid	\N	\N	-1	t	\N	\N	f	\N
-1453734184	admindb	1453734184	admindb	mne_system	apache	sport	ssl port	SSL Port	-1	f	\N	\N	f	\N
-1453734147	admindb	1453734196	admindb	mne_system	apache	port	\N	Port	-1	f	\N	\N	f	\N
-1472131925	admindb	1599127068	admindb	mne_crm	personowndata	color	\N	Farbe	1020	t	\N	\N	f	\N
-1453279206	admindb	1453824828	admindb	mne_system	apachesite	alias	\N	Alias	-1	f	\N	\N	f	\N
-1453279455	admindb	1453824828	admindb	mne_system	apachesite	email	webmaster email	Webmaster Email	1010	f	email	\N	f	\N
-1453279507	admindb	1453824828	admindb	mne_system	apachesite	httpsonly	https only	Nur Https	-1	f	\N	\N	f	\N
-1453827575	admindb	1453827593	admindb	mne_system	apachesite	conftext	configuration	Konfiguration	-1	f	\N	\N	f	\N
-1453279185	admindb	1457446443	admindb	mne_system	apachesite	domain	\N	Domain	-1	f	notempty	\N	f	\N
-1459319375	admindb	1459319375	admindb	mne_system	certca	certcaid	\N	\N	-1	t	\N	\N	f	\N
-1453279145	admindb	1453898836	admindb	mne_system	apachesite	apachesiteid	name	Name	-1	t	alphanumminus	\N	f	\N
-1453984640	admindb	1453985390	admindb	mne_system	apachesite	lastread	last read	Letztes Lesen	1000	f	\N	\N	f	\N
-1457363072	admindb	1457363072	admindb	mne_system	apachesite	sitetype	type	Typ	-1	f	\N	\N	f	\N
-1453898514	admindb	1457442839	admindb	mne_system	apachesite	enabled	\N	aktiviert	-1	f	\N	\N	f	\N
-1453279343	admindb	1464170547	admindb	mne_system	apachesite	documentroot	document root	Startverzeichnis	-1	f	\N	\N	f	\N
-1459330576	admindb	1465215643	admindb	mne_system	certca	city	\N	Stadt	-1	f	notempty	\N	f	\N
-1459319413	admindb	1465215652	admindb	mne_system	certca	country	\N	Land	-1	f	notempty	\N	f	\N
-1459319542	admindb	1465215660	admindb	mne_system	certca	email	\N	Email	1010	f	notempty	\N	f	\N
-1433321298	admindb	1551718406	admindb	mne_system	network	available	\N	vorhanden	1	f	\N	\N	f	\N
-1552567515	admindb	1552567515	admindb	mne_system	sync	syncid	\N	\N	-1	t	\N	\N	f	\N
-1433151859	admindb	1551779671	admindb	mne_system	network	mask	\N	Mask	-1	f	num1_numoempty	\N	f	\N
-1459319499	admindb	1465215668	admindb	mne_system	certca	org	organisation	Organisation	-1	f	notempty	\N	f	\N
-1459319520	admindb	1465215675	admindb	mne_system	certca	orgunit	org. unit	Org. Einheit	-1	f	notempty	\N	f	\N
-1459319475	admindb	1465215686	admindb	mne_system	certca	state	province	Provinz	-1	f	notempty	\N	f	\N
-1465818092	admindb	1465818092	admindb	mne_application	htmlcompose	htmlcomposeid	\N	\N	-1	f	\N	\N	f	\N
-1449236580	admindb	1522143660	admindb	mne_application	yearday	wday	week day	Wochentag	1004	f	\N	\N	f	\N
-1465819785	admindb	1465819785	admindb	mne_application	htmlcomposetabselect	htmlcomposetabselectid	\N	\N	-1	f	\N	\N	f	\N
-1465823279	admindb	1465823279	admindb	mne_application	htmlcomposetabslider	htmlcomposeid	\N	\N	-1	f	\N	\N	f	\N
-1465818239	admindb	1465827496	admindb	mne_application	htmlcomposenames	htmlcomposeid	\N	\N	-1	f	\N	\N	f	\N
-1465820825	admindb	1465828097	admindb	mne_application	htmlcomposetabnames	htmlcomposetabid	\N	\N	-1	f	\N	\N	f	\N
-1465828245	admindb	1465828245	admindb	mne_application	htmlcomposetabnames	htmlcomposeid	\N	\N	-1	f	\N	\N	f	\N
-1465828753	admindb	1465828753	admindb	mne_application	htmlcomposetabselect	htmlcomposeid	\N	\N	-1	f	\N	\N	f	\N
-1471854495	admindb	1471854495	admindb	mne_system	domain	typ	type	Typ	-1	f	\N	\N	f	\N
-1472020204	admindb	1472020204	admindb	mne_system	domain	description	\N	Beschreibung	-1	f	\N	\N	f	\N
-1465820501	admindb	1522144234	admindb	mne_application	htmlcomposetab	htmlcomposeid	\N	\N	-1	f	\N	\N	f	\N
-1465818933	admindb	1522144234	admindb	mne_application	htmlcomposetab	htmlcomposetabid	\N	\N	-1	f	\N	\N	f	\N
-1471854445	admindb	1485264629	admindb	mne_system	domain	domain	domain	Domain	-1	f	notempty	\N	f	\N
-1471854697	admindb	1485264637	admindb	mne_system	domain	workgroup	work group	Arbeitsgruppe	-1	f	notempty	\N	f	\N
-1478171346	admindb	1478171346	admindb	mne_system	access	command	\N	Kommando	-1	f	\N	\N	f	\N
-1478171371	admindb	1478171371	admindb	mne_system	access	access	access	Zugriff	-1	f	\N	\N	f	\N
-1478261204	admindb	1478261204	admindb	mne_system	dnsaddress	dnsaddressid	\N	\N	-1	t	\N	\N	f	\N
-1478261258	admindb	1478261258	admindb	mne_system	dnsaddress	name	\N	Name	-1	f	\N	\N	f	\N
-1292920226	admindb	1473241176	admindb	mne_personnal	personowndata	unitcost	cost per hour	Kosten/Stunde	-1	f	\N	\N	f	\N
-1301320940	admindb	1473241176	admindb	mne_personnal	personowndata	wtime	workingtime per day	tägliche Arbeitszeit	1003	f	\N	\N	f	\N
-1262636078	admindb	1473241176	admindb	mne_personnal	personowndata	personowndataid	\N	\N	-1	t	\N	\N	f	\N
-1478261286	admindb	1478261443	admindb	mne_system	dnsaddress	record	record	Record	-1	f	AAAA|CNAME|MX|A	Bitte einen DNS Recordtype angeben	f	\N
-1478676342	admindb	1478676432	admindb	mne_system	domain	dhcpend	end address	Endaddresse	-1	f	ip4addrempty	\N	f	\N
-1474274867	admindb	1474274867	admindb	mne_system	domain	primaryname	pdc name	PDC Name	-1	f	\N	\N	f	\N
-1474274900	admindb	1474274945	admindb	mne_system	domain	primaryaddr	pdc address	PDC Adresse	-1	f	ip4addrempty	\N	f	\N
-1474359856	admindb	1474360886	admindb	mne_system	personsharepasswd	renew	need password renew 	Benötige erneute Passwordeingabe	-1	f	\N	\N	f	\N
-1474361391	admindb	1474361391	admindb	mne_system	personsharepasswdpublic	loginname	user name	Benutzername	-1	f	\N	\N	f	\N
-1474361418	admindb	1474361418	admindb	mne_system	personsharepasswdpublic	renew	need password renew	Benötige neue Passwordeingabe	-1	f	\N	\N	f	\N
-1474361439	admindb	1474361439	admindb	mne_system	personsharepasswdpublic	validuntil	access until	Zugriff bis	-1	f	\N	\N	f	\N
-1477056571	admindb	1477056571	admindb	mne_system	sogo	sogoid	\N	\N	-1	t	\N	\N	f	\N
-1477547314	admindb	1477547314	admindb	mne_system	mailalias	mailaliasid	\N	\N	-1	t	\N	\N	f	\N
-1477547613	admindb	1477547613	admindb	mne_system	mailalias	personid	\N	\N	-1	f	\N	\N	f	\N
-1477570272	admindb	1477570378	admindb	mne_system	sogo	mailcanonical	name as mail adress	Name als Maildaddresse	-1	f	\N	\N	f	\N
-1477570408	admindb	1477570445	admindb	mne_system	sogo	mailrelayuser	relay mail user name	Relay Mail Benutzername	-1	f	\N	\N	f	\N
-1472131908	admindb	1599127068	admindb	mne_crm	personowndata	active	\N	aktiv	-1	t	\N	\N	f	\N
-1472131939	admindb	1599127068	admindb	mne_crm	personowndata	createdate	\N	\N	-1	f	\N	\N	f	\N
-1472131943	admindb	1599127068	admindb	mne_crm	personowndata	createuser	\N	\N	-1	f	\N	\N	f	\N
-1472131947	admindb	1599127068	admindb	mne_crm	personowndata	modifydate	\N	\N	-1	f	\N	\N	f	\N
-1449469901	admindb	1603714923	admindb	mne_application	yearday	vfullday	date	Datum	1007	f	\N	\N	f	\N
-1477570469	admindb	1477570469	admindb	mne_system	sogo	mailrelay	relay mail server	Relay Mail Server	-1	f	\N	\N	f	\N
-1478676318	admindb	1478676465	admindb	mne_system	domain	dhcpstart	start address	Startaddresse	-1	f	ip4addrempty	\N	f	\N
-1473919066	admindb	1477991555	admindb	mne_system	domain	netdevice	interface	Schnittstelle	-1	f	notempty	\N	f	\N
-1477935568	admindb	1477991961	admindb	mne_system	domain	dnsforwarder	dns forwarder	DNS Forward	-1	f	\N	\N	f	\N
-1478171313	admindb	1478171313	admindb	mne_system	access	accessid	\N	\N	-1	t	\N	\N	f	\N
-1478780683	admindb	1478780683	admindb	mne_system	dnsaddress	fix	fix address	feste Addresse	-1	f	\N	\N	f	\N
-1478261242	admindb	1478791868	admindb	mne_system	dnsaddress	address	\N	Adresse	-1	f	\N	\N	f	\N
-1478780659	admindb	1478857711	admindb	mne_system	dnsaddress	mac	mac address	MAC Addresse	-1	f	macaddrempty	\N	f	\N
-1272265377	admindb	1479471069	admindb	mne_crm	product	productnumber	product nr.	Produktnr.	-1	f	numoempty	\N	f	\N
-1271678647	admindb	1510223171	admindb	mne_application	userpref	startweblet	start view	Startmaske	-1	f	\N	\N	f	\N
-1520430531	admindb	1520430546	admindb	mne_system	access	custom	customized	angepasst	-1	f	\N	\N	f	\N
-1134572025	admindb	1522136997	admindb	mne_crm	offer	offernumber	offer number	Angebotsnummer	-1	t	notempty	eine beliebige Zeichenkette bis 16 Zeichen	f	\N
-1522137644	admindb	1522137653	admindb	mne_application	tablecolnames	colname	\N	\N	-1	f	\N	\N	f	\N
-1551718994	admindb	1551719005	admindb	mne_system	network	configured	ERP configured	ERP konfiguriert	-1	f	\N	\N	f	\N
-1552497156	admindb	1552497156	admindb	mne_system	domain	dnssearch	dns search domains	DNS Suchdomains	-1	f	\N	\N	f	\N
-1552567551	admindb	1552567551	admindb	mne_system	sync	enabled	\N	\N	-1	f	\N	\N	f	\N
-1553165562	admindb	1553165562	admindb	mne_application	folder	hostname	\N	Hostname	-1	f	\N	\N	f	\N
-1553176122	admindb	1553176212	admindb	mne_system	personshares	count	\N	Anzahl	-1	f	\N	\N	f	\N
-1471854431	admindb	1553246743	admindb	mne_system	domain	domainid	\N	\N	-1	t	\N	\N	f	\N
-1553265565	admindb	1553265565	admindb	mne_system	netdevice	hostname	\N	Rechner	-1	f	\N	\N	f	\N
-1553266373	admindb	1553266373	admindb	mne_system	network	hostname	\N	Rechner	2	f	\N	\N	f	\N
-1553753765	admindb	1553753765	admindb	mne_system	apachemod	hostname	\N	Rechnername	-1	f	\N	\N	f	\N
-1553753795	admindb	1553753795	admindb	mne_system	apachesite	hostname	\N	Rechnername	-1	f	\N	\N	f	\N
-1578380687	admindb	1578380687	admindb	mne_system	dnsaddress	comment	\N	Komentar	-1	f	\N	\N	f	\N
-1578468209	admindb	1578480656	admindb	mne_system	network	addr6	ipv6 adress	Ipv6 Addresse	-1	f	ip6addrempty	\N	f	\N
-1578468250	admindb	1578480675	admindb	mne_system	network	mask6	prefixlen	Prefix Länge	-1	f	num1_numoempty	\N	f	\N
-1578499084	admindb	1578499084	admindb	mne_system	domain	dhcp6end	end address ipv6	Endaddresse Ipv6	-1	f	ip6addrempty	\N	f	\N
-1578499098	admindb	1578499122	admindb	mne_system	domain	dhcp6start	start address ipv6	Startaddresse Ipv6	-1	f	ip6addrempty	\N	f	\N
-1610360737	admindb	1610360737	admindb	mne_application	applications	applicationsid	\N	\N	-1	t	\N	\N	f	\N
-1610360755	admindb	1610360755	admindb	mne_application	applications	menuname	\N	\N	-1	t	\N	\N	f	\N
-1610464759	admindb	1610464759	admindb	mne_warehouse	part	partdescription	description	Beschreibung	-1	t	\N	\N	f	\N
-1099320384	admindb	1610627938	admindb	mne_crm	city	countryid	\N	\N	-1	f	\N	\N	f	\N
-1611060402	admindb	1611060419	admindb	mne_application	userpref	exportencoding	export encoding	Export Encoding	-1	f	\N	\N	f	\N
 \.
 
 
@@ -31385,11 +30705,11 @@ COPY mne_application.timestyle (createdate, createuser, language, modifydate, mo
 --
 
 COPY mne_application.translate (createdate, createuser, modifydate, modifyuser, id, text_de, text_en, categorie, accesstime) FROM stdin;
-1098171178	admindb	1098176417	admindb	falsch		false		\N
-1383931504	admindb	1383931504	admindb	Lager		stock		\N
-1100158135	admindb	1100158238	admindb	Company		company		\N
-1598002633	admindb	1600336233	admindb	Der Aktenschrank <%s> existiert nicht		the filling cabinet don't exist	DbHttpUtilsRepository	\N
-1383931202	admindb	1383931202	admindb	Logout		logout		\N
+1358763543	admindb	1382447256	admindb	Zuordnen		assign	HttpTranslate	\N
+1107782479	admindb	1107782604	admindb	screen		screen		\N
+1100785141	admindb	1101396538	admindb	Addresse		address		\N
+1351236297	admindb	1370626130	admindb	Produktzeiten		product times	DbQuery	\N
+1351236297	admindb	1370626136	admindb	Eigene Zeit		own time	DbQuery	\N
 1351237472	admindb	1381276899	admindb	Gesamt		entire	DbQuery	\N
 1130508768	admindb	1135341651	admindb	Mai		may	Http	\N
 1590648144	admindb	1600336203	admindb	Abfrage		query	HttpTranslate	\N
@@ -31446,23 +30766,19 @@ COPY mne_application.translate (createdate, createuser, modifydate, modifyuser, 
 1587456569	admindb	1600336194	admindb	Detail		detail	HttpTranslate	\N
 1590646566	admindb	1600336198	admindb	letzte Abfrage		last query	HttpTranslate	\N
 1410784641	admindb	1410784641	admindb					\N
+1598002633	admindb	1600336233	admindb	Der Aktenschrank <%s> existiert nicht		the filling cabinet don't exist	DbHttpUtilsRepository	\N
 1603189456	admindb	1603189456	admindb	Angebot war eine Vorlage und wurde kopiert		offer is a template and is copied	DbConnect	0
 1603189604	admindb	1603189604	admindb	Angebot ohne Referenz kann nicht zum Auftrag werden		can not make a offer to a order without reference	DbConnect	0
 1600936734	admindb	1605023375	admindb	Letze Abfrage: keine werte angefordert		last query: no values requested	DbHttpUtilsQuery	0
 1605080618	admindb	1605080618	admindb	Bautagebuch		builddiary		0
 1605541834	admindb	1605541834	admindb	admindb	Datenbankadministrator	database admin	DbGroup	0
-1605541943	admindb	1605541943	admindb	adminbuilddiary	Verwaltung Bautagebuch	admin builddiary	DbGroup	0
-1605542122	admindb	1605542122	admindb	adminfixture	Verwaltung Inventar	admin fixture	DbGroup	0
-1605542152	admindb	1605542152	admindb	adminmail	Verwaltung Mail	admin mail	DbGroup	0
-1605542206	admindb	1605542206	admindb	adminpersonnal	Verwaltung Personal	admin personnal	DbGroup	0
-1605542249	admindb	1605542249	admindb	adminpersonnaltime	Verwaltung Zeiteinträge	admin time recording	DbGroup	0
-1605542279	admindb	1605542279	admindb	adminrepository	Verwaltung Aktenschrank	admin repository	DbGroup	0
-1605542308	admindb	1605542308	admindb	adminshare	Verwaltung Freigaben	admin shares	DbGroup	0
-1605542360	admindb	1605542360	admindb	adminshipment	Verwaltung Auslieferung	admin shipment	DbGroup	0
-1605542398	admindb	1605542398	admindb	adminsystem	Verwaltung Betriebssystem	admin system	DbGroup	0
-1605542432	admindb	1605542432	admindb	adminwarehouse	Verwaltung Lager	admin warehouse	DbGroup	0
+1605542122	admindb	1617712714	admindb	admerpfixture	Verwaltung Inventar	admin fixture	DbGroup	0
+1605542152	admindb	1617712714	admindb	admerpmail	Verwaltung Mail	admin mail	DbGroup	0
+1605542206	admindb	1617712714	admindb	admerppersonnal	Verwaltung Personal	admin personnal	DbGroup	0
+1605542249	admindb	1617712714	admindb	admerppersonnaltime	Verwaltung Zeiteinträge	admin time recording	DbGroup	0
+1605542279	admindb	1617712714	admindb	admerprepository	Verwaltung Aktenschrank	admin repository	DbGroup	0
+1605542360	admindb	1617712714	admindb	admerpshipment	Verwaltung Auslieferung	admin shipment	DbGroup	0
 1605542895	admindb	1605542895	admindb	showhoai	Zeige HOAI Rechner	show compute hoai 	DbGroup	0
-1605541908	admindb	1605597714	admindb	admincrm	Verwaltung Kontakt/Aufträge	admin contact/order	DbGroup	0
 1608111564	admindb	1609750347	admindb	Auslagerung		outgoing	DbQuerySingle	0
 1608121320	admindb	1609750464	admindb	Das Teil ist für einen Auftrag reserviert		the part is reserved for an order	DbConnect	0
 1608121654	admindb	1609750464	admindb	Lagerplatz enthält keine passende Teile		storage location does not contain matching parts	DbConnect	0
@@ -31512,12 +30828,12 @@ COPY mne_application.translate (createdate, createuser, modifydate, modifyuser, 
 1598449020	admindb	1600336375	admindb	kann temporäres für <%s> nicht öffnen		kann open temp for <%s>	TmpFile	\N
 1598516754	admindb	1598516866	admindb	interesse		interest	DbQuerySingle	\N
 1598516754	admindb	1598516866	admindb	inaktiv		inactive	DbQuerySingle	\N
+1100158135	admindb	1100158238	admindb	Company		company		\N
+1383931202	admindb	1383931202	admindb	Logout		logout		\N
 1418990098	admindb	1576762335	admindb	Rot		red	HttpTranslate	\N
 1351236365	admindb	1381276711	admindb	neue Version		new version	HttpTranslate	\N
 1534346356	admindb	1576760261	admindb	Zugriff nicht möglich		no access	HttpTranslate	\N
 1351236297	admindb	1370626121	admindb	Produkt Schritt		product step	DbQuery	\N
-1351236297	admindb	1370626130	admindb	Produktzeiten		product times	DbQuery	\N
-1351236297	admindb	1370626136	admindb	Eigene Zeit		own time	DbQuery	\N
 1351236297	admindb	1370626153	admindb	eigene Zeiten		own time	DbQuery	\N
 1351236297	admindb	1370626161	admindb	Total		total	HttpTranslate	\N
 1351236328	admindb	1370626266	admindb	Bitte eine Zahl eingeben		only numbers	HttpTranslate	\N
@@ -31526,6 +30842,7 @@ COPY mne_application.translate (createdate, createuser, modifydate, modifyuser, 
 1351236328	admindb	1370626343	admindb	Schlüsselwert		key value	HttpTranslate	\N
 1351236328	admindb	1370626361	admindb	Letzter Kindknoten ist kein Textknoten		last childnode is a text node	HttpTranslate	\N
 1351236084	admindb	1370626366	admindb	Optionen		options	DbQuery	\N
+1605541908	admindb	1617712714	admindb	admerpcrm	Verwaltung Kontakt/Aufträge	admin contact/order	DbGroup	0
 1351236084	admindb	1370626379	admindb	Wartung Optionen		support options	DbQuery	\N
 1351236328	admindb	1370626392	admindb	Text fett schreiben		text bold	HttpTranslate	\N
 1351236328	admindb	1370626399	admindb	Text kursiv schreiben		text italic	HttpTranslate	\N
@@ -31725,6 +31042,7 @@ COPY mne_application.translate (createdate, createuser, modifydate, modifyuser, 
 1353422172	admindb	1382445807	admindb	Menüeintrag bearbeiten		modify menu item	HttpTranslate	\N
 1353422734	admindb	1382445816	admindb	Element hinzufügen		add element	HttpTranslate	\N
 1353422734	admindb	1382445823	admindb	Element bearbeiten		modify element	HttpTranslate	\N
+1102512917	admindb	1102517189	admindb	endet		ends	Http	\N
 1353478666	admindb	1382445831	admindb	Primary Key hinzufügen		add primary key	HttpTranslate	\N
 1353478666	admindb	1382445841	admindb	Primary Key bearbeiten		modify primary key	HttpTranslate	\N
 1353484291	admindb	1382445851	admindb	Rechnung hinzufügen		add invoice	HttpTranslate	\N
@@ -31811,7 +31129,6 @@ COPY mne_application.translate (createdate, createuser, modifydate, modifyuser, 
 1358522876	admindb	1382447139	admindb	 eingeben		enter	DbHttpAdminTable	\N
 1358763543	admindb	1382447163	admindb	Konto anzeigen		show account	HttpTranslate	\N
 1358763543	admindb	1382447228	admindb	Quitieren	Quittieren	accept	HttpTranslate	\N
-1358763543	admindb	1382447256	admindb	Zuordnen		assign	HttpTranslate	\N
 1358772802	admindb	1382447262	admindb	Heute		today	HttpTranslate	\N
 1358245346	admindb	1382447317	admindb	Der Autoreport <%s> hat keine Zeilen		the report <%s> has no rows	DbHttpReport	\N
 1358245549	admindb	1382447629	admindb	Rechnungskonditionen hinzufügen		add incoive terms	HttpTranslate	\N
@@ -31862,6 +31179,7 @@ COPY mne_application.translate (createdate, createuser, modifydate, modifyuser, 
 1098112255	admindb	1098114286	admindb	Select		select	Http	\N
 1098112255	admindb	1098114307	admindb	neue Zeile		new row	Http	\N
 1098114027	admindb	1098114337	admindb	für Sql-Befehl		for sql statement	DbConn	\N
+1098171178	admindb	1098176417	admindb	falsch		false		\N
 1098171178	admindb	1098176429	admindb	wahr		true		\N
 1098116843	admindb	1098176447	admindb	löschen		delete	Http	\N
 1101401559	admindb	1102329015	admindb	Ergebnis der Abfrage im Weblet <$1> hat mehr als ein Ergebnis		query result in weblet <$1> has more than one row	Http	\N
@@ -31869,12 +31187,10 @@ COPY mne_application.translate (createdate, createuser, modifydate, modifyuser, 
 1101402530	admindb	1102329086	admindb	Land <$1> wirklich löschen ?		delete country <$1> ?	Http	\N
 1101909377	admindb	1102329095	admindb	Ortschaften		Citys	Http	\N
 1101905614	admindb	1102329111	admindb	Notiz: %s		notice: %s	DbConnect	\N
-1145522270	admindb	1147792360	admindb	Einmalig		single	Http	\N
 1101822659	admindb	1102329128	admindb	Konnte mich nicht zur Datenbank %s verbinden		can't connect to database %s	DbConnect	\N
 1101909975	admindb	1102329136	admindb	neue Ortschaft		new city	Http	\N
 1102501059	admindb	1102517158	admindb	gleich		equal	Http	\N
 1102501059	admindb	1102517169	admindb	beinhaltet		contains	Http	\N
-1102512917	admindb	1102517189	admindb	endet		ends	Http	\N
 1102501399	admindb	1102517197	admindb	suchen		search	Http	\N
 1102348793	admindb	1102517203	admindb	Neu		new	Http	\N
 1102517377	admindb	1102517398	admindb	ungleich		not equal	Http	\N
@@ -31954,6 +31270,7 @@ COPY mne_application.translate (createdate, createuser, modifydate, modifyuser, 
 1098350497	admindb	1098776774	admindb	Bitte einen Benutzer auswählen		please select a user	Http	\N
 1098719038	admindb	1098776827	admindb	1.Tabelle		first table	Http	\N
 1098719038	admindb	1098776838	admindb	2.Tabelle		second table	Http	\N
+1147860666	admindb	1147864295	admindb	spezial		special	Http	\N
 1098797157	admindb	1098890786	admindb	Kein Tabellenname beim addieren einer Spalte vorhanden		no table name during adding a Row	PgTabl	\N
 1098797332	admindb	1098890831	admindb	kann Tabelle %s nicht erzeugen - Tabelle existiert		unable to create table %s - table exist	PgTabl	\N
 1098807168	admindb	1098891594	admindb	Neue Tabelle		new table	Http	\N
@@ -32028,10 +31345,10 @@ COPY mne_application.translate (createdate, createuser, modifydate, modifyuser, 
 1144930138	admindb	1147792314	admindb	Gesammt		all	Http	\N
 1097767924	admindb	1097768042	admindb	Grösse		size		\N
 1145623792	admindb	1147792354	admindb	Auftragsbestätigung		confirmation	Http	\N
+1145522270	admindb	1147792360	admindb	Einmalig		single	Http	\N
 1147270767	admindb	1147792381	admindb	Lieferschein <$1> wirklich löschen ?		delete delivery not <$1> ?	Http	\N
 1147860594	admindb	1147864283	admindb	ändern		modify		\N
 1147860594	admindb	1147864288	admindb	einfügen		insert		\N
-1147860666	admindb	1147864295	admindb	spezial		special	Http	\N
 1098116259	admindb	1151930165	admindb	Tabellen		tables		\N
 1098116259	admindb	1151930166	admindb	Inhalte		contents		\N
 1131108243	admindb	1152881754	admindb	Auswahllisten		select lists		\N
@@ -32043,10 +31360,10 @@ COPY mne_application.translate (createdate, createuser, modifydate, modifyuser, 
 1106754220	admindb	1106754344	admindb	Firma Löschen		delete company	Http	\N
 1106754220	admindb	1106754383	admindb	Kann Element <$1:$2> nicht lesen		can't read element<$1:$2>	Http	\N
 1098103403	admindb	1098103713	admindb	Tabelle gelöscht		table deleted	Http	\N
+1099393527	admindb	1099483765	admindb	Administration		adminstration	Http	\N
 1100158138	admindb	1100158252	admindb	Name <%s> ist unbenannt		name <%s> is unknown	DbHtml	\N
 1106754422	admindb	1106754450	admindb	Kann Element <$1:$2> nicht vorbesetzen		can't preset element <$1:$2>	Http	\N
 1106754220	admindb	1107269039	admindb	Element mit id <$1> ist unbekannt		element with id <$1> is unknown	Http	\N
-1107782479	admindb	1107782604	admindb	screen		screen		\N
 1106850234	admindb	1107783033	admindb	Menüs		menu		\N
 1097767982	admindb	1107783046	admindb	Sichten		views		\N
 1098116259	admindb	1107783051	admindb	Joins		joins		\N
@@ -32121,7 +31438,6 @@ COPY mne_application.translate (createdate, createuser, modifydate, modifyuser, 
 1383931735	admindb	1605702912	admindb	Personaldaten		personnal data		0
 1099311930	admindb	1099483717	admindb	Keine Spalten zum Einfügen in die Tabelle %s vorhanden		now row avalible during insert into table %s	PgTabl	\N
 1099393527	admindb	1099483755	admindb	Anwendung		application	Http	\N
-1099393527	admindb	1099483765	admindb	Administration		adminstration	Http	\N
 1099927721	admindb	1099995332	admindb	Registerkarte 		register card	Http	\N
 1099487296	admindb	1099995658	admindb	Sicht		view		\N
 1099931005	admindb	1099995688	admindb	Keine Inc num <%ld> vorhanden		no inc num<%ld>	DbHtml	\N
@@ -32282,8 +31598,8 @@ COPY mne_application.translate (createdate, createuser, modifydate, modifyuser, 
 1472112330	admindb	1472112330	admindb	Zertifikate		certificates	HttpMenu	\N
 1099297138	admindb	1099300514	admindb	Tabelle %s exitiert nicht oder besitzt keine Spalten		table %s do not exists or contain no rows	PgJoin	\N
 1099297994	admindb	1099300532	admindb	Spalte		row	Http	\N
+1472112353	admindb	1472112353	admindb	Domain		domain	HttpMenu	\N
 1100790297	admindb	1101396531	admindb	Kein Tabellenname beim Einfügen in die  Tabelle vorhanden		no tablename during insert into table	PgTable	\N
-1100785141	admindb	1101396538	admindb	Addresse		address		\N
 1101384269	admindb	1101396571	admindb	Transaktion ist beim Start nicht abgeschlossen		transaction not closed during starting a new transaction	DbConnect	\N
 1101396801	admindb	1101396918	admindb	Kein Tabellenname beim Modifizieren in die  Tabelle vorhanden		no tablename during modify a table	PgTable	\N
 1102326767	admindb	1102328894	admindb	letzter SQL-Befehl		last sql command	DbConnect	\N
@@ -32334,9 +31650,12 @@ COPY mne_application.translate (createdate, createuser, modifydate, modifyuser, 
 1380119138	admindb	1382448871	admindb	Login wirklich löschen		really delete login	HttpTranslate	\N
 1377270253	admindb	1382448890	admindb	Es wurden Teile der Bestellung ausgeliefert		parts of the order are delivered	DbConnect	\N
 1377270253	admindb	1382448934	admindb	Es wurde am Auftrag gearbeitet		the order as time recording  items	DbConnect	\N
+1383931504	admindb	1383931504	admindb	Lager		stock		\N
 1351236328	admindb	1381273349	admindb	Auswahl in das Clipboard übertragen und löschen		transfer selection to the clipboard and delete it	HttpTranslate	\N
 1351236329	admindb	1381273641	admindb	Kann nur aus einer Tabelle Zeilen löschen		can delete rows only from a table	HttpTranslate	\N
 1351236329	admindb	1381273812	admindb	Zeile vor die aktuelle Zeile hinzufügen		insert a row before actual row	HttpTranslate	\N
+1383931667	admindb	1383931667	admindb	Zeiterfassung		time recording		\N
+1383931691	admindb	1383931691	admindb	Zeitplanung		time management		\N
 1351236362	admindb	1381273928	admindb	MneAjaxWebet:readData:$1 weblet.act_values besitzt keine Daten für 		MneAjaxWebet:readData:$1 weblet.act_values do not contain data for	HttpTranslate	\N
 1351236362	admindb	1381274066	admindb	 Fehler in Reihe $1 und Spalte $2		error in row $1 col $2	HttpTranslate	\N
 1351236365	admindb	1381276684	admindb	Wirklich alle indiduellen Einstellungen der Produkte überschreiben?	Wirklich alle individuellen Einstellungen der Produkte überschreiben?	really overwrite all  individual settings of the products?	HttpTranslate	\N
@@ -32400,8 +31719,6 @@ COPY mne_application.translate (createdate, createuser, modifydate, modifyuser, 
 1383931584	admindb	1383931584	admindb	Inventarart		type of fixtures		\N
 1383931600	admindb	1383931600	admindb	Personal		personnal		\N
 1383931644	admindb	1383931644	admindb	Tagesrapport		day time recording		\N
-1383931667	admindb	1383931667	admindb	Zeiterfassung		time recording		\N
-1383931691	admindb	1383931691	admindb	Zeitplanung		time management		\N
 1383931754	admindb	1383931754	admindb	Fähigkeiten		skills		\N
 1383931770	admindb	1383931770	admindb	Konten		accounts		\N
 1383931789	admindb	1383931789	admindb	Hilfe		help		\N
@@ -32411,6 +31728,7 @@ COPY mne_application.translate (createdate, createuser, modifydate, modifyuser, 
 1382532883	admindb	1383931935	admindb	Status des Kindprozesses ist <%d>		state of the child procress is <%d>	DbHttpReport	\N
 1391603266	admindb	1399367884	admindb	Ordner Hinzufügen		add folder	HttpTranslate	\N
 1382536350	admindb	1383931974	admindb	Keine Rechnungen zum versenden vorhanden		no invoice for sending  available	HttpTranslate	\N
+1472112392	admindb	1472112392	admindb	Netzwerk		network	HttpMenu	\N
 1382536904	admindb	1383931987	admindb	Keine Mahnungen zum versenden vorhanden		no reminder  available for sending	HttpTranslate	\N
 1382536993	admindb	1383932015	admindb	Lieferschein ist schon einer Rechnung zugeordnet		delievery note is allready assigned to an invoice	DbConnect	\N
 1382537037	admindb	1383932036	admindb	Die Rechnung ist erfolgt und kann nicht geändert werden		the invoice is sended and can't modify	DbConnect	\N
@@ -32464,6 +31782,7 @@ COPY mne_application.translate (createdate, createuser, modifydate, modifyuser, 
 1391584665	admindb	1399367466	admindb	Aktenordner bearbeiten		modify file	HttpTranslate	\N
 1391584665	admindb	1399367471	admindb	Aktenordner 		file	HttpTranslate	\N
 1391584665	admindb	1399367488	admindb	Änderungsmitteilung ist leer - fortfahren ?		modify message is empty - continue ?	HttpTranslate	\N
+1453800709	admindb	1576763190	admindb	Aktivieren		activate	HttpTranslate	\N
 1391584665	admindb	1399367542	admindb	Änderungen akzeptieren		accept  modifications	HttpTranslate	\N
 1391585336	admindb	1399367559	admindb	Die Datei <%s> wurde nicht gefunden		the file <%s> was not found	HttpFilesystem	\N
 1391588823	admindb	1399367580	admindb	Der Aktenordner muss einen Namen haben		the file must be a name	DbHttpUtilsRepository	\N
@@ -32532,6 +31851,8 @@ COPY mne_application.translate (createdate, createuser, modifydate, modifyuser, 
 1410162017	admindb	1576761972	admindb	Rechnung wurde nicht verschickt		invoice was not sent	DbConnect	\N
 1410162017	admindb	1576761992	admindb	Rechnung ist schon als bezahlt makiert		invoice is already marked as paid	DbConnect	\N
 1410178850	admindb	1576762027	admindb	Bitte bezahlte Summe bei den Rechnungskontakten eintragen		please enter the amount paid in the billing contacts	DbConnect	\N
+1472112427	admindb	1472112427	admindb	Apache		apache	HttpMenu	\N
+1472112444	admindb	1472112444	admindb	Erp		erp	HttpMenu	\N
 1410241523	admindb	1576762046	admindb	Mahnung noch nicht notwendig oder schon versendet - wirklich drucken ?		reminder not yet necessary or already sent - really print?	HttpTranslate	\N
 1410244141	admindb	1576762063	admindb	1. Mahnung ist noch nicht notwendig		1. reminder is not yet necessary	DbConnect	\N
 1410244209	admindb	1576762102	admindb	Das Produkt ist unbekannt		the product is unknown	DbConnect	\N
@@ -32587,7 +31908,6 @@ COPY mne_application.translate (createdate, createuser, modifydate, modifyuser, 
 1453800709	admindb	1576763144	admindb	Apache Konfiguration hinzufügen		add apache configuration	HttpTranslate	\N
 1453800709	admindb	1576763152	admindb	Apache Konfiguration bearbeiten		modify apache konfiguration	HttpTranslate	\N
 1478676125	admindb	1576763174	admindb	DHCP		DHCP	HttpTranslate	\N
-1453800709	admindb	1576763190	admindb	Aktivieren		activate	HttpTranslate	\N
 1453824770	admindb	1576763195	admindb	Webseite hinzufügen		add web site	HttpTranslate	\N
 1453824770	admindb	1576763201	admindb	webseite bearbeiten		modify web stite	HttpTranslate	\N
 1453824770	admindb	1576763206	admindb	Webseite 		website	HttpTranslate	\N
@@ -32598,10 +31918,6 @@ COPY mne_application.translate (createdate, createuser, modifydate, modifyuser, 
 1425652584	admindb	1472110463	admindb	Message gefunden		message found		\N
 1352797415	admindb	1472111002	admindb	Subweblet bearbeiten		modify subweblet	HttpTranslate	\N
 1472111086	admindb	1472111086	admindb	Sql ausführen		execute sql	HttpMenu	\N
-1472112353	admindb	1472112353	admindb	Domain		domain	HttpMenu	\N
-1472112392	admindb	1472112392	admindb	Netzwerk		network	HttpMenu	\N
-1472112427	admindb	1472112427	admindb	Apache		apache	HttpMenu	\N
-1472112444	admindb	1472112444	admindb	Erp		erp	HttpMenu	\N
 1544191080	admindb	1576763267	admindb	Kosten werden mit hinterlegten Kosten überschrieben		costs are overwritten with the stored costs	DbConnect	\N
 1545059127	admindb	1576763288	admindb	Die Kosten werden noch von einem Produkt benötigt		the costs are still required by a product	DbConnect	\N
 1545060855	admindb	1576763296	admindb	Benutzer kann sich nicht einloggen		user can't login	HttpTranslate	\N
@@ -32728,6 +32044,8 @@ COPY mne_application.translate (createdate, createuser, modifydate, modifyuser, 
 1478853269	admindb	1478853269	admindb	\n				\N
 1609859278	admindb	1609859278	admindb	Benutzer <admindb>existiert schon bitte anderen Namen wählen			DbConnect	\N
 1609863538	admindb	1609863538	admindb	Benutzer <admindb>existiert wird nur zugeordnet			DbConnect	\N
+1605541943	admindb	1617712714	admindb	admerpbuilddiary	Verwaltung Bautagebuch	admin builddiary	DbGroup	0
+1605542432	admindb	1617712714	admindb	admerpwarehouse	Verwaltung Lager	admin warehouse	DbGroup	0
 \.
 
 
@@ -32747,7 +32065,7 @@ COPY mne_application.trustrequest (createdate, createuser, modifydate, modifyuse
 --
 
 COPY mne_application.update (updateid, version, updatehost) FROM stdin;
-0	8.0.1	update.nelson-it.ch
+0	10.0.0	update.nelson-it.ch
 \.
 
 
@@ -32786,1102 +32104,1102 @@ COPY mne_application.year (yearmin, yearmax, yearid, createuser, modifyuser, cre
 --
 
 COPY mne_application.yearday (leapyear, vyear, vquarter, vmonth, vday, wday, vfullday, createuser, modifyuser, createdate, modifydate) FROM stdin;
-t	2020	1	1	1	4	01012020	admindb	admindb	1611066328	1611066328
-t	2020	1	1	2	5	02012020	admindb	admindb	1611066328	1611066328
-t	2020	1	1	3	6	03012020	admindb	admindb	1611066328	1611066328
-t	2020	1	1	4	7	04012020	admindb	admindb	1611066328	1611066328
-t	2020	1	1	5	1	05012020	admindb	admindb	1611066328	1611066328
-t	2020	1	1	6	2	06012020	admindb	admindb	1611066328	1611066328
-t	2020	1	1	7	3	07012020	admindb	admindb	1611066328	1611066328
-t	2020	1	1	8	4	08012020	admindb	admindb	1611066328	1611066328
-t	2020	1	1	9	5	09012020	admindb	admindb	1611066328	1611066328
-t	2020	1	1	10	6	10012020	admindb	admindb	1611066328	1611066328
-t	2020	1	1	11	7	11012020	admindb	admindb	1611066328	1611066328
-t	2020	1	1	12	1	12012020	admindb	admindb	1611066328	1611066328
-t	2020	1	1	13	2	13012020	admindb	admindb	1611066328	1611066328
-t	2020	1	1	14	3	14012020	admindb	admindb	1611066328	1611066328
-t	2020	1	1	15	4	15012020	admindb	admindb	1611066328	1611066328
-t	2020	1	1	16	5	16012020	admindb	admindb	1611066328	1611066328
-t	2020	1	1	17	6	17012020	admindb	admindb	1611066328	1611066328
-t	2020	1	1	18	7	18012020	admindb	admindb	1611066328	1611066328
-t	2020	1	1	19	1	19012020	admindb	admindb	1611066328	1611066328
-t	2020	1	1	20	2	20012020	admindb	admindb	1611066328	1611066328
-t	2020	1	1	21	3	21012020	admindb	admindb	1611066328	1611066328
-t	2020	1	1	22	4	22012020	admindb	admindb	1611066328	1611066328
-t	2020	1	1	23	5	23012020	admindb	admindb	1611066328	1611066328
-t	2020	1	1	24	6	24012020	admindb	admindb	1611066328	1611066328
-t	2020	1	1	25	7	25012020	admindb	admindb	1611066328	1611066328
-t	2020	1	1	26	1	26012020	admindb	admindb	1611066328	1611066328
-t	2020	1	1	27	2	27012020	admindb	admindb	1611066328	1611066328
-t	2020	1	1	28	3	28012020	admindb	admindb	1611066328	1611066328
-t	2020	1	1	29	4	29012020	admindb	admindb	1611066328	1611066328
-t	2020	1	1	30	5	30012020	admindb	admindb	1611066328	1611066328
-t	2020	1	1	31	6	31012020	admindb	admindb	1611066328	1611066328
-t	2020	1	2	1	7	01022020	admindb	admindb	1611066328	1611066328
-t	2020	1	2	2	1	02022020	admindb	admindb	1611066328	1611066328
-t	2020	1	2	3	2	03022020	admindb	admindb	1611066328	1611066328
-t	2020	1	2	4	3	04022020	admindb	admindb	1611066328	1611066328
-t	2020	1	2	5	4	05022020	admindb	admindb	1611066328	1611066328
-t	2020	1	2	6	5	06022020	admindb	admindb	1611066328	1611066328
-t	2020	1	2	7	6	07022020	admindb	admindb	1611066328	1611066328
-t	2020	1	2	8	7	08022020	admindb	admindb	1611066328	1611066328
-t	2020	1	2	9	1	09022020	admindb	admindb	1611066328	1611066328
-t	2020	1	2	10	2	10022020	admindb	admindb	1611066328	1611066328
-t	2020	1	2	11	3	11022020	admindb	admindb	1611066328	1611066328
-t	2020	1	2	12	4	12022020	admindb	admindb	1611066328	1611066328
-t	2020	1	2	13	5	13022020	admindb	admindb	1611066328	1611066328
-t	2020	1	2	14	6	14022020	admindb	admindb	1611066328	1611066328
-t	2020	1	2	15	7	15022020	admindb	admindb	1611066328	1611066328
-t	2020	1	2	16	1	16022020	admindb	admindb	1611066328	1611066328
-t	2020	1	2	17	2	17022020	admindb	admindb	1611066328	1611066328
-t	2020	1	2	18	3	18022020	admindb	admindb	1611066328	1611066328
-t	2020	1	2	19	4	19022020	admindb	admindb	1611066328	1611066328
-t	2020	1	2	20	5	20022020	admindb	admindb	1611066328	1611066328
-t	2020	1	2	21	6	21022020	admindb	admindb	1611066328	1611066328
-t	2020	1	2	22	7	22022020	admindb	admindb	1611066328	1611066328
-t	2020	1	2	23	1	23022020	admindb	admindb	1611066328	1611066328
-t	2020	1	2	24	2	24022020	admindb	admindb	1611066328	1611066328
-t	2020	1	2	25	3	25022020	admindb	admindb	1611066328	1611066328
-t	2020	1	2	26	4	26022020	admindb	admindb	1611066328	1611066328
-t	2020	1	2	27	5	27022020	admindb	admindb	1611066328	1611066328
-t	2020	1	2	28	6	28022020	admindb	admindb	1611066328	1611066328
-t	2020	1	2	29	7	29022020	admindb	admindb	1611066328	1611066328
-t	2020	1	3	1	1	01032020	admindb	admindb	1611066328	1611066328
-t	2020	1	3	2	2	02032020	admindb	admindb	1611066328	1611066328
-t	2020	1	3	3	3	03032020	admindb	admindb	1611066328	1611066328
-t	2020	1	3	4	4	04032020	admindb	admindb	1611066328	1611066328
-t	2020	1	3	5	5	05032020	admindb	admindb	1611066328	1611066328
-t	2020	1	3	6	6	06032020	admindb	admindb	1611066328	1611066328
-t	2020	1	3	7	7	07032020	admindb	admindb	1611066328	1611066328
-t	2020	1	3	8	1	08032020	admindb	admindb	1611066328	1611066328
-t	2020	1	3	9	2	09032020	admindb	admindb	1611066328	1611066328
-t	2020	1	3	10	3	10032020	admindb	admindb	1611066328	1611066328
-t	2020	1	3	11	4	11032020	admindb	admindb	1611066328	1611066328
-t	2020	1	3	12	5	12032020	admindb	admindb	1611066328	1611066328
-t	2020	1	3	13	6	13032020	admindb	admindb	1611066328	1611066328
-t	2020	1	3	14	7	14032020	admindb	admindb	1611066328	1611066328
-t	2020	1	3	15	1	15032020	admindb	admindb	1611066328	1611066328
-t	2020	1	3	16	2	16032020	admindb	admindb	1611066328	1611066328
-t	2020	1	3	17	3	17032020	admindb	admindb	1611066328	1611066328
-t	2020	1	3	18	4	18032020	admindb	admindb	1611066328	1611066328
-t	2020	1	3	19	5	19032020	admindb	admindb	1611066328	1611066328
-t	2020	1	3	20	6	20032020	admindb	admindb	1611066328	1611066328
-t	2020	1	3	21	7	21032020	admindb	admindb	1611066328	1611066328
-t	2020	1	3	22	1	22032020	admindb	admindb	1611066328	1611066328
-t	2020	1	3	23	2	23032020	admindb	admindb	1611066328	1611066328
-t	2020	1	3	24	3	24032020	admindb	admindb	1611066328	1611066328
-t	2020	1	3	25	4	25032020	admindb	admindb	1611066328	1611066328
-t	2020	1	3	26	5	26032020	admindb	admindb	1611066328	1611066328
-t	2020	1	3	27	6	27032020	admindb	admindb	1611066328	1611066328
-t	2020	1	3	28	7	28032020	admindb	admindb	1611066328	1611066328
-t	2020	1	3	29	1	29032020	admindb	admindb	1611066328	1611066328
-t	2020	1	3	30	2	30032020	admindb	admindb	1611066328	1611066328
-t	2020	1	3	31	3	31032020	admindb	admindb	1611066328	1611066328
-t	2020	2	4	1	4	01042020	admindb	admindb	1611066328	1611066328
-t	2020	2	4	2	5	02042020	admindb	admindb	1611066328	1611066328
-t	2020	2	4	3	6	03042020	admindb	admindb	1611066328	1611066328
-t	2020	2	4	4	7	04042020	admindb	admindb	1611066328	1611066328
-t	2020	2	4	5	1	05042020	admindb	admindb	1611066328	1611066328
-t	2020	2	4	6	2	06042020	admindb	admindb	1611066328	1611066328
-t	2020	2	4	7	3	07042020	admindb	admindb	1611066328	1611066328
-t	2020	2	4	8	4	08042020	admindb	admindb	1611066328	1611066328
-t	2020	2	4	9	5	09042020	admindb	admindb	1611066328	1611066328
-t	2020	2	4	10	6	10042020	admindb	admindb	1611066328	1611066328
-t	2020	2	4	11	7	11042020	admindb	admindb	1611066328	1611066328
-t	2020	2	4	12	1	12042020	admindb	admindb	1611066328	1611066328
-t	2020	2	4	13	2	13042020	admindb	admindb	1611066328	1611066328
-t	2020	2	4	14	3	14042020	admindb	admindb	1611066328	1611066328
-t	2020	2	4	15	4	15042020	admindb	admindb	1611066328	1611066328
-t	2020	2	4	16	5	16042020	admindb	admindb	1611066328	1611066328
-t	2020	2	4	17	6	17042020	admindb	admindb	1611066328	1611066328
-t	2020	2	4	18	7	18042020	admindb	admindb	1611066328	1611066328
-t	2020	2	4	19	1	19042020	admindb	admindb	1611066328	1611066328
-t	2020	2	4	20	2	20042020	admindb	admindb	1611066328	1611066328
-t	2020	2	4	21	3	21042020	admindb	admindb	1611066328	1611066328
-t	2020	2	4	22	4	22042020	admindb	admindb	1611066328	1611066328
-t	2020	2	4	23	5	23042020	admindb	admindb	1611066328	1611066328
-t	2020	2	4	24	6	24042020	admindb	admindb	1611066328	1611066328
-t	2020	2	4	25	7	25042020	admindb	admindb	1611066328	1611066328
-t	2020	2	4	26	1	26042020	admindb	admindb	1611066328	1611066328
-t	2020	2	4	27	2	27042020	admindb	admindb	1611066328	1611066328
-t	2020	2	4	28	3	28042020	admindb	admindb	1611066328	1611066328
-t	2020	2	4	29	4	29042020	admindb	admindb	1611066328	1611066328
-t	2020	2	4	30	5	30042020	admindb	admindb	1611066328	1611066328
-t	2020	2	5	1	6	01052020	admindb	admindb	1611066328	1611066328
-t	2020	2	5	2	7	02052020	admindb	admindb	1611066328	1611066328
-t	2020	2	5	3	1	03052020	admindb	admindb	1611066328	1611066328
-t	2020	2	5	4	2	04052020	admindb	admindb	1611066328	1611066328
-t	2020	2	5	5	3	05052020	admindb	admindb	1611066328	1611066328
-t	2020	2	5	6	4	06052020	admindb	admindb	1611066328	1611066328
-t	2020	2	5	7	5	07052020	admindb	admindb	1611066328	1611066328
-t	2020	2	5	8	6	08052020	admindb	admindb	1611066328	1611066328
-t	2020	2	5	9	7	09052020	admindb	admindb	1611066328	1611066328
-t	2020	2	5	10	1	10052020	admindb	admindb	1611066328	1611066328
-t	2020	2	5	11	2	11052020	admindb	admindb	1611066328	1611066328
-t	2020	2	5	12	3	12052020	admindb	admindb	1611066328	1611066328
-t	2020	2	5	13	4	13052020	admindb	admindb	1611066328	1611066328
-t	2020	2	5	14	5	14052020	admindb	admindb	1611066328	1611066328
-t	2020	2	5	15	6	15052020	admindb	admindb	1611066328	1611066328
-t	2020	2	5	16	7	16052020	admindb	admindb	1611066328	1611066328
-t	2020	2	5	17	1	17052020	admindb	admindb	1611066328	1611066328
-t	2020	2	5	18	2	18052020	admindb	admindb	1611066328	1611066328
-t	2020	2	5	19	3	19052020	admindb	admindb	1611066328	1611066328
-t	2020	2	5	20	4	20052020	admindb	admindb	1611066328	1611066328
-t	2020	2	5	21	5	21052020	admindb	admindb	1611066328	1611066328
-t	2020	2	5	22	6	22052020	admindb	admindb	1611066328	1611066328
-t	2020	2	5	23	7	23052020	admindb	admindb	1611066328	1611066328
-t	2020	2	5	24	1	24052020	admindb	admindb	1611066328	1611066328
-t	2020	2	5	25	2	25052020	admindb	admindb	1611066328	1611066328
-t	2020	2	5	26	3	26052020	admindb	admindb	1611066328	1611066328
-t	2020	2	5	27	4	27052020	admindb	admindb	1611066328	1611066328
-t	2020	2	5	28	5	28052020	admindb	admindb	1611066328	1611066328
-t	2020	2	5	29	6	29052020	admindb	admindb	1611066328	1611066328
-t	2020	2	5	30	7	30052020	admindb	admindb	1611066328	1611066328
-t	2020	2	5	31	1	31052020	admindb	admindb	1611066328	1611066328
-t	2020	2	6	1	2	01062020	admindb	admindb	1611066328	1611066328
-t	2020	2	6	2	3	02062020	admindb	admindb	1611066328	1611066328
-t	2020	2	6	3	4	03062020	admindb	admindb	1611066328	1611066328
-t	2020	2	6	4	5	04062020	admindb	admindb	1611066328	1611066328
-t	2020	2	6	5	6	05062020	admindb	admindb	1611066328	1611066328
-t	2020	2	6	6	7	06062020	admindb	admindb	1611066328	1611066328
-t	2020	2	6	7	1	07062020	admindb	admindb	1611066328	1611066328
-t	2020	2	6	8	2	08062020	admindb	admindb	1611066328	1611066328
-t	2020	2	6	9	3	09062020	admindb	admindb	1611066328	1611066328
-t	2020	2	6	10	4	10062020	admindb	admindb	1611066328	1611066328
-t	2020	2	6	11	5	11062020	admindb	admindb	1611066328	1611066328
-t	2020	2	6	12	6	12062020	admindb	admindb	1611066328	1611066328
-t	2020	2	6	13	7	13062020	admindb	admindb	1611066328	1611066328
-t	2020	2	6	14	1	14062020	admindb	admindb	1611066328	1611066328
-t	2020	2	6	15	2	15062020	admindb	admindb	1611066328	1611066328
-t	2020	2	6	16	3	16062020	admindb	admindb	1611066328	1611066328
-t	2020	2	6	17	4	17062020	admindb	admindb	1611066328	1611066328
-t	2020	2	6	18	5	18062020	admindb	admindb	1611066328	1611066328
-t	2020	2	6	19	6	19062020	admindb	admindb	1611066328	1611066328
-t	2020	2	6	20	7	20062020	admindb	admindb	1611066328	1611066328
-t	2020	2	6	21	1	21062020	admindb	admindb	1611066328	1611066328
-t	2020	2	6	22	2	22062020	admindb	admindb	1611066328	1611066328
-t	2020	2	6	23	3	23062020	admindb	admindb	1611066328	1611066328
-t	2020	2	6	24	4	24062020	admindb	admindb	1611066328	1611066328
-t	2020	2	6	25	5	25062020	admindb	admindb	1611066328	1611066328
-t	2020	2	6	26	6	26062020	admindb	admindb	1611066328	1611066328
-t	2020	2	6	27	7	27062020	admindb	admindb	1611066328	1611066328
-t	2020	2	6	28	1	28062020	admindb	admindb	1611066328	1611066328
-t	2020	2	6	29	2	29062020	admindb	admindb	1611066328	1611066328
-t	2020	2	6	30	3	30062020	admindb	admindb	1611066328	1611066328
-t	2020	3	7	1	4	01072020	admindb	admindb	1611066328	1611066328
-t	2020	3	7	2	5	02072020	admindb	admindb	1611066328	1611066328
-t	2020	3	7	3	6	03072020	admindb	admindb	1611066328	1611066328
-t	2020	3	7	4	7	04072020	admindb	admindb	1611066328	1611066328
-t	2020	3	7	5	1	05072020	admindb	admindb	1611066328	1611066328
-t	2020	3	7	6	2	06072020	admindb	admindb	1611066328	1611066328
-t	2020	3	7	7	3	07072020	admindb	admindb	1611066328	1611066328
-t	2020	3	7	8	4	08072020	admindb	admindb	1611066328	1611066328
-t	2020	3	7	9	5	09072020	admindb	admindb	1611066328	1611066328
-t	2020	3	7	10	6	10072020	admindb	admindb	1611066328	1611066328
-t	2020	3	7	11	7	11072020	admindb	admindb	1611066328	1611066328
-t	2020	3	7	12	1	12072020	admindb	admindb	1611066328	1611066328
-t	2020	3	7	13	2	13072020	admindb	admindb	1611066328	1611066328
-t	2020	3	7	14	3	14072020	admindb	admindb	1611066328	1611066328
-t	2020	3	7	15	4	15072020	admindb	admindb	1611066328	1611066328
-t	2020	3	7	16	5	16072020	admindb	admindb	1611066328	1611066328
-t	2020	3	7	17	6	17072020	admindb	admindb	1611066328	1611066328
-t	2020	3	7	18	7	18072020	admindb	admindb	1611066328	1611066328
-t	2020	3	7	19	1	19072020	admindb	admindb	1611066328	1611066328
-t	2020	3	7	20	2	20072020	admindb	admindb	1611066328	1611066328
-t	2020	3	7	21	3	21072020	admindb	admindb	1611066328	1611066328
-t	2020	3	7	22	4	22072020	admindb	admindb	1611066328	1611066328
-t	2020	3	7	23	5	23072020	admindb	admindb	1611066328	1611066328
-t	2020	3	7	24	6	24072020	admindb	admindb	1611066328	1611066328
-t	2020	3	7	25	7	25072020	admindb	admindb	1611066328	1611066328
-t	2020	3	7	26	1	26072020	admindb	admindb	1611066328	1611066328
-t	2020	3	7	27	2	27072020	admindb	admindb	1611066328	1611066328
-t	2020	3	7	28	3	28072020	admindb	admindb	1611066328	1611066328
-t	2020	3	7	29	4	29072020	admindb	admindb	1611066328	1611066328
-t	2020	3	7	30	5	30072020	admindb	admindb	1611066328	1611066328
-t	2020	3	7	31	6	31072020	admindb	admindb	1611066328	1611066328
-t	2020	3	8	1	7	01082020	admindb	admindb	1611066328	1611066328
-t	2020	3	8	2	1	02082020	admindb	admindb	1611066328	1611066328
-t	2020	3	8	3	2	03082020	admindb	admindb	1611066328	1611066328
-t	2020	3	8	4	3	04082020	admindb	admindb	1611066328	1611066328
-t	2020	3	8	5	4	05082020	admindb	admindb	1611066328	1611066328
-t	2020	3	8	6	5	06082020	admindb	admindb	1611066328	1611066328
-t	2020	3	8	7	6	07082020	admindb	admindb	1611066328	1611066328
-t	2020	3	8	8	7	08082020	admindb	admindb	1611066328	1611066328
-t	2020	3	8	9	1	09082020	admindb	admindb	1611066328	1611066328
-t	2020	3	8	10	2	10082020	admindb	admindb	1611066328	1611066328
-t	2020	3	8	11	3	11082020	admindb	admindb	1611066328	1611066328
-t	2020	3	8	12	4	12082020	admindb	admindb	1611066328	1611066328
-t	2020	3	8	13	5	13082020	admindb	admindb	1611066328	1611066328
-t	2020	3	8	14	6	14082020	admindb	admindb	1611066328	1611066328
-t	2020	3	8	15	7	15082020	admindb	admindb	1611066328	1611066328
-t	2020	3	8	16	1	16082020	admindb	admindb	1611066328	1611066328
-t	2020	3	8	17	2	17082020	admindb	admindb	1611066328	1611066328
-t	2020	3	8	18	3	18082020	admindb	admindb	1611066328	1611066328
-t	2020	3	8	19	4	19082020	admindb	admindb	1611066328	1611066328
-t	2020	3	8	20	5	20082020	admindb	admindb	1611066328	1611066328
-t	2020	3	8	21	6	21082020	admindb	admindb	1611066328	1611066328
-t	2020	3	8	22	7	22082020	admindb	admindb	1611066328	1611066328
-t	2020	3	8	23	1	23082020	admindb	admindb	1611066328	1611066328
-t	2020	3	8	24	2	24082020	admindb	admindb	1611066328	1611066328
-t	2020	3	8	25	3	25082020	admindb	admindb	1611066328	1611066328
-t	2020	3	8	26	4	26082020	admindb	admindb	1611066328	1611066328
-t	2020	3	8	27	5	27082020	admindb	admindb	1611066328	1611066328
-t	2020	3	8	28	6	28082020	admindb	admindb	1611066328	1611066328
-t	2020	3	8	29	7	29082020	admindb	admindb	1611066328	1611066328
-t	2020	3	8	30	1	30082020	admindb	admindb	1611066328	1611066328
-t	2020	3	8	31	2	31082020	admindb	admindb	1611066328	1611066328
-t	2020	3	9	1	3	01092020	admindb	admindb	1611066328	1611066328
-t	2020	3	9	2	4	02092020	admindb	admindb	1611066328	1611066328
-t	2020	3	9	3	5	03092020	admindb	admindb	1611066328	1611066328
-t	2020	3	9	4	6	04092020	admindb	admindb	1611066328	1611066328
-t	2020	3	9	5	7	05092020	admindb	admindb	1611066328	1611066328
-t	2020	3	9	6	1	06092020	admindb	admindb	1611066328	1611066328
-t	2020	3	9	7	2	07092020	admindb	admindb	1611066328	1611066328
-t	2020	3	9	8	3	08092020	admindb	admindb	1611066328	1611066328
-t	2020	3	9	9	4	09092020	admindb	admindb	1611066328	1611066328
-t	2020	3	9	10	5	10092020	admindb	admindb	1611066328	1611066328
-t	2020	3	9	11	6	11092020	admindb	admindb	1611066328	1611066328
-t	2020	3	9	12	7	12092020	admindb	admindb	1611066328	1611066328
-t	2020	3	9	13	1	13092020	admindb	admindb	1611066328	1611066328
-t	2020	3	9	14	2	14092020	admindb	admindb	1611066328	1611066328
-t	2020	3	9	15	3	15092020	admindb	admindb	1611066328	1611066328
-t	2020	3	9	16	4	16092020	admindb	admindb	1611066328	1611066328
-t	2020	3	9	17	5	17092020	admindb	admindb	1611066328	1611066328
-t	2020	3	9	18	6	18092020	admindb	admindb	1611066328	1611066328
-t	2020	3	9	19	7	19092020	admindb	admindb	1611066328	1611066328
-t	2020	3	9	20	1	20092020	admindb	admindb	1611066328	1611066328
-t	2020	3	9	21	2	21092020	admindb	admindb	1611066328	1611066328
-t	2020	3	9	22	3	22092020	admindb	admindb	1611066328	1611066328
-t	2020	3	9	23	4	23092020	admindb	admindb	1611066328	1611066328
-t	2020	3	9	24	5	24092020	admindb	admindb	1611066328	1611066328
-t	2020	3	9	25	6	25092020	admindb	admindb	1611066328	1611066328
-t	2020	3	9	26	7	26092020	admindb	admindb	1611066328	1611066328
-t	2020	3	9	27	1	27092020	admindb	admindb	1611066328	1611066328
-t	2020	3	9	28	2	28092020	admindb	admindb	1611066328	1611066328
-t	2020	3	9	29	3	29092020	admindb	admindb	1611066328	1611066328
-t	2020	3	9	30	4	30092020	admindb	admindb	1611066328	1611066328
-t	2020	4	10	1	5	01102020	admindb	admindb	1611066328	1611066328
-t	2020	4	10	2	6	02102020	admindb	admindb	1611066328	1611066328
-t	2020	4	10	3	7	03102020	admindb	admindb	1611066328	1611066328
-t	2020	4	10	4	1	04102020	admindb	admindb	1611066328	1611066328
-t	2020	4	10	5	2	05102020	admindb	admindb	1611066328	1611066328
-t	2020	4	10	6	3	06102020	admindb	admindb	1611066328	1611066328
-t	2020	4	10	7	4	07102020	admindb	admindb	1611066328	1611066328
-t	2020	4	10	8	5	08102020	admindb	admindb	1611066328	1611066328
-t	2020	4	10	9	6	09102020	admindb	admindb	1611066328	1611066328
-t	2020	4	10	10	7	10102020	admindb	admindb	1611066328	1611066328
-t	2020	4	10	11	1	11102020	admindb	admindb	1611066328	1611066328
-t	2020	4	10	12	2	12102020	admindb	admindb	1611066328	1611066328
-t	2020	4	10	13	3	13102020	admindb	admindb	1611066328	1611066328
-t	2020	4	10	14	4	14102020	admindb	admindb	1611066328	1611066328
-t	2020	4	10	15	5	15102020	admindb	admindb	1611066328	1611066328
-t	2020	4	10	16	6	16102020	admindb	admindb	1611066328	1611066328
-t	2020	4	10	17	7	17102020	admindb	admindb	1611066328	1611066328
-t	2020	4	10	18	1	18102020	admindb	admindb	1611066328	1611066328
-t	2020	4	10	19	2	19102020	admindb	admindb	1611066328	1611066328
-t	2020	4	10	20	3	20102020	admindb	admindb	1611066328	1611066328
-t	2020	4	10	21	4	21102020	admindb	admindb	1611066328	1611066328
-t	2020	4	10	22	5	22102020	admindb	admindb	1611066328	1611066328
-t	2020	4	10	23	6	23102020	admindb	admindb	1611066328	1611066328
-t	2020	4	10	24	7	24102020	admindb	admindb	1611066328	1611066328
-t	2020	4	10	25	1	25102020	admindb	admindb	1611066328	1611066328
-t	2020	4	10	26	2	26102020	admindb	admindb	1611066328	1611066328
-t	2020	4	10	27	3	27102020	admindb	admindb	1611066328	1611066328
-t	2020	4	10	28	4	28102020	admindb	admindb	1611066328	1611066328
-t	2020	4	10	29	5	29102020	admindb	admindb	1611066328	1611066328
-t	2020	4	10	30	6	30102020	admindb	admindb	1611066328	1611066328
-t	2020	4	10	31	7	31102020	admindb	admindb	1611066328	1611066328
-t	2020	4	11	1	1	01112020	admindb	admindb	1611066328	1611066328
-t	2020	4	11	2	2	02112020	admindb	admindb	1611066328	1611066328
-t	2020	4	11	3	3	03112020	admindb	admindb	1611066328	1611066328
-t	2020	4	11	4	4	04112020	admindb	admindb	1611066328	1611066328
-t	2020	4	11	5	5	05112020	admindb	admindb	1611066328	1611066328
-t	2020	4	11	6	6	06112020	admindb	admindb	1611066328	1611066328
-t	2020	4	11	7	7	07112020	admindb	admindb	1611066328	1611066328
-t	2020	4	11	8	1	08112020	admindb	admindb	1611066328	1611066328
-t	2020	4	11	9	2	09112020	admindb	admindb	1611066328	1611066328
-t	2020	4	11	10	3	10112020	admindb	admindb	1611066328	1611066328
-t	2020	4	11	11	4	11112020	admindb	admindb	1611066328	1611066328
-t	2020	4	11	12	5	12112020	admindb	admindb	1611066328	1611066328
-t	2020	4	11	13	6	13112020	admindb	admindb	1611066328	1611066328
-t	2020	4	11	14	7	14112020	admindb	admindb	1611066328	1611066328
-t	2020	4	11	15	1	15112020	admindb	admindb	1611066328	1611066328
-t	2020	4	11	16	2	16112020	admindb	admindb	1611066328	1611066328
-t	2020	4	11	17	3	17112020	admindb	admindb	1611066328	1611066328
-t	2020	4	11	18	4	18112020	admindb	admindb	1611066328	1611066328
-t	2020	4	11	19	5	19112020	admindb	admindb	1611066328	1611066328
-t	2020	4	11	20	6	20112020	admindb	admindb	1611066328	1611066328
-t	2020	4	11	21	7	21112020	admindb	admindb	1611066328	1611066328
-t	2020	4	11	22	1	22112020	admindb	admindb	1611066328	1611066328
-t	2020	4	11	23	2	23112020	admindb	admindb	1611066328	1611066328
-t	2020	4	11	24	3	24112020	admindb	admindb	1611066328	1611066328
-t	2020	4	11	25	4	25112020	admindb	admindb	1611066328	1611066328
-t	2020	4	11	26	5	26112020	admindb	admindb	1611066328	1611066328
-t	2020	4	11	27	6	27112020	admindb	admindb	1611066328	1611066328
-t	2020	4	11	28	7	28112020	admindb	admindb	1611066328	1611066328
-t	2020	4	11	29	1	29112020	admindb	admindb	1611066328	1611066328
-t	2020	4	11	30	2	30112020	admindb	admindb	1611066328	1611066328
-t	2020	4	12	1	3	01122020	admindb	admindb	1611066328	1611066328
-t	2020	4	12	2	4	02122020	admindb	admindb	1611066328	1611066328
-t	2020	4	12	3	5	03122020	admindb	admindb	1611066328	1611066328
-t	2020	4	12	4	6	04122020	admindb	admindb	1611066328	1611066328
-t	2020	4	12	5	7	05122020	admindb	admindb	1611066328	1611066328
-t	2020	4	12	6	1	06122020	admindb	admindb	1611066328	1611066328
-t	2020	4	12	7	2	07122020	admindb	admindb	1611066328	1611066328
-t	2020	4	12	8	3	08122020	admindb	admindb	1611066328	1611066328
-t	2020	4	12	9	4	09122020	admindb	admindb	1611066328	1611066328
-t	2020	4	12	10	5	10122020	admindb	admindb	1611066328	1611066328
-t	2020	4	12	11	6	11122020	admindb	admindb	1611066328	1611066328
-t	2020	4	12	12	7	12122020	admindb	admindb	1611066328	1611066328
-t	2020	4	12	13	1	13122020	admindb	admindb	1611066328	1611066328
-t	2020	4	12	14	2	14122020	admindb	admindb	1611066328	1611066328
-t	2020	4	12	15	3	15122020	admindb	admindb	1611066328	1611066328
-t	2020	4	12	16	4	16122020	admindb	admindb	1611066328	1611066328
-t	2020	4	12	17	5	17122020	admindb	admindb	1611066328	1611066328
-t	2020	4	12	18	6	18122020	admindb	admindb	1611066328	1611066328
-t	2020	4	12	19	7	19122020	admindb	admindb	1611066328	1611066328
-t	2020	4	12	20	1	20122020	admindb	admindb	1611066328	1611066328
-t	2020	4	12	21	2	21122020	admindb	admindb	1611066328	1611066328
-t	2020	4	12	22	3	22122020	admindb	admindb	1611066328	1611066328
-t	2020	4	12	23	4	23122020	admindb	admindb	1611066328	1611066328
-t	2020	4	12	24	5	24122020	admindb	admindb	1611066328	1611066328
-t	2020	4	12	25	6	25122020	admindb	admindb	1611066328	1611066328
-t	2020	4	12	26	7	26122020	admindb	admindb	1611066328	1611066328
-t	2020	4	12	27	1	27122020	admindb	admindb	1611066328	1611066328
-t	2020	4	12	28	2	28122020	admindb	admindb	1611066328	1611066328
-t	2020	4	12	29	3	29122020	admindb	admindb	1611066328	1611066328
-t	2020	4	12	30	4	30122020	admindb	admindb	1611066328	1611066328
-t	2020	4	12	31	5	31122020	admindb	admindb	1611066328	1611066328
-f	2021	1	1	1	6	01012021	admindb	admindb	1611066328	1611066328
-f	2021	1	1	2	7	02012021	admindb	admindb	1611066328	1611066328
-f	2021	1	1	3	1	03012021	admindb	admindb	1611066328	1611066328
-f	2021	1	1	4	2	04012021	admindb	admindb	1611066328	1611066328
-f	2021	1	1	5	3	05012021	admindb	admindb	1611066328	1611066328
-f	2021	1	1	6	4	06012021	admindb	admindb	1611066328	1611066328
-f	2021	1	1	7	5	07012021	admindb	admindb	1611066328	1611066328
-f	2021	1	1	8	6	08012021	admindb	admindb	1611066328	1611066328
-f	2021	1	1	9	7	09012021	admindb	admindb	1611066328	1611066328
-f	2021	1	1	10	1	10012021	admindb	admindb	1611066328	1611066328
-f	2021	1	1	11	2	11012021	admindb	admindb	1611066328	1611066328
-f	2021	1	1	12	3	12012021	admindb	admindb	1611066328	1611066328
-f	2021	1	1	13	4	13012021	admindb	admindb	1611066328	1611066328
-f	2021	1	1	14	5	14012021	admindb	admindb	1611066328	1611066328
-f	2021	1	1	15	6	15012021	admindb	admindb	1611066328	1611066328
-f	2021	1	1	16	7	16012021	admindb	admindb	1611066328	1611066328
-f	2021	1	1	17	1	17012021	admindb	admindb	1611066328	1611066328
-f	2021	1	1	18	2	18012021	admindb	admindb	1611066328	1611066328
-f	2021	1	1	19	3	19012021	admindb	admindb	1611066328	1611066328
-f	2021	1	1	20	4	20012021	admindb	admindb	1611066328	1611066328
-f	2021	1	1	21	5	21012021	admindb	admindb	1611066328	1611066328
-f	2021	1	1	22	6	22012021	admindb	admindb	1611066328	1611066328
-f	2021	1	1	23	7	23012021	admindb	admindb	1611066328	1611066328
-f	2021	1	1	24	1	24012021	admindb	admindb	1611066328	1611066328
-f	2021	1	1	25	2	25012021	admindb	admindb	1611066328	1611066328
-f	2021	1	1	26	3	26012021	admindb	admindb	1611066328	1611066328
-f	2021	1	1	27	4	27012021	admindb	admindb	1611066328	1611066328
-f	2021	1	1	28	5	28012021	admindb	admindb	1611066328	1611066328
-f	2021	1	1	29	6	29012021	admindb	admindb	1611066328	1611066328
-f	2021	1	1	30	7	30012021	admindb	admindb	1611066328	1611066328
-f	2021	1	1	31	1	31012021	admindb	admindb	1611066328	1611066328
-f	2021	1	2	1	2	01022021	admindb	admindb	1611066328	1611066328
-f	2021	1	2	2	3	02022021	admindb	admindb	1611066328	1611066328
-f	2021	1	2	3	4	03022021	admindb	admindb	1611066328	1611066328
-f	2021	1	2	4	5	04022021	admindb	admindb	1611066328	1611066328
-f	2021	1	2	5	6	05022021	admindb	admindb	1611066328	1611066328
-f	2021	1	2	6	7	06022021	admindb	admindb	1611066328	1611066328
-f	2021	1	2	7	1	07022021	admindb	admindb	1611066328	1611066328
-f	2021	1	2	8	2	08022021	admindb	admindb	1611066328	1611066328
-f	2021	1	2	9	3	09022021	admindb	admindb	1611066328	1611066328
-f	2021	1	2	10	4	10022021	admindb	admindb	1611066328	1611066328
-f	2021	1	2	11	5	11022021	admindb	admindb	1611066328	1611066328
-f	2021	1	2	12	6	12022021	admindb	admindb	1611066328	1611066328
-f	2021	1	2	13	7	13022021	admindb	admindb	1611066328	1611066328
-f	2021	1	2	14	1	14022021	admindb	admindb	1611066328	1611066328
-f	2021	1	2	15	2	15022021	admindb	admindb	1611066328	1611066328
-f	2021	1	2	16	3	16022021	admindb	admindb	1611066328	1611066328
-f	2021	1	2	17	4	17022021	admindb	admindb	1611066328	1611066328
-f	2021	1	2	18	5	18022021	admindb	admindb	1611066328	1611066328
-f	2021	1	2	19	6	19022021	admindb	admindb	1611066328	1611066328
-f	2021	1	2	20	7	20022021	admindb	admindb	1611066328	1611066328
-f	2021	1	2	21	1	21022021	admindb	admindb	1611066328	1611066328
-f	2021	1	2	22	2	22022021	admindb	admindb	1611066328	1611066328
-f	2021	1	2	23	3	23022021	admindb	admindb	1611066328	1611066328
-f	2021	1	2	24	4	24022021	admindb	admindb	1611066328	1611066328
-f	2021	1	2	25	5	25022021	admindb	admindb	1611066328	1611066328
-f	2021	1	2	26	6	26022021	admindb	admindb	1611066328	1611066328
-f	2021	1	2	27	7	27022021	admindb	admindb	1611066328	1611066328
-f	2021	1	2	28	1	28022021	admindb	admindb	1611066328	1611066328
-f	2021	1	3	1	2	01032021	admindb	admindb	1611066328	1611066328
-f	2021	1	3	2	3	02032021	admindb	admindb	1611066328	1611066328
-f	2021	1	3	3	4	03032021	admindb	admindb	1611066328	1611066328
-f	2021	1	3	4	5	04032021	admindb	admindb	1611066328	1611066328
-f	2021	1	3	5	6	05032021	admindb	admindb	1611066328	1611066328
-f	2021	1	3	6	7	06032021	admindb	admindb	1611066328	1611066328
-f	2021	1	3	7	1	07032021	admindb	admindb	1611066328	1611066328
-f	2021	1	3	8	2	08032021	admindb	admindb	1611066328	1611066328
-f	2021	1	3	9	3	09032021	admindb	admindb	1611066328	1611066328
-f	2021	1	3	10	4	10032021	admindb	admindb	1611066328	1611066328
-f	2021	1	3	11	5	11032021	admindb	admindb	1611066328	1611066328
-f	2021	1	3	12	6	12032021	admindb	admindb	1611066328	1611066328
-f	2021	1	3	13	7	13032021	admindb	admindb	1611066328	1611066328
-f	2021	1	3	14	1	14032021	admindb	admindb	1611066328	1611066328
-f	2021	1	3	15	2	15032021	admindb	admindb	1611066328	1611066328
-f	2021	1	3	16	3	16032021	admindb	admindb	1611066328	1611066328
-f	2021	1	3	17	4	17032021	admindb	admindb	1611066328	1611066328
-f	2021	1	3	18	5	18032021	admindb	admindb	1611066328	1611066328
-f	2021	1	3	19	6	19032021	admindb	admindb	1611066328	1611066328
-f	2021	1	3	20	7	20032021	admindb	admindb	1611066328	1611066328
-f	2021	1	3	21	1	21032021	admindb	admindb	1611066328	1611066328
-f	2021	1	3	22	2	22032021	admindb	admindb	1611066328	1611066328
-f	2021	1	3	23	3	23032021	admindb	admindb	1611066328	1611066328
-f	2021	1	3	24	4	24032021	admindb	admindb	1611066328	1611066328
-f	2021	1	3	25	5	25032021	admindb	admindb	1611066328	1611066328
-f	2021	1	3	26	6	26032021	admindb	admindb	1611066328	1611066328
-f	2021	1	3	27	7	27032021	admindb	admindb	1611066328	1611066328
-f	2021	1	3	28	1	28032021	admindb	admindb	1611066328	1611066328
-f	2021	1	3	29	2	29032021	admindb	admindb	1611066328	1611066328
-f	2021	1	3	30	3	30032021	admindb	admindb	1611066328	1611066328
-f	2021	1	3	31	4	31032021	admindb	admindb	1611066328	1611066328
-f	2021	2	4	1	5	01042021	admindb	admindb	1611066328	1611066328
-f	2021	2	4	2	6	02042021	admindb	admindb	1611066328	1611066328
-f	2021	2	4	3	7	03042021	admindb	admindb	1611066328	1611066328
-f	2021	2	4	4	1	04042021	admindb	admindb	1611066328	1611066328
-f	2021	2	4	5	2	05042021	admindb	admindb	1611066328	1611066328
-f	2021	2	4	6	3	06042021	admindb	admindb	1611066328	1611066328
-f	2021	2	4	7	4	07042021	admindb	admindb	1611066328	1611066328
-f	2021	2	4	8	5	08042021	admindb	admindb	1611066328	1611066328
-f	2021	2	4	9	6	09042021	admindb	admindb	1611066328	1611066328
-f	2021	2	4	10	7	10042021	admindb	admindb	1611066328	1611066328
-f	2021	2	4	11	1	11042021	admindb	admindb	1611066328	1611066328
-f	2021	2	4	12	2	12042021	admindb	admindb	1611066328	1611066328
-f	2021	2	4	13	3	13042021	admindb	admindb	1611066328	1611066328
-f	2021	2	4	14	4	14042021	admindb	admindb	1611066328	1611066328
-f	2021	2	4	15	5	15042021	admindb	admindb	1611066328	1611066328
-f	2021	2	4	16	6	16042021	admindb	admindb	1611066328	1611066328
-f	2021	2	4	17	7	17042021	admindb	admindb	1611066328	1611066328
-f	2021	2	4	18	1	18042021	admindb	admindb	1611066328	1611066328
-f	2021	2	4	19	2	19042021	admindb	admindb	1611066328	1611066328
-f	2021	2	4	20	3	20042021	admindb	admindb	1611066328	1611066328
-f	2021	2	4	21	4	21042021	admindb	admindb	1611066328	1611066328
-f	2021	2	4	22	5	22042021	admindb	admindb	1611066328	1611066328
-f	2021	2	4	23	6	23042021	admindb	admindb	1611066328	1611066328
-f	2021	2	4	24	7	24042021	admindb	admindb	1611066328	1611066328
-f	2021	2	4	25	1	25042021	admindb	admindb	1611066328	1611066328
-f	2021	2	4	26	2	26042021	admindb	admindb	1611066328	1611066328
-f	2021	2	4	27	3	27042021	admindb	admindb	1611066328	1611066328
-f	2021	2	4	28	4	28042021	admindb	admindb	1611066328	1611066328
-f	2021	2	4	29	5	29042021	admindb	admindb	1611066328	1611066328
-f	2021	2	4	30	6	30042021	admindb	admindb	1611066328	1611066328
-f	2021	2	5	1	7	01052021	admindb	admindb	1611066328	1611066328
-f	2021	2	5	2	1	02052021	admindb	admindb	1611066328	1611066328
-f	2021	2	5	3	2	03052021	admindb	admindb	1611066328	1611066328
-f	2021	2	5	4	3	04052021	admindb	admindb	1611066328	1611066328
-f	2021	2	5	5	4	05052021	admindb	admindb	1611066328	1611066328
-f	2021	2	5	6	5	06052021	admindb	admindb	1611066328	1611066328
-f	2021	2	5	7	6	07052021	admindb	admindb	1611066328	1611066328
-f	2021	2	5	8	7	08052021	admindb	admindb	1611066328	1611066328
-f	2021	2	5	9	1	09052021	admindb	admindb	1611066328	1611066328
-f	2021	2	5	10	2	10052021	admindb	admindb	1611066328	1611066328
-f	2021	2	5	11	3	11052021	admindb	admindb	1611066328	1611066328
-f	2021	2	5	12	4	12052021	admindb	admindb	1611066328	1611066328
-f	2021	2	5	13	5	13052021	admindb	admindb	1611066328	1611066328
-f	2021	2	5	14	6	14052021	admindb	admindb	1611066328	1611066328
-f	2021	2	5	15	7	15052021	admindb	admindb	1611066328	1611066328
-f	2021	2	5	16	1	16052021	admindb	admindb	1611066328	1611066328
-f	2021	2	5	17	2	17052021	admindb	admindb	1611066328	1611066328
-f	2021	2	5	18	3	18052021	admindb	admindb	1611066328	1611066328
-f	2021	2	5	19	4	19052021	admindb	admindb	1611066328	1611066328
-f	2021	2	5	20	5	20052021	admindb	admindb	1611066328	1611066328
-f	2021	2	5	21	6	21052021	admindb	admindb	1611066328	1611066328
-f	2021	2	5	22	7	22052021	admindb	admindb	1611066328	1611066328
-f	2021	2	5	23	1	23052021	admindb	admindb	1611066328	1611066328
-f	2021	2	5	24	2	24052021	admindb	admindb	1611066328	1611066328
-f	2021	2	5	25	3	25052021	admindb	admindb	1611066328	1611066328
-f	2021	2	5	26	4	26052021	admindb	admindb	1611066328	1611066328
-f	2021	2	5	27	5	27052021	admindb	admindb	1611066328	1611066328
-f	2021	2	5	28	6	28052021	admindb	admindb	1611066328	1611066328
-f	2021	2	5	29	7	29052021	admindb	admindb	1611066328	1611066328
-f	2021	2	5	30	1	30052021	admindb	admindb	1611066328	1611066328
-f	2021	2	5	31	2	31052021	admindb	admindb	1611066328	1611066328
-f	2021	2	6	1	3	01062021	admindb	admindb	1611066328	1611066328
-f	2021	2	6	2	4	02062021	admindb	admindb	1611066328	1611066328
-f	2021	2	6	3	5	03062021	admindb	admindb	1611066328	1611066328
-f	2021	2	6	4	6	04062021	admindb	admindb	1611066328	1611066328
-f	2021	2	6	5	7	05062021	admindb	admindb	1611066328	1611066328
-f	2021	2	6	6	1	06062021	admindb	admindb	1611066328	1611066328
-f	2021	2	6	7	2	07062021	admindb	admindb	1611066328	1611066328
-f	2021	2	6	8	3	08062021	admindb	admindb	1611066328	1611066328
-f	2021	2	6	9	4	09062021	admindb	admindb	1611066328	1611066328
-f	2021	2	6	10	5	10062021	admindb	admindb	1611066328	1611066328
-f	2021	2	6	11	6	11062021	admindb	admindb	1611066328	1611066328
-f	2021	2	6	12	7	12062021	admindb	admindb	1611066328	1611066328
-f	2021	2	6	13	1	13062021	admindb	admindb	1611066328	1611066328
-f	2021	2	6	14	2	14062021	admindb	admindb	1611066328	1611066328
-f	2021	2	6	15	3	15062021	admindb	admindb	1611066328	1611066328
-f	2021	2	6	16	4	16062021	admindb	admindb	1611066328	1611066328
-f	2021	2	6	17	5	17062021	admindb	admindb	1611066328	1611066328
-f	2021	2	6	18	6	18062021	admindb	admindb	1611066328	1611066328
-f	2021	2	6	19	7	19062021	admindb	admindb	1611066328	1611066328
-f	2021	2	6	20	1	20062021	admindb	admindb	1611066328	1611066328
-f	2021	2	6	21	2	21062021	admindb	admindb	1611066328	1611066328
-f	2021	2	6	22	3	22062021	admindb	admindb	1611066328	1611066328
-f	2021	2	6	23	4	23062021	admindb	admindb	1611066328	1611066328
-f	2021	2	6	24	5	24062021	admindb	admindb	1611066328	1611066328
-f	2021	2	6	25	6	25062021	admindb	admindb	1611066328	1611066328
-f	2021	2	6	26	7	26062021	admindb	admindb	1611066328	1611066328
-f	2021	2	6	27	1	27062021	admindb	admindb	1611066328	1611066328
-f	2021	2	6	28	2	28062021	admindb	admindb	1611066328	1611066328
-f	2021	2	6	29	3	29062021	admindb	admindb	1611066328	1611066328
-f	2021	2	6	30	4	30062021	admindb	admindb	1611066328	1611066328
-f	2021	3	7	1	5	01072021	admindb	admindb	1611066328	1611066328
-f	2021	3	7	2	6	02072021	admindb	admindb	1611066328	1611066328
-f	2021	3	7	3	7	03072021	admindb	admindb	1611066328	1611066328
-f	2021	3	7	4	1	04072021	admindb	admindb	1611066328	1611066328
-f	2021	3	7	5	2	05072021	admindb	admindb	1611066328	1611066328
-f	2021	3	7	6	3	06072021	admindb	admindb	1611066328	1611066328
-f	2021	3	7	7	4	07072021	admindb	admindb	1611066328	1611066328
-f	2021	3	7	8	5	08072021	admindb	admindb	1611066328	1611066328
-f	2021	3	7	9	6	09072021	admindb	admindb	1611066328	1611066328
-f	2021	3	7	10	7	10072021	admindb	admindb	1611066328	1611066328
-f	2021	3	7	11	1	11072021	admindb	admindb	1611066328	1611066328
-f	2021	3	7	12	2	12072021	admindb	admindb	1611066328	1611066328
-f	2021	3	7	13	3	13072021	admindb	admindb	1611066328	1611066328
-f	2021	3	7	14	4	14072021	admindb	admindb	1611066328	1611066328
-f	2021	3	7	15	5	15072021	admindb	admindb	1611066328	1611066328
-f	2021	3	7	16	6	16072021	admindb	admindb	1611066328	1611066328
-f	2021	3	7	17	7	17072021	admindb	admindb	1611066328	1611066328
-f	2021	3	7	18	1	18072021	admindb	admindb	1611066328	1611066328
-f	2021	3	7	19	2	19072021	admindb	admindb	1611066328	1611066328
-f	2021	3	7	20	3	20072021	admindb	admindb	1611066328	1611066328
-f	2021	3	7	21	4	21072021	admindb	admindb	1611066328	1611066328
-f	2021	3	7	22	5	22072021	admindb	admindb	1611066328	1611066328
-f	2021	3	7	23	6	23072021	admindb	admindb	1611066328	1611066328
-f	2021	3	7	24	7	24072021	admindb	admindb	1611066328	1611066328
-f	2021	3	7	25	1	25072021	admindb	admindb	1611066328	1611066328
-f	2021	3	7	26	2	26072021	admindb	admindb	1611066328	1611066328
-f	2021	3	7	27	3	27072021	admindb	admindb	1611066328	1611066328
-f	2021	3	7	28	4	28072021	admindb	admindb	1611066328	1611066328
-f	2021	3	7	29	5	29072021	admindb	admindb	1611066328	1611066328
-f	2021	3	7	30	6	30072021	admindb	admindb	1611066328	1611066328
-f	2021	3	7	31	7	31072021	admindb	admindb	1611066328	1611066328
-f	2021	3	8	1	1	01082021	admindb	admindb	1611066328	1611066328
-f	2021	3	8	2	2	02082021	admindb	admindb	1611066328	1611066328
-f	2021	3	8	3	3	03082021	admindb	admindb	1611066328	1611066328
-f	2021	3	8	4	4	04082021	admindb	admindb	1611066328	1611066328
-f	2021	3	8	5	5	05082021	admindb	admindb	1611066328	1611066328
-f	2021	3	8	6	6	06082021	admindb	admindb	1611066328	1611066328
-f	2021	3	8	7	7	07082021	admindb	admindb	1611066328	1611066328
-f	2021	3	8	8	1	08082021	admindb	admindb	1611066328	1611066328
-f	2021	3	8	9	2	09082021	admindb	admindb	1611066328	1611066328
-f	2021	3	8	10	3	10082021	admindb	admindb	1611066328	1611066328
-f	2021	3	8	11	4	11082021	admindb	admindb	1611066328	1611066328
-f	2021	3	8	12	5	12082021	admindb	admindb	1611066328	1611066328
-f	2021	3	8	13	6	13082021	admindb	admindb	1611066328	1611066328
-f	2021	3	8	14	7	14082021	admindb	admindb	1611066328	1611066328
-f	2021	3	8	15	1	15082021	admindb	admindb	1611066328	1611066328
-f	2021	3	8	16	2	16082021	admindb	admindb	1611066328	1611066328
-f	2021	3	8	17	3	17082021	admindb	admindb	1611066328	1611066328
-f	2021	3	8	18	4	18082021	admindb	admindb	1611066328	1611066328
-f	2021	3	8	19	5	19082021	admindb	admindb	1611066328	1611066328
-f	2021	3	8	20	6	20082021	admindb	admindb	1611066328	1611066328
-f	2021	3	8	21	7	21082021	admindb	admindb	1611066328	1611066328
-f	2021	3	8	22	1	22082021	admindb	admindb	1611066328	1611066328
-f	2021	3	8	23	2	23082021	admindb	admindb	1611066328	1611066328
-f	2021	3	8	24	3	24082021	admindb	admindb	1611066328	1611066328
-f	2021	3	8	25	4	25082021	admindb	admindb	1611066328	1611066328
-f	2021	3	8	26	5	26082021	admindb	admindb	1611066328	1611066328
-f	2021	3	8	27	6	27082021	admindb	admindb	1611066328	1611066328
-f	2021	3	8	28	7	28082021	admindb	admindb	1611066328	1611066328
-f	2021	3	8	29	1	29082021	admindb	admindb	1611066328	1611066328
-f	2021	3	8	30	2	30082021	admindb	admindb	1611066328	1611066328
-f	2021	3	8	31	3	31082021	admindb	admindb	1611066328	1611066328
-f	2021	3	9	1	4	01092021	admindb	admindb	1611066328	1611066328
-f	2021	3	9	2	5	02092021	admindb	admindb	1611066328	1611066328
-f	2021	3	9	3	6	03092021	admindb	admindb	1611066328	1611066328
-f	2021	3	9	4	7	04092021	admindb	admindb	1611066328	1611066328
-f	2021	3	9	5	1	05092021	admindb	admindb	1611066328	1611066328
-f	2021	3	9	6	2	06092021	admindb	admindb	1611066328	1611066328
-f	2021	3	9	7	3	07092021	admindb	admindb	1611066328	1611066328
-f	2021	3	9	8	4	08092021	admindb	admindb	1611066328	1611066328
-f	2021	3	9	9	5	09092021	admindb	admindb	1611066328	1611066328
-f	2021	3	9	10	6	10092021	admindb	admindb	1611066328	1611066328
-f	2021	3	9	11	7	11092021	admindb	admindb	1611066328	1611066328
-f	2021	3	9	12	1	12092021	admindb	admindb	1611066328	1611066328
-f	2021	3	9	13	2	13092021	admindb	admindb	1611066328	1611066328
-f	2021	3	9	14	3	14092021	admindb	admindb	1611066328	1611066328
-f	2021	3	9	15	4	15092021	admindb	admindb	1611066328	1611066328
-f	2021	3	9	16	5	16092021	admindb	admindb	1611066328	1611066328
-f	2021	3	9	17	6	17092021	admindb	admindb	1611066328	1611066328
-f	2021	3	9	18	7	18092021	admindb	admindb	1611066328	1611066328
-f	2021	3	9	19	1	19092021	admindb	admindb	1611066328	1611066328
-f	2021	3	9	20	2	20092021	admindb	admindb	1611066328	1611066328
-f	2021	3	9	21	3	21092021	admindb	admindb	1611066328	1611066328
-f	2021	3	9	22	4	22092021	admindb	admindb	1611066328	1611066328
-f	2021	3	9	23	5	23092021	admindb	admindb	1611066328	1611066328
-f	2021	3	9	24	6	24092021	admindb	admindb	1611066328	1611066328
-f	2021	3	9	25	7	25092021	admindb	admindb	1611066328	1611066328
-f	2021	3	9	26	1	26092021	admindb	admindb	1611066328	1611066328
-f	2021	3	9	27	2	27092021	admindb	admindb	1611066328	1611066328
-f	2021	3	9	28	3	28092021	admindb	admindb	1611066328	1611066328
-f	2021	3	9	29	4	29092021	admindb	admindb	1611066328	1611066328
-f	2021	3	9	30	5	30092021	admindb	admindb	1611066328	1611066328
-f	2021	4	10	1	6	01102021	admindb	admindb	1611066328	1611066328
-f	2021	4	10	2	7	02102021	admindb	admindb	1611066328	1611066328
-f	2021	4	10	3	1	03102021	admindb	admindb	1611066328	1611066328
-f	2021	4	10	4	2	04102021	admindb	admindb	1611066328	1611066328
-f	2021	4	10	5	3	05102021	admindb	admindb	1611066328	1611066328
-f	2021	4	10	6	4	06102021	admindb	admindb	1611066328	1611066328
-f	2021	4	10	7	5	07102021	admindb	admindb	1611066328	1611066328
-f	2021	4	10	8	6	08102021	admindb	admindb	1611066328	1611066328
-f	2021	4	10	9	7	09102021	admindb	admindb	1611066328	1611066328
-f	2021	4	10	10	1	10102021	admindb	admindb	1611066328	1611066328
-f	2021	4	10	11	2	11102021	admindb	admindb	1611066328	1611066328
-f	2021	4	10	12	3	12102021	admindb	admindb	1611066328	1611066328
-f	2021	4	10	13	4	13102021	admindb	admindb	1611066328	1611066328
-f	2021	4	10	14	5	14102021	admindb	admindb	1611066328	1611066328
-f	2021	4	10	15	6	15102021	admindb	admindb	1611066328	1611066328
-f	2021	4	10	16	7	16102021	admindb	admindb	1611066328	1611066328
-f	2021	4	10	17	1	17102021	admindb	admindb	1611066328	1611066328
-f	2021	4	10	18	2	18102021	admindb	admindb	1611066328	1611066328
-f	2021	4	10	19	3	19102021	admindb	admindb	1611066328	1611066328
-f	2021	4	10	20	4	20102021	admindb	admindb	1611066328	1611066328
-f	2021	4	10	21	5	21102021	admindb	admindb	1611066328	1611066328
-f	2021	4	10	22	6	22102021	admindb	admindb	1611066328	1611066328
-f	2021	4	10	23	7	23102021	admindb	admindb	1611066328	1611066328
-f	2021	4	10	24	1	24102021	admindb	admindb	1611066328	1611066328
-f	2021	4	10	25	2	25102021	admindb	admindb	1611066328	1611066328
-f	2021	4	10	26	3	26102021	admindb	admindb	1611066328	1611066328
-f	2021	4	10	27	4	27102021	admindb	admindb	1611066328	1611066328
-f	2021	4	10	28	5	28102021	admindb	admindb	1611066328	1611066328
-f	2021	4	10	29	6	29102021	admindb	admindb	1611066328	1611066328
-f	2021	4	10	30	7	30102021	admindb	admindb	1611066328	1611066328
-f	2021	4	10	31	1	31102021	admindb	admindb	1611066328	1611066328
-f	2021	4	11	1	2	01112021	admindb	admindb	1611066328	1611066328
-f	2021	4	11	2	3	02112021	admindb	admindb	1611066328	1611066328
-f	2021	4	11	3	4	03112021	admindb	admindb	1611066328	1611066328
-f	2021	4	11	4	5	04112021	admindb	admindb	1611066328	1611066328
-f	2021	4	11	5	6	05112021	admindb	admindb	1611066328	1611066328
-f	2021	4	11	6	7	06112021	admindb	admindb	1611066328	1611066328
-f	2021	4	11	7	1	07112021	admindb	admindb	1611066328	1611066328
-f	2021	4	11	8	2	08112021	admindb	admindb	1611066328	1611066328
-f	2021	4	11	9	3	09112021	admindb	admindb	1611066328	1611066328
-f	2021	4	11	10	4	10112021	admindb	admindb	1611066328	1611066328
-f	2021	4	11	11	5	11112021	admindb	admindb	1611066328	1611066328
-f	2021	4	11	12	6	12112021	admindb	admindb	1611066328	1611066328
-f	2021	4	11	13	7	13112021	admindb	admindb	1611066328	1611066328
-f	2021	4	11	14	1	14112021	admindb	admindb	1611066328	1611066328
-f	2021	4	11	15	2	15112021	admindb	admindb	1611066328	1611066328
-f	2021	4	11	16	3	16112021	admindb	admindb	1611066328	1611066328
-f	2021	4	11	17	4	17112021	admindb	admindb	1611066328	1611066328
-f	2021	4	11	18	5	18112021	admindb	admindb	1611066328	1611066328
-f	2021	4	11	19	6	19112021	admindb	admindb	1611066328	1611066328
-f	2021	4	11	20	7	20112021	admindb	admindb	1611066328	1611066328
-f	2021	4	11	21	1	21112021	admindb	admindb	1611066328	1611066328
-f	2021	4	11	22	2	22112021	admindb	admindb	1611066328	1611066328
-f	2021	4	11	23	3	23112021	admindb	admindb	1611066328	1611066328
-f	2021	4	11	24	4	24112021	admindb	admindb	1611066328	1611066328
-f	2021	4	11	25	5	25112021	admindb	admindb	1611066328	1611066328
-f	2021	4	11	26	6	26112021	admindb	admindb	1611066328	1611066328
-f	2021	4	11	27	7	27112021	admindb	admindb	1611066328	1611066328
-f	2021	4	11	28	1	28112021	admindb	admindb	1611066328	1611066328
-f	2021	4	11	29	2	29112021	admindb	admindb	1611066328	1611066328
-f	2021	4	11	30	3	30112021	admindb	admindb	1611066328	1611066328
-f	2021	4	12	1	4	01122021	admindb	admindb	1611066328	1611066328
-f	2021	4	12	2	5	02122021	admindb	admindb	1611066328	1611066328
-f	2021	4	12	3	6	03122021	admindb	admindb	1611066328	1611066328
-f	2021	4	12	4	7	04122021	admindb	admindb	1611066328	1611066328
-f	2021	4	12	5	1	05122021	admindb	admindb	1611066328	1611066328
-f	2021	4	12	6	2	06122021	admindb	admindb	1611066328	1611066328
-f	2021	4	12	7	3	07122021	admindb	admindb	1611066328	1611066328
-f	2021	4	12	8	4	08122021	admindb	admindb	1611066328	1611066328
-f	2021	4	12	9	5	09122021	admindb	admindb	1611066328	1611066328
-f	2021	4	12	10	6	10122021	admindb	admindb	1611066328	1611066328
-f	2021	4	12	11	7	11122021	admindb	admindb	1611066328	1611066328
-f	2021	4	12	12	1	12122021	admindb	admindb	1611066328	1611066328
-f	2021	4	12	13	2	13122021	admindb	admindb	1611066328	1611066328
-f	2021	4	12	14	3	14122021	admindb	admindb	1611066328	1611066328
-f	2021	4	12	15	4	15122021	admindb	admindb	1611066328	1611066328
-f	2021	4	12	16	5	16122021	admindb	admindb	1611066328	1611066328
-f	2021	4	12	17	6	17122021	admindb	admindb	1611066328	1611066328
-f	2021	4	12	18	7	18122021	admindb	admindb	1611066328	1611066328
-f	2021	4	12	19	1	19122021	admindb	admindb	1611066328	1611066328
-f	2021	4	12	20	2	20122021	admindb	admindb	1611066328	1611066328
-f	2021	4	12	21	3	21122021	admindb	admindb	1611066328	1611066328
-f	2021	4	12	22	4	22122021	admindb	admindb	1611066328	1611066328
-f	2021	4	12	23	5	23122021	admindb	admindb	1611066328	1611066328
-f	2021	4	12	24	6	24122021	admindb	admindb	1611066328	1611066328
-f	2021	4	12	25	7	25122021	admindb	admindb	1611066328	1611066328
-f	2021	4	12	26	1	26122021	admindb	admindb	1611066328	1611066328
-f	2021	4	12	27	2	27122021	admindb	admindb	1611066328	1611066328
-f	2021	4	12	28	3	28122021	admindb	admindb	1611066328	1611066328
-f	2021	4	12	29	4	29122021	admindb	admindb	1611066328	1611066328
-f	2021	4	12	30	5	30122021	admindb	admindb	1611066328	1611066328
-f	2021	4	12	31	6	31122021	admindb	admindb	1611066328	1611066328
-f	2022	1	1	1	7	01012022	admindb	admindb	1611066328	1611066328
-f	2022	1	1	2	1	02012022	admindb	admindb	1611066328	1611066328
-f	2022	1	1	3	2	03012022	admindb	admindb	1611066328	1611066328
-f	2022	1	1	4	3	04012022	admindb	admindb	1611066328	1611066328
-f	2022	1	1	5	4	05012022	admindb	admindb	1611066328	1611066328
-f	2022	1	1	6	5	06012022	admindb	admindb	1611066328	1611066328
-f	2022	1	1	7	6	07012022	admindb	admindb	1611066328	1611066328
-f	2022	1	1	8	7	08012022	admindb	admindb	1611066328	1611066328
-f	2022	1	1	9	1	09012022	admindb	admindb	1611066328	1611066328
-f	2022	1	1	10	2	10012022	admindb	admindb	1611066328	1611066328
-f	2022	1	1	11	3	11012022	admindb	admindb	1611066328	1611066328
-f	2022	1	1	12	4	12012022	admindb	admindb	1611066328	1611066328
-f	2022	1	1	13	5	13012022	admindb	admindb	1611066328	1611066328
-f	2022	1	1	14	6	14012022	admindb	admindb	1611066328	1611066328
-f	2022	1	1	15	7	15012022	admindb	admindb	1611066328	1611066328
-f	2022	1	1	16	1	16012022	admindb	admindb	1611066328	1611066328
-f	2022	1	1	17	2	17012022	admindb	admindb	1611066328	1611066328
-f	2022	1	1	18	3	18012022	admindb	admindb	1611066328	1611066328
-f	2022	1	1	19	4	19012022	admindb	admindb	1611066328	1611066328
-f	2022	1	1	20	5	20012022	admindb	admindb	1611066328	1611066328
-f	2022	1	1	21	6	21012022	admindb	admindb	1611066328	1611066328
-f	2022	1	1	22	7	22012022	admindb	admindb	1611066328	1611066328
-f	2022	1	1	23	1	23012022	admindb	admindb	1611066328	1611066328
-f	2022	1	1	24	2	24012022	admindb	admindb	1611066328	1611066328
-f	2022	1	1	25	3	25012022	admindb	admindb	1611066328	1611066328
-f	2022	1	1	26	4	26012022	admindb	admindb	1611066328	1611066328
-f	2022	1	1	27	5	27012022	admindb	admindb	1611066328	1611066328
-f	2022	1	1	28	6	28012022	admindb	admindb	1611066328	1611066328
-f	2022	1	1	29	7	29012022	admindb	admindb	1611066328	1611066328
-f	2022	1	1	30	1	30012022	admindb	admindb	1611066328	1611066328
-f	2022	1	1	31	2	31012022	admindb	admindb	1611066328	1611066328
-f	2022	1	2	1	3	01022022	admindb	admindb	1611066328	1611066328
-f	2022	1	2	2	4	02022022	admindb	admindb	1611066328	1611066328
-f	2022	1	2	3	5	03022022	admindb	admindb	1611066328	1611066328
-f	2022	1	2	4	6	04022022	admindb	admindb	1611066328	1611066328
-f	2022	1	2	5	7	05022022	admindb	admindb	1611066328	1611066328
-f	2022	1	2	6	1	06022022	admindb	admindb	1611066328	1611066328
-f	2022	1	2	7	2	07022022	admindb	admindb	1611066328	1611066328
-f	2022	1	2	8	3	08022022	admindb	admindb	1611066328	1611066328
-f	2022	1	2	9	4	09022022	admindb	admindb	1611066328	1611066328
-f	2022	1	2	10	5	10022022	admindb	admindb	1611066328	1611066328
-f	2022	1	2	11	6	11022022	admindb	admindb	1611066328	1611066328
-f	2022	1	2	12	7	12022022	admindb	admindb	1611066328	1611066328
-f	2022	1	2	13	1	13022022	admindb	admindb	1611066328	1611066328
-f	2022	1	2	14	2	14022022	admindb	admindb	1611066328	1611066328
-f	2022	1	2	15	3	15022022	admindb	admindb	1611066328	1611066328
-f	2022	1	2	16	4	16022022	admindb	admindb	1611066328	1611066328
-f	2022	1	2	17	5	17022022	admindb	admindb	1611066328	1611066328
-f	2022	1	2	18	6	18022022	admindb	admindb	1611066328	1611066328
-f	2022	1	2	19	7	19022022	admindb	admindb	1611066328	1611066328
-f	2022	1	2	20	1	20022022	admindb	admindb	1611066328	1611066328
-f	2022	1	2	21	2	21022022	admindb	admindb	1611066328	1611066328
-f	2022	1	2	22	3	22022022	admindb	admindb	1611066328	1611066328
-f	2022	1	2	23	4	23022022	admindb	admindb	1611066328	1611066328
-f	2022	1	2	24	5	24022022	admindb	admindb	1611066328	1611066328
-f	2022	1	2	25	6	25022022	admindb	admindb	1611066328	1611066328
-f	2022	1	2	26	7	26022022	admindb	admindb	1611066328	1611066328
-f	2022	1	2	27	1	27022022	admindb	admindb	1611066328	1611066328
-f	2022	1	2	28	2	28022022	admindb	admindb	1611066328	1611066328
-f	2022	1	3	1	3	01032022	admindb	admindb	1611066328	1611066328
-f	2022	1	3	2	4	02032022	admindb	admindb	1611066328	1611066328
-f	2022	1	3	3	5	03032022	admindb	admindb	1611066328	1611066328
-f	2022	1	3	4	6	04032022	admindb	admindb	1611066328	1611066328
-f	2022	1	3	5	7	05032022	admindb	admindb	1611066328	1611066328
-f	2022	1	3	6	1	06032022	admindb	admindb	1611066328	1611066328
-f	2022	1	3	7	2	07032022	admindb	admindb	1611066328	1611066328
-f	2022	1	3	8	3	08032022	admindb	admindb	1611066328	1611066328
-f	2022	1	3	9	4	09032022	admindb	admindb	1611066328	1611066328
-f	2022	1	3	10	5	10032022	admindb	admindb	1611066328	1611066328
-f	2022	1	3	11	6	11032022	admindb	admindb	1611066328	1611066328
-f	2022	1	3	12	7	12032022	admindb	admindb	1611066328	1611066328
-f	2022	1	3	13	1	13032022	admindb	admindb	1611066328	1611066328
-f	2022	1	3	14	2	14032022	admindb	admindb	1611066328	1611066328
-f	2022	1	3	15	3	15032022	admindb	admindb	1611066328	1611066328
-f	2022	1	3	16	4	16032022	admindb	admindb	1611066328	1611066328
-f	2022	1	3	17	5	17032022	admindb	admindb	1611066328	1611066328
-f	2022	1	3	18	6	18032022	admindb	admindb	1611066328	1611066328
-f	2022	1	3	19	7	19032022	admindb	admindb	1611066328	1611066328
-f	2022	1	3	20	1	20032022	admindb	admindb	1611066328	1611066328
-f	2022	1	3	21	2	21032022	admindb	admindb	1611066328	1611066328
-f	2022	1	3	22	3	22032022	admindb	admindb	1611066328	1611066328
-f	2022	1	3	23	4	23032022	admindb	admindb	1611066328	1611066328
-f	2022	1	3	24	5	24032022	admindb	admindb	1611066328	1611066328
-f	2022	1	3	25	6	25032022	admindb	admindb	1611066328	1611066328
-f	2022	1	3	26	7	26032022	admindb	admindb	1611066328	1611066328
-f	2022	1	3	27	1	27032022	admindb	admindb	1611066328	1611066328
-f	2022	1	3	28	2	28032022	admindb	admindb	1611066328	1611066328
-f	2022	1	3	29	3	29032022	admindb	admindb	1611066328	1611066328
-f	2022	1	3	30	4	30032022	admindb	admindb	1611066328	1611066328
-f	2022	1	3	31	5	31032022	admindb	admindb	1611066328	1611066328
-f	2022	2	4	1	6	01042022	admindb	admindb	1611066328	1611066328
-f	2022	2	4	2	7	02042022	admindb	admindb	1611066328	1611066328
-f	2022	2	4	3	1	03042022	admindb	admindb	1611066328	1611066328
-f	2022	2	4	4	2	04042022	admindb	admindb	1611066328	1611066328
-f	2022	2	4	5	3	05042022	admindb	admindb	1611066328	1611066328
-f	2022	2	4	6	4	06042022	admindb	admindb	1611066328	1611066328
-f	2022	2	4	7	5	07042022	admindb	admindb	1611066328	1611066328
-f	2022	2	4	8	6	08042022	admindb	admindb	1611066328	1611066328
-f	2022	2	4	9	7	09042022	admindb	admindb	1611066328	1611066328
-f	2022	2	4	10	1	10042022	admindb	admindb	1611066328	1611066328
-f	2022	2	4	11	2	11042022	admindb	admindb	1611066328	1611066328
-f	2022	2	4	12	3	12042022	admindb	admindb	1611066328	1611066328
-f	2022	2	4	13	4	13042022	admindb	admindb	1611066328	1611066328
-f	2022	2	4	14	5	14042022	admindb	admindb	1611066328	1611066328
-f	2022	2	4	15	6	15042022	admindb	admindb	1611066328	1611066328
-f	2022	2	4	16	7	16042022	admindb	admindb	1611066328	1611066328
-f	2022	2	4	17	1	17042022	admindb	admindb	1611066328	1611066328
-f	2022	2	4	18	2	18042022	admindb	admindb	1611066328	1611066328
-f	2022	2	4	19	3	19042022	admindb	admindb	1611066328	1611066328
-f	2022	2	4	20	4	20042022	admindb	admindb	1611066328	1611066328
-f	2022	2	4	21	5	21042022	admindb	admindb	1611066328	1611066328
-f	2022	2	4	22	6	22042022	admindb	admindb	1611066328	1611066328
-f	2022	2	4	23	7	23042022	admindb	admindb	1611066328	1611066328
-f	2022	2	4	24	1	24042022	admindb	admindb	1611066328	1611066328
-f	2022	2	4	25	2	25042022	admindb	admindb	1611066328	1611066328
-f	2022	2	4	26	3	26042022	admindb	admindb	1611066328	1611066328
-f	2022	2	4	27	4	27042022	admindb	admindb	1611066328	1611066328
-f	2022	2	4	28	5	28042022	admindb	admindb	1611066328	1611066328
-f	2022	2	4	29	6	29042022	admindb	admindb	1611066328	1611066328
-f	2022	2	4	30	7	30042022	admindb	admindb	1611066328	1611066328
-f	2022	2	5	1	1	01052022	admindb	admindb	1611066328	1611066328
-f	2022	2	5	2	2	02052022	admindb	admindb	1611066328	1611066328
-f	2022	2	5	3	3	03052022	admindb	admindb	1611066328	1611066328
-f	2022	2	5	4	4	04052022	admindb	admindb	1611066328	1611066328
-f	2022	2	5	5	5	05052022	admindb	admindb	1611066328	1611066328
-f	2022	2	5	6	6	06052022	admindb	admindb	1611066328	1611066328
-f	2022	2	5	7	7	07052022	admindb	admindb	1611066328	1611066328
-f	2022	2	5	8	1	08052022	admindb	admindb	1611066328	1611066328
-f	2022	2	5	9	2	09052022	admindb	admindb	1611066328	1611066328
-f	2022	2	5	10	3	10052022	admindb	admindb	1611066328	1611066328
-f	2022	2	5	11	4	11052022	admindb	admindb	1611066328	1611066328
-f	2022	2	5	12	5	12052022	admindb	admindb	1611066328	1611066328
-f	2022	2	5	13	6	13052022	admindb	admindb	1611066328	1611066328
-f	2022	2	5	14	7	14052022	admindb	admindb	1611066328	1611066328
-f	2022	2	5	15	1	15052022	admindb	admindb	1611066328	1611066328
-f	2022	2	5	16	2	16052022	admindb	admindb	1611066328	1611066328
-f	2022	2	5	17	3	17052022	admindb	admindb	1611066328	1611066328
-f	2022	2	5	18	4	18052022	admindb	admindb	1611066328	1611066328
-f	2022	2	5	19	5	19052022	admindb	admindb	1611066328	1611066328
-f	2022	2	5	20	6	20052022	admindb	admindb	1611066328	1611066328
-f	2022	2	5	21	7	21052022	admindb	admindb	1611066328	1611066328
-f	2022	2	5	22	1	22052022	admindb	admindb	1611066328	1611066328
-f	2022	2	5	23	2	23052022	admindb	admindb	1611066328	1611066328
-f	2022	2	5	24	3	24052022	admindb	admindb	1611066328	1611066328
-f	2022	2	5	25	4	25052022	admindb	admindb	1611066328	1611066328
-f	2022	2	5	26	5	26052022	admindb	admindb	1611066328	1611066328
-f	2022	2	5	27	6	27052022	admindb	admindb	1611066328	1611066328
-f	2022	2	5	28	7	28052022	admindb	admindb	1611066328	1611066328
-f	2022	2	5	29	1	29052022	admindb	admindb	1611066328	1611066328
-f	2022	2	5	30	2	30052022	admindb	admindb	1611066328	1611066328
-f	2022	2	5	31	3	31052022	admindb	admindb	1611066328	1611066328
-f	2022	2	6	1	4	01062022	admindb	admindb	1611066328	1611066328
-f	2022	2	6	2	5	02062022	admindb	admindb	1611066328	1611066328
-f	2022	2	6	3	6	03062022	admindb	admindb	1611066328	1611066328
-f	2022	2	6	4	7	04062022	admindb	admindb	1611066328	1611066328
-f	2022	2	6	5	1	05062022	admindb	admindb	1611066328	1611066328
-f	2022	2	6	6	2	06062022	admindb	admindb	1611066328	1611066328
-f	2022	2	6	7	3	07062022	admindb	admindb	1611066328	1611066328
-f	2022	2	6	8	4	08062022	admindb	admindb	1611066328	1611066328
-f	2022	2	6	9	5	09062022	admindb	admindb	1611066328	1611066328
-f	2022	2	6	10	6	10062022	admindb	admindb	1611066328	1611066328
-f	2022	2	6	11	7	11062022	admindb	admindb	1611066328	1611066328
-f	2022	2	6	12	1	12062022	admindb	admindb	1611066328	1611066328
-f	2022	2	6	13	2	13062022	admindb	admindb	1611066328	1611066328
-f	2022	2	6	14	3	14062022	admindb	admindb	1611066328	1611066328
-f	2022	2	6	15	4	15062022	admindb	admindb	1611066328	1611066328
-f	2022	2	6	16	5	16062022	admindb	admindb	1611066328	1611066328
-f	2022	2	6	17	6	17062022	admindb	admindb	1611066328	1611066328
-f	2022	2	6	18	7	18062022	admindb	admindb	1611066328	1611066328
-f	2022	2	6	19	1	19062022	admindb	admindb	1611066328	1611066328
-f	2022	2	6	20	2	20062022	admindb	admindb	1611066328	1611066328
-f	2022	2	6	21	3	21062022	admindb	admindb	1611066328	1611066328
-f	2022	2	6	22	4	22062022	admindb	admindb	1611066328	1611066328
-f	2022	2	6	23	5	23062022	admindb	admindb	1611066328	1611066328
-f	2022	2	6	24	6	24062022	admindb	admindb	1611066328	1611066328
-f	2022	2	6	25	7	25062022	admindb	admindb	1611066328	1611066328
-f	2022	2	6	26	1	26062022	admindb	admindb	1611066328	1611066328
-f	2022	2	6	27	2	27062022	admindb	admindb	1611066328	1611066328
-f	2022	2	6	28	3	28062022	admindb	admindb	1611066328	1611066328
-f	2022	2	6	29	4	29062022	admindb	admindb	1611066328	1611066328
-f	2022	2	6	30	5	30062022	admindb	admindb	1611066328	1611066328
-f	2022	3	7	1	6	01072022	admindb	admindb	1611066328	1611066328
-f	2022	3	7	2	7	02072022	admindb	admindb	1611066328	1611066328
-f	2022	3	7	3	1	03072022	admindb	admindb	1611066328	1611066328
-f	2022	3	7	4	2	04072022	admindb	admindb	1611066328	1611066328
-f	2022	3	7	5	3	05072022	admindb	admindb	1611066328	1611066328
-f	2022	3	7	6	4	06072022	admindb	admindb	1611066328	1611066328
-f	2022	3	7	7	5	07072022	admindb	admindb	1611066328	1611066328
-f	2022	3	7	8	6	08072022	admindb	admindb	1611066328	1611066328
-f	2022	3	7	9	7	09072022	admindb	admindb	1611066328	1611066328
-f	2022	3	7	10	1	10072022	admindb	admindb	1611066328	1611066328
-f	2022	3	7	11	2	11072022	admindb	admindb	1611066328	1611066328
-f	2022	3	7	12	3	12072022	admindb	admindb	1611066328	1611066328
-f	2022	3	7	13	4	13072022	admindb	admindb	1611066328	1611066328
-f	2022	3	7	14	5	14072022	admindb	admindb	1611066328	1611066328
-f	2022	3	7	15	6	15072022	admindb	admindb	1611066328	1611066328
-f	2022	3	7	16	7	16072022	admindb	admindb	1611066328	1611066328
-f	2022	3	7	17	1	17072022	admindb	admindb	1611066328	1611066328
-f	2022	3	7	18	2	18072022	admindb	admindb	1611066328	1611066328
-f	2022	3	7	19	3	19072022	admindb	admindb	1611066328	1611066328
-f	2022	3	7	20	4	20072022	admindb	admindb	1611066328	1611066328
-f	2022	3	7	21	5	21072022	admindb	admindb	1611066328	1611066328
-f	2022	3	7	22	6	22072022	admindb	admindb	1611066328	1611066328
-f	2022	3	7	23	7	23072022	admindb	admindb	1611066328	1611066328
-f	2022	3	7	24	1	24072022	admindb	admindb	1611066328	1611066328
-f	2022	3	7	25	2	25072022	admindb	admindb	1611066328	1611066328
-f	2022	3	7	26	3	26072022	admindb	admindb	1611066328	1611066328
-f	2022	3	7	27	4	27072022	admindb	admindb	1611066328	1611066328
-f	2022	3	7	28	5	28072022	admindb	admindb	1611066328	1611066328
-f	2022	3	7	29	6	29072022	admindb	admindb	1611066328	1611066328
-f	2022	3	7	30	7	30072022	admindb	admindb	1611066328	1611066328
-f	2022	3	7	31	1	31072022	admindb	admindb	1611066328	1611066328
-f	2022	3	8	1	2	01082022	admindb	admindb	1611066328	1611066328
-f	2022	3	8	2	3	02082022	admindb	admindb	1611066328	1611066328
-f	2022	3	8	3	4	03082022	admindb	admindb	1611066328	1611066328
-f	2022	3	8	4	5	04082022	admindb	admindb	1611066328	1611066328
-f	2022	3	8	5	6	05082022	admindb	admindb	1611066328	1611066328
-f	2022	3	8	6	7	06082022	admindb	admindb	1611066328	1611066328
-f	2022	3	8	7	1	07082022	admindb	admindb	1611066328	1611066328
-f	2022	3	8	8	2	08082022	admindb	admindb	1611066328	1611066328
-f	2022	3	8	9	3	09082022	admindb	admindb	1611066328	1611066328
-f	2022	3	8	10	4	10082022	admindb	admindb	1611066328	1611066328
-f	2022	3	8	11	5	11082022	admindb	admindb	1611066328	1611066328
-f	2022	3	8	12	6	12082022	admindb	admindb	1611066328	1611066328
-f	2022	3	8	13	7	13082022	admindb	admindb	1611066328	1611066328
-f	2022	3	8	14	1	14082022	admindb	admindb	1611066328	1611066328
-f	2022	3	8	15	2	15082022	admindb	admindb	1611066328	1611066328
-f	2022	3	8	16	3	16082022	admindb	admindb	1611066328	1611066328
-f	2022	3	8	17	4	17082022	admindb	admindb	1611066328	1611066328
-f	2022	3	8	18	5	18082022	admindb	admindb	1611066328	1611066328
-f	2022	3	8	19	6	19082022	admindb	admindb	1611066328	1611066328
-f	2022	3	8	20	7	20082022	admindb	admindb	1611066328	1611066328
-f	2022	3	8	21	1	21082022	admindb	admindb	1611066328	1611066328
-f	2022	3	8	22	2	22082022	admindb	admindb	1611066328	1611066328
-f	2022	3	8	23	3	23082022	admindb	admindb	1611066328	1611066328
-f	2022	3	8	24	4	24082022	admindb	admindb	1611066328	1611066328
-f	2022	3	8	25	5	25082022	admindb	admindb	1611066328	1611066328
-f	2022	3	8	26	6	26082022	admindb	admindb	1611066328	1611066328
-f	2022	3	8	27	7	27082022	admindb	admindb	1611066328	1611066328
-f	2022	3	8	28	1	28082022	admindb	admindb	1611066328	1611066328
-f	2022	3	8	29	2	29082022	admindb	admindb	1611066328	1611066328
-f	2022	3	8	30	3	30082022	admindb	admindb	1611066328	1611066328
-f	2022	3	8	31	4	31082022	admindb	admindb	1611066328	1611066328
-f	2022	3	9	1	5	01092022	admindb	admindb	1611066328	1611066328
-f	2022	3	9	2	6	02092022	admindb	admindb	1611066328	1611066328
-f	2022	3	9	3	7	03092022	admindb	admindb	1611066328	1611066328
-f	2022	3	9	4	1	04092022	admindb	admindb	1611066328	1611066328
-f	2022	3	9	5	2	05092022	admindb	admindb	1611066328	1611066328
-f	2022	3	9	6	3	06092022	admindb	admindb	1611066328	1611066328
-f	2022	3	9	7	4	07092022	admindb	admindb	1611066328	1611066328
-f	2022	3	9	8	5	08092022	admindb	admindb	1611066328	1611066328
-f	2022	3	9	9	6	09092022	admindb	admindb	1611066328	1611066328
-f	2022	3	9	10	7	10092022	admindb	admindb	1611066328	1611066328
-f	2022	3	9	11	1	11092022	admindb	admindb	1611066328	1611066328
-f	2022	3	9	12	2	12092022	admindb	admindb	1611066328	1611066328
-f	2022	3	9	13	3	13092022	admindb	admindb	1611066328	1611066328
-f	2022	3	9	14	4	14092022	admindb	admindb	1611066328	1611066328
-f	2022	3	9	15	5	15092022	admindb	admindb	1611066328	1611066328
-f	2022	3	9	16	6	16092022	admindb	admindb	1611066328	1611066328
-f	2022	3	9	17	7	17092022	admindb	admindb	1611066328	1611066328
-f	2022	3	9	18	1	18092022	admindb	admindb	1611066328	1611066328
-f	2022	3	9	19	2	19092022	admindb	admindb	1611066328	1611066328
-f	2022	3	9	20	3	20092022	admindb	admindb	1611066328	1611066328
-f	2022	3	9	21	4	21092022	admindb	admindb	1611066328	1611066328
-f	2022	3	9	22	5	22092022	admindb	admindb	1611066328	1611066328
-f	2022	3	9	23	6	23092022	admindb	admindb	1611066328	1611066328
-f	2022	3	9	24	7	24092022	admindb	admindb	1611066328	1611066328
-f	2022	3	9	25	1	25092022	admindb	admindb	1611066328	1611066328
-f	2022	3	9	26	2	26092022	admindb	admindb	1611066328	1611066328
-f	2022	3	9	27	3	27092022	admindb	admindb	1611066328	1611066328
-f	2022	3	9	28	4	28092022	admindb	admindb	1611066328	1611066328
-f	2022	3	9	29	5	29092022	admindb	admindb	1611066328	1611066328
-f	2022	3	9	30	6	30092022	admindb	admindb	1611066328	1611066328
-f	2022	4	10	1	7	01102022	admindb	admindb	1611066328	1611066328
-f	2022	4	10	2	1	02102022	admindb	admindb	1611066328	1611066328
-f	2022	4	10	3	2	03102022	admindb	admindb	1611066328	1611066328
-f	2022	4	10	4	3	04102022	admindb	admindb	1611066328	1611066328
-f	2022	4	10	5	4	05102022	admindb	admindb	1611066328	1611066328
-f	2022	4	10	6	5	06102022	admindb	admindb	1611066328	1611066328
-f	2022	4	10	7	6	07102022	admindb	admindb	1611066328	1611066328
-f	2022	4	10	8	7	08102022	admindb	admindb	1611066328	1611066328
-f	2022	4	10	9	1	09102022	admindb	admindb	1611066328	1611066328
-f	2022	4	10	10	2	10102022	admindb	admindb	1611066328	1611066328
-f	2022	4	10	11	3	11102022	admindb	admindb	1611066328	1611066328
-f	2022	4	10	12	4	12102022	admindb	admindb	1611066328	1611066328
-f	2022	4	10	13	5	13102022	admindb	admindb	1611066328	1611066328
-f	2022	4	10	14	6	14102022	admindb	admindb	1611066328	1611066328
-f	2022	4	10	15	7	15102022	admindb	admindb	1611066328	1611066328
-f	2022	4	10	16	1	16102022	admindb	admindb	1611066328	1611066328
-f	2022	4	10	17	2	17102022	admindb	admindb	1611066328	1611066328
-f	2022	4	10	18	3	18102022	admindb	admindb	1611066328	1611066328
-f	2022	4	10	19	4	19102022	admindb	admindb	1611066328	1611066328
-f	2022	4	10	20	5	20102022	admindb	admindb	1611066328	1611066328
-f	2022	4	10	21	6	21102022	admindb	admindb	1611066328	1611066328
-f	2022	4	10	22	7	22102022	admindb	admindb	1611066328	1611066328
-f	2022	4	10	23	1	23102022	admindb	admindb	1611066328	1611066328
-f	2022	4	10	24	2	24102022	admindb	admindb	1611066328	1611066328
-f	2022	4	10	25	3	25102022	admindb	admindb	1611066328	1611066328
-f	2022	4	10	26	4	26102022	admindb	admindb	1611066328	1611066328
-f	2022	4	10	27	5	27102022	admindb	admindb	1611066328	1611066328
-f	2022	4	10	28	6	28102022	admindb	admindb	1611066328	1611066328
-f	2022	4	10	29	7	29102022	admindb	admindb	1611066328	1611066328
-f	2022	4	10	30	1	30102022	admindb	admindb	1611066328	1611066328
-f	2022	4	10	31	2	31102022	admindb	admindb	1611066328	1611066328
-f	2022	4	11	1	3	01112022	admindb	admindb	1611066328	1611066328
-f	2022	4	11	2	4	02112022	admindb	admindb	1611066328	1611066328
-f	2022	4	11	3	5	03112022	admindb	admindb	1611066328	1611066328
-f	2022	4	11	4	6	04112022	admindb	admindb	1611066328	1611066328
-f	2022	4	11	5	7	05112022	admindb	admindb	1611066328	1611066328
-f	2022	4	11	6	1	06112022	admindb	admindb	1611066328	1611066328
-f	2022	4	11	7	2	07112022	admindb	admindb	1611066328	1611066328
-f	2022	4	11	8	3	08112022	admindb	admindb	1611066328	1611066328
-f	2022	4	11	9	4	09112022	admindb	admindb	1611066328	1611066328
-f	2022	4	11	10	5	10112022	admindb	admindb	1611066328	1611066328
-f	2022	4	11	11	6	11112022	admindb	admindb	1611066328	1611066328
-f	2022	4	11	12	7	12112022	admindb	admindb	1611066328	1611066328
-f	2022	4	11	13	1	13112022	admindb	admindb	1611066328	1611066328
-f	2022	4	11	14	2	14112022	admindb	admindb	1611066328	1611066328
-f	2022	4	11	15	3	15112022	admindb	admindb	1611066328	1611066328
-f	2022	4	11	16	4	16112022	admindb	admindb	1611066328	1611066328
-f	2022	4	11	17	5	17112022	admindb	admindb	1611066328	1611066328
-f	2022	4	11	18	6	18112022	admindb	admindb	1611066328	1611066328
-f	2022	4	11	19	7	19112022	admindb	admindb	1611066328	1611066328
-f	2022	4	11	20	1	20112022	admindb	admindb	1611066328	1611066328
-f	2022	4	11	21	2	21112022	admindb	admindb	1611066328	1611066328
-f	2022	4	11	22	3	22112022	admindb	admindb	1611066328	1611066328
-f	2022	4	11	23	4	23112022	admindb	admindb	1611066328	1611066328
-f	2022	4	11	24	5	24112022	admindb	admindb	1611066328	1611066328
-f	2022	4	11	25	6	25112022	admindb	admindb	1611066328	1611066328
-f	2022	4	11	26	7	26112022	admindb	admindb	1611066328	1611066328
-f	2022	4	11	27	1	27112022	admindb	admindb	1611066328	1611066328
-f	2022	4	11	28	2	28112022	admindb	admindb	1611066328	1611066328
-f	2022	4	11	29	3	29112022	admindb	admindb	1611066328	1611066328
-f	2022	4	11	30	4	30112022	admindb	admindb	1611066328	1611066328
-f	2022	4	12	1	5	01122022	admindb	admindb	1611066328	1611066328
-f	2022	4	12	2	6	02122022	admindb	admindb	1611066328	1611066328
-f	2022	4	12	3	7	03122022	admindb	admindb	1611066328	1611066328
-f	2022	4	12	4	1	04122022	admindb	admindb	1611066328	1611066328
-f	2022	4	12	5	2	05122022	admindb	admindb	1611066328	1611066328
-f	2022	4	12	6	3	06122022	admindb	admindb	1611066328	1611066328
-f	2022	4	12	7	4	07122022	admindb	admindb	1611066328	1611066328
-f	2022	4	12	8	5	08122022	admindb	admindb	1611066328	1611066328
-f	2022	4	12	9	6	09122022	admindb	admindb	1611066328	1611066328
-f	2022	4	12	10	7	10122022	admindb	admindb	1611066328	1611066328
-f	2022	4	12	11	1	11122022	admindb	admindb	1611066328	1611066328
-f	2022	4	12	12	2	12122022	admindb	admindb	1611066328	1611066328
-f	2022	4	12	13	3	13122022	admindb	admindb	1611066328	1611066328
-f	2022	4	12	14	4	14122022	admindb	admindb	1611066328	1611066328
-f	2022	4	12	15	5	15122022	admindb	admindb	1611066328	1611066328
-f	2022	4	12	16	6	16122022	admindb	admindb	1611066328	1611066328
-f	2022	4	12	17	7	17122022	admindb	admindb	1611066328	1611066328
-f	2022	4	12	18	1	18122022	admindb	admindb	1611066328	1611066328
-f	2022	4	12	19	2	19122022	admindb	admindb	1611066328	1611066328
-f	2022	4	12	20	3	20122022	admindb	admindb	1611066328	1611066328
-f	2022	4	12	21	4	21122022	admindb	admindb	1611066328	1611066328
-f	2022	4	12	22	5	22122022	admindb	admindb	1611066328	1611066328
-f	2022	4	12	23	6	23122022	admindb	admindb	1611066328	1611066328
-f	2022	4	12	24	7	24122022	admindb	admindb	1611066328	1611066328
-f	2022	4	12	25	1	25122022	admindb	admindb	1611066328	1611066328
-f	2022	4	12	26	2	26122022	admindb	admindb	1611066328	1611066328
-f	2022	4	12	27	3	27122022	admindb	admindb	1611066328	1611066328
-f	2022	4	12	28	4	28122022	admindb	admindb	1611066328	1611066328
-f	2022	4	12	29	5	29122022	admindb	admindb	1611066328	1611066328
-f	2022	4	12	30	6	30122022	admindb	admindb	1611066328	1611066328
-f	2022	4	12	31	7	31122022	admindb	admindb	1611066328	1611066328
+t	2020	1	1	1	4	01012020	admindb	admindb	1617774650	1617774650
+t	2020	1	1	2	5	02012020	admindb	admindb	1617774650	1617774650
+t	2020	1	1	3	6	03012020	admindb	admindb	1617774650	1617774650
+t	2020	1	1	4	7	04012020	admindb	admindb	1617774650	1617774650
+t	2020	1	1	5	1	05012020	admindb	admindb	1617774650	1617774650
+t	2020	1	1	6	2	06012020	admindb	admindb	1617774650	1617774650
+t	2020	1	1	7	3	07012020	admindb	admindb	1617774650	1617774650
+t	2020	1	1	8	4	08012020	admindb	admindb	1617774650	1617774650
+t	2020	1	1	9	5	09012020	admindb	admindb	1617774650	1617774650
+t	2020	1	1	10	6	10012020	admindb	admindb	1617774650	1617774650
+t	2020	1	1	11	7	11012020	admindb	admindb	1617774650	1617774650
+t	2020	1	1	12	1	12012020	admindb	admindb	1617774650	1617774650
+t	2020	1	1	13	2	13012020	admindb	admindb	1617774650	1617774650
+t	2020	1	1	14	3	14012020	admindb	admindb	1617774650	1617774650
+t	2020	1	1	15	4	15012020	admindb	admindb	1617774650	1617774650
+t	2020	1	1	16	5	16012020	admindb	admindb	1617774650	1617774650
+t	2020	1	1	17	6	17012020	admindb	admindb	1617774650	1617774650
+t	2020	1	1	18	7	18012020	admindb	admindb	1617774650	1617774650
+t	2020	1	1	19	1	19012020	admindb	admindb	1617774650	1617774650
+t	2020	1	1	20	2	20012020	admindb	admindb	1617774650	1617774650
+t	2020	1	1	21	3	21012020	admindb	admindb	1617774650	1617774650
+t	2020	1	1	22	4	22012020	admindb	admindb	1617774650	1617774650
+t	2020	1	1	23	5	23012020	admindb	admindb	1617774650	1617774650
+t	2020	1	1	24	6	24012020	admindb	admindb	1617774650	1617774650
+t	2020	1	1	25	7	25012020	admindb	admindb	1617774650	1617774650
+t	2020	1	1	26	1	26012020	admindb	admindb	1617774650	1617774650
+t	2020	1	1	27	2	27012020	admindb	admindb	1617774650	1617774650
+t	2020	1	1	28	3	28012020	admindb	admindb	1617774650	1617774650
+t	2020	1	1	29	4	29012020	admindb	admindb	1617774650	1617774650
+t	2020	1	1	30	5	30012020	admindb	admindb	1617774650	1617774650
+t	2020	1	1	31	6	31012020	admindb	admindb	1617774650	1617774650
+t	2020	1	2	1	7	01022020	admindb	admindb	1617774650	1617774650
+t	2020	1	2	2	1	02022020	admindb	admindb	1617774650	1617774650
+t	2020	1	2	3	2	03022020	admindb	admindb	1617774650	1617774650
+t	2020	1	2	4	3	04022020	admindb	admindb	1617774650	1617774650
+t	2020	1	2	5	4	05022020	admindb	admindb	1617774650	1617774650
+t	2020	1	2	6	5	06022020	admindb	admindb	1617774650	1617774650
+t	2020	1	2	7	6	07022020	admindb	admindb	1617774650	1617774650
+t	2020	1	2	8	7	08022020	admindb	admindb	1617774650	1617774650
+t	2020	1	2	9	1	09022020	admindb	admindb	1617774650	1617774650
+t	2020	1	2	10	2	10022020	admindb	admindb	1617774650	1617774650
+t	2020	1	2	11	3	11022020	admindb	admindb	1617774650	1617774650
+t	2020	1	2	12	4	12022020	admindb	admindb	1617774650	1617774650
+t	2020	1	2	13	5	13022020	admindb	admindb	1617774650	1617774650
+t	2020	1	2	14	6	14022020	admindb	admindb	1617774650	1617774650
+t	2020	1	2	15	7	15022020	admindb	admindb	1617774650	1617774650
+t	2020	1	2	16	1	16022020	admindb	admindb	1617774650	1617774650
+t	2020	1	2	17	2	17022020	admindb	admindb	1617774650	1617774650
+t	2020	1	2	18	3	18022020	admindb	admindb	1617774650	1617774650
+t	2020	1	2	19	4	19022020	admindb	admindb	1617774650	1617774650
+t	2020	1	2	20	5	20022020	admindb	admindb	1617774650	1617774650
+t	2020	1	2	21	6	21022020	admindb	admindb	1617774650	1617774650
+t	2020	1	2	22	7	22022020	admindb	admindb	1617774650	1617774650
+t	2020	1	2	23	1	23022020	admindb	admindb	1617774650	1617774650
+t	2020	1	2	24	2	24022020	admindb	admindb	1617774650	1617774650
+t	2020	1	2	25	3	25022020	admindb	admindb	1617774650	1617774650
+t	2020	1	2	26	4	26022020	admindb	admindb	1617774650	1617774650
+t	2020	1	2	27	5	27022020	admindb	admindb	1617774650	1617774650
+t	2020	1	2	28	6	28022020	admindb	admindb	1617774650	1617774650
+t	2020	1	2	29	7	29022020	admindb	admindb	1617774650	1617774650
+t	2020	1	3	1	1	01032020	admindb	admindb	1617774650	1617774650
+t	2020	1	3	2	2	02032020	admindb	admindb	1617774650	1617774650
+t	2020	1	3	3	3	03032020	admindb	admindb	1617774650	1617774650
+t	2020	1	3	4	4	04032020	admindb	admindb	1617774650	1617774650
+t	2020	1	3	5	5	05032020	admindb	admindb	1617774650	1617774650
+t	2020	1	3	6	6	06032020	admindb	admindb	1617774650	1617774650
+t	2020	1	3	7	7	07032020	admindb	admindb	1617774650	1617774650
+t	2020	1	3	8	1	08032020	admindb	admindb	1617774650	1617774650
+t	2020	1	3	9	2	09032020	admindb	admindb	1617774650	1617774650
+t	2020	1	3	10	3	10032020	admindb	admindb	1617774650	1617774650
+t	2020	1	3	11	4	11032020	admindb	admindb	1617774650	1617774650
+t	2020	1	3	12	5	12032020	admindb	admindb	1617774650	1617774650
+t	2020	1	3	13	6	13032020	admindb	admindb	1617774650	1617774650
+t	2020	1	3	14	7	14032020	admindb	admindb	1617774650	1617774650
+t	2020	1	3	15	1	15032020	admindb	admindb	1617774650	1617774650
+t	2020	1	3	16	2	16032020	admindb	admindb	1617774650	1617774650
+t	2020	1	3	17	3	17032020	admindb	admindb	1617774650	1617774650
+t	2020	1	3	18	4	18032020	admindb	admindb	1617774650	1617774650
+t	2020	1	3	19	5	19032020	admindb	admindb	1617774650	1617774650
+t	2020	1	3	20	6	20032020	admindb	admindb	1617774650	1617774650
+t	2020	1	3	21	7	21032020	admindb	admindb	1617774650	1617774650
+t	2020	1	3	22	1	22032020	admindb	admindb	1617774650	1617774650
+t	2020	1	3	23	2	23032020	admindb	admindb	1617774650	1617774650
+t	2020	1	3	24	3	24032020	admindb	admindb	1617774650	1617774650
+t	2020	1	3	25	4	25032020	admindb	admindb	1617774650	1617774650
+t	2020	1	3	26	5	26032020	admindb	admindb	1617774650	1617774650
+t	2020	1	3	27	6	27032020	admindb	admindb	1617774650	1617774650
+t	2020	1	3	28	7	28032020	admindb	admindb	1617774650	1617774650
+t	2020	1	3	29	1	29032020	admindb	admindb	1617774650	1617774650
+t	2020	1	3	30	2	30032020	admindb	admindb	1617774650	1617774650
+t	2020	1	3	31	3	31032020	admindb	admindb	1617774650	1617774650
+t	2020	2	4	1	4	01042020	admindb	admindb	1617774650	1617774650
+t	2020	2	4	2	5	02042020	admindb	admindb	1617774650	1617774650
+t	2020	2	4	3	6	03042020	admindb	admindb	1617774650	1617774650
+t	2020	2	4	4	7	04042020	admindb	admindb	1617774650	1617774650
+t	2020	2	4	5	1	05042020	admindb	admindb	1617774650	1617774650
+t	2020	2	4	6	2	06042020	admindb	admindb	1617774650	1617774650
+t	2020	2	4	7	3	07042020	admindb	admindb	1617774650	1617774650
+t	2020	2	4	8	4	08042020	admindb	admindb	1617774650	1617774650
+t	2020	2	4	9	5	09042020	admindb	admindb	1617774650	1617774650
+t	2020	2	4	10	6	10042020	admindb	admindb	1617774650	1617774650
+t	2020	2	4	11	7	11042020	admindb	admindb	1617774650	1617774650
+t	2020	2	4	12	1	12042020	admindb	admindb	1617774650	1617774650
+t	2020	2	4	13	2	13042020	admindb	admindb	1617774650	1617774650
+t	2020	2	4	14	3	14042020	admindb	admindb	1617774650	1617774650
+t	2020	2	4	15	4	15042020	admindb	admindb	1617774650	1617774650
+t	2020	2	4	16	5	16042020	admindb	admindb	1617774650	1617774650
+t	2020	2	4	17	6	17042020	admindb	admindb	1617774650	1617774650
+t	2020	2	4	18	7	18042020	admindb	admindb	1617774650	1617774650
+t	2020	2	4	19	1	19042020	admindb	admindb	1617774650	1617774650
+t	2020	2	4	20	2	20042020	admindb	admindb	1617774650	1617774650
+t	2020	2	4	21	3	21042020	admindb	admindb	1617774650	1617774650
+t	2020	2	4	22	4	22042020	admindb	admindb	1617774650	1617774650
+t	2020	2	4	23	5	23042020	admindb	admindb	1617774650	1617774650
+t	2020	2	4	24	6	24042020	admindb	admindb	1617774650	1617774650
+t	2020	2	4	25	7	25042020	admindb	admindb	1617774650	1617774650
+t	2020	2	4	26	1	26042020	admindb	admindb	1617774650	1617774650
+t	2020	2	4	27	2	27042020	admindb	admindb	1617774650	1617774650
+t	2020	2	4	28	3	28042020	admindb	admindb	1617774650	1617774650
+t	2020	2	4	29	4	29042020	admindb	admindb	1617774650	1617774650
+t	2020	2	4	30	5	30042020	admindb	admindb	1617774650	1617774650
+t	2020	2	5	1	6	01052020	admindb	admindb	1617774650	1617774650
+t	2020	2	5	2	7	02052020	admindb	admindb	1617774650	1617774650
+t	2020	2	5	3	1	03052020	admindb	admindb	1617774650	1617774650
+t	2020	2	5	4	2	04052020	admindb	admindb	1617774650	1617774650
+t	2020	2	5	5	3	05052020	admindb	admindb	1617774650	1617774650
+t	2020	2	5	6	4	06052020	admindb	admindb	1617774650	1617774650
+t	2020	2	5	7	5	07052020	admindb	admindb	1617774650	1617774650
+t	2020	2	5	8	6	08052020	admindb	admindb	1617774650	1617774650
+t	2020	2	5	9	7	09052020	admindb	admindb	1617774650	1617774650
+t	2020	2	5	10	1	10052020	admindb	admindb	1617774650	1617774650
+t	2020	2	5	11	2	11052020	admindb	admindb	1617774650	1617774650
+t	2020	2	5	12	3	12052020	admindb	admindb	1617774650	1617774650
+t	2020	2	5	13	4	13052020	admindb	admindb	1617774650	1617774650
+t	2020	2	5	14	5	14052020	admindb	admindb	1617774650	1617774650
+t	2020	2	5	15	6	15052020	admindb	admindb	1617774650	1617774650
+t	2020	2	5	16	7	16052020	admindb	admindb	1617774650	1617774650
+t	2020	2	5	17	1	17052020	admindb	admindb	1617774650	1617774650
+t	2020	2	5	18	2	18052020	admindb	admindb	1617774650	1617774650
+t	2020	2	5	19	3	19052020	admindb	admindb	1617774650	1617774650
+t	2020	2	5	20	4	20052020	admindb	admindb	1617774650	1617774650
+t	2020	2	5	21	5	21052020	admindb	admindb	1617774650	1617774650
+t	2020	2	5	22	6	22052020	admindb	admindb	1617774650	1617774650
+t	2020	2	5	23	7	23052020	admindb	admindb	1617774650	1617774650
+t	2020	2	5	24	1	24052020	admindb	admindb	1617774650	1617774650
+t	2020	2	5	25	2	25052020	admindb	admindb	1617774650	1617774650
+t	2020	2	5	26	3	26052020	admindb	admindb	1617774650	1617774650
+t	2020	2	5	27	4	27052020	admindb	admindb	1617774650	1617774650
+t	2020	2	5	28	5	28052020	admindb	admindb	1617774650	1617774650
+t	2020	2	5	29	6	29052020	admindb	admindb	1617774650	1617774650
+t	2020	2	5	30	7	30052020	admindb	admindb	1617774650	1617774650
+t	2020	2	5	31	1	31052020	admindb	admindb	1617774650	1617774650
+t	2020	2	6	1	2	01062020	admindb	admindb	1617774650	1617774650
+t	2020	2	6	2	3	02062020	admindb	admindb	1617774650	1617774650
+t	2020	2	6	3	4	03062020	admindb	admindb	1617774650	1617774650
+t	2020	2	6	4	5	04062020	admindb	admindb	1617774650	1617774650
+t	2020	2	6	5	6	05062020	admindb	admindb	1617774650	1617774650
+t	2020	2	6	6	7	06062020	admindb	admindb	1617774650	1617774650
+t	2020	2	6	7	1	07062020	admindb	admindb	1617774650	1617774650
+t	2020	2	6	8	2	08062020	admindb	admindb	1617774650	1617774650
+t	2020	2	6	9	3	09062020	admindb	admindb	1617774650	1617774650
+t	2020	2	6	10	4	10062020	admindb	admindb	1617774650	1617774650
+t	2020	2	6	11	5	11062020	admindb	admindb	1617774650	1617774650
+t	2020	2	6	12	6	12062020	admindb	admindb	1617774650	1617774650
+t	2020	2	6	13	7	13062020	admindb	admindb	1617774650	1617774650
+t	2020	2	6	14	1	14062020	admindb	admindb	1617774650	1617774650
+t	2020	2	6	15	2	15062020	admindb	admindb	1617774650	1617774650
+t	2020	2	6	16	3	16062020	admindb	admindb	1617774650	1617774650
+t	2020	2	6	17	4	17062020	admindb	admindb	1617774650	1617774650
+t	2020	2	6	18	5	18062020	admindb	admindb	1617774650	1617774650
+t	2020	2	6	19	6	19062020	admindb	admindb	1617774650	1617774650
+t	2020	2	6	20	7	20062020	admindb	admindb	1617774650	1617774650
+t	2020	2	6	21	1	21062020	admindb	admindb	1617774650	1617774650
+t	2020	2	6	22	2	22062020	admindb	admindb	1617774650	1617774650
+t	2020	2	6	23	3	23062020	admindb	admindb	1617774650	1617774650
+t	2020	2	6	24	4	24062020	admindb	admindb	1617774650	1617774650
+t	2020	2	6	25	5	25062020	admindb	admindb	1617774650	1617774650
+t	2020	2	6	26	6	26062020	admindb	admindb	1617774650	1617774650
+t	2020	2	6	27	7	27062020	admindb	admindb	1617774650	1617774650
+t	2020	2	6	28	1	28062020	admindb	admindb	1617774650	1617774650
+t	2020	2	6	29	2	29062020	admindb	admindb	1617774650	1617774650
+t	2020	2	6	30	3	30062020	admindb	admindb	1617774650	1617774650
+t	2020	3	7	1	4	01072020	admindb	admindb	1617774650	1617774650
+t	2020	3	7	2	5	02072020	admindb	admindb	1617774650	1617774650
+t	2020	3	7	3	6	03072020	admindb	admindb	1617774650	1617774650
+t	2020	3	7	4	7	04072020	admindb	admindb	1617774650	1617774650
+t	2020	3	7	5	1	05072020	admindb	admindb	1617774650	1617774650
+t	2020	3	7	6	2	06072020	admindb	admindb	1617774650	1617774650
+t	2020	3	7	7	3	07072020	admindb	admindb	1617774650	1617774650
+t	2020	3	7	8	4	08072020	admindb	admindb	1617774650	1617774650
+t	2020	3	7	9	5	09072020	admindb	admindb	1617774650	1617774650
+t	2020	3	7	10	6	10072020	admindb	admindb	1617774650	1617774650
+t	2020	3	7	11	7	11072020	admindb	admindb	1617774650	1617774650
+t	2020	3	7	12	1	12072020	admindb	admindb	1617774650	1617774650
+t	2020	3	7	13	2	13072020	admindb	admindb	1617774650	1617774650
+t	2020	3	7	14	3	14072020	admindb	admindb	1617774650	1617774650
+t	2020	3	7	15	4	15072020	admindb	admindb	1617774650	1617774650
+t	2020	3	7	16	5	16072020	admindb	admindb	1617774650	1617774650
+t	2020	3	7	17	6	17072020	admindb	admindb	1617774650	1617774650
+t	2020	3	7	18	7	18072020	admindb	admindb	1617774650	1617774650
+t	2020	3	7	19	1	19072020	admindb	admindb	1617774650	1617774650
+t	2020	3	7	20	2	20072020	admindb	admindb	1617774650	1617774650
+t	2020	3	7	21	3	21072020	admindb	admindb	1617774650	1617774650
+t	2020	3	7	22	4	22072020	admindb	admindb	1617774650	1617774650
+t	2020	3	7	23	5	23072020	admindb	admindb	1617774650	1617774650
+t	2020	3	7	24	6	24072020	admindb	admindb	1617774650	1617774650
+t	2020	3	7	25	7	25072020	admindb	admindb	1617774650	1617774650
+t	2020	3	7	26	1	26072020	admindb	admindb	1617774650	1617774650
+t	2020	3	7	27	2	27072020	admindb	admindb	1617774650	1617774650
+t	2020	3	7	28	3	28072020	admindb	admindb	1617774650	1617774650
+t	2020	3	7	29	4	29072020	admindb	admindb	1617774650	1617774650
+t	2020	3	7	30	5	30072020	admindb	admindb	1617774650	1617774650
+t	2020	3	7	31	6	31072020	admindb	admindb	1617774650	1617774650
+t	2020	3	8	1	7	01082020	admindb	admindb	1617774650	1617774650
+t	2020	3	8	2	1	02082020	admindb	admindb	1617774650	1617774650
+t	2020	3	8	3	2	03082020	admindb	admindb	1617774650	1617774650
+t	2020	3	8	4	3	04082020	admindb	admindb	1617774650	1617774650
+t	2020	3	8	5	4	05082020	admindb	admindb	1617774650	1617774650
+t	2020	3	8	6	5	06082020	admindb	admindb	1617774650	1617774650
+t	2020	3	8	7	6	07082020	admindb	admindb	1617774650	1617774650
+t	2020	3	8	8	7	08082020	admindb	admindb	1617774650	1617774650
+t	2020	3	8	9	1	09082020	admindb	admindb	1617774650	1617774650
+t	2020	3	8	10	2	10082020	admindb	admindb	1617774650	1617774650
+t	2020	3	8	11	3	11082020	admindb	admindb	1617774650	1617774650
+t	2020	3	8	12	4	12082020	admindb	admindb	1617774650	1617774650
+t	2020	3	8	13	5	13082020	admindb	admindb	1617774650	1617774650
+t	2020	3	8	14	6	14082020	admindb	admindb	1617774650	1617774650
+t	2020	3	8	15	7	15082020	admindb	admindb	1617774650	1617774650
+t	2020	3	8	16	1	16082020	admindb	admindb	1617774650	1617774650
+t	2020	3	8	17	2	17082020	admindb	admindb	1617774650	1617774650
+t	2020	3	8	18	3	18082020	admindb	admindb	1617774650	1617774650
+t	2020	3	8	19	4	19082020	admindb	admindb	1617774650	1617774650
+t	2020	3	8	20	5	20082020	admindb	admindb	1617774650	1617774650
+t	2020	3	8	21	6	21082020	admindb	admindb	1617774650	1617774650
+t	2020	3	8	22	7	22082020	admindb	admindb	1617774650	1617774650
+t	2020	3	8	23	1	23082020	admindb	admindb	1617774650	1617774650
+t	2020	3	8	24	2	24082020	admindb	admindb	1617774650	1617774650
+t	2020	3	8	25	3	25082020	admindb	admindb	1617774650	1617774650
+t	2020	3	8	26	4	26082020	admindb	admindb	1617774650	1617774650
+t	2020	3	8	27	5	27082020	admindb	admindb	1617774650	1617774650
+t	2020	3	8	28	6	28082020	admindb	admindb	1617774650	1617774650
+t	2020	3	8	29	7	29082020	admindb	admindb	1617774650	1617774650
+t	2020	3	8	30	1	30082020	admindb	admindb	1617774650	1617774650
+t	2020	3	8	31	2	31082020	admindb	admindb	1617774650	1617774650
+t	2020	3	9	1	3	01092020	admindb	admindb	1617774650	1617774650
+t	2020	3	9	2	4	02092020	admindb	admindb	1617774650	1617774650
+t	2020	3	9	3	5	03092020	admindb	admindb	1617774650	1617774650
+t	2020	3	9	4	6	04092020	admindb	admindb	1617774650	1617774650
+t	2020	3	9	5	7	05092020	admindb	admindb	1617774650	1617774650
+t	2020	3	9	6	1	06092020	admindb	admindb	1617774650	1617774650
+t	2020	3	9	7	2	07092020	admindb	admindb	1617774650	1617774650
+t	2020	3	9	8	3	08092020	admindb	admindb	1617774650	1617774650
+t	2020	3	9	9	4	09092020	admindb	admindb	1617774650	1617774650
+t	2020	3	9	10	5	10092020	admindb	admindb	1617774650	1617774650
+t	2020	3	9	11	6	11092020	admindb	admindb	1617774650	1617774650
+t	2020	3	9	12	7	12092020	admindb	admindb	1617774650	1617774650
+t	2020	3	9	13	1	13092020	admindb	admindb	1617774650	1617774650
+t	2020	3	9	14	2	14092020	admindb	admindb	1617774650	1617774650
+t	2020	3	9	15	3	15092020	admindb	admindb	1617774650	1617774650
+t	2020	3	9	16	4	16092020	admindb	admindb	1617774650	1617774650
+t	2020	3	9	17	5	17092020	admindb	admindb	1617774650	1617774650
+t	2020	3	9	18	6	18092020	admindb	admindb	1617774650	1617774650
+t	2020	3	9	19	7	19092020	admindb	admindb	1617774650	1617774650
+t	2020	3	9	20	1	20092020	admindb	admindb	1617774650	1617774650
+t	2020	3	9	21	2	21092020	admindb	admindb	1617774650	1617774650
+t	2020	3	9	22	3	22092020	admindb	admindb	1617774650	1617774650
+t	2020	3	9	23	4	23092020	admindb	admindb	1617774650	1617774650
+t	2020	3	9	24	5	24092020	admindb	admindb	1617774650	1617774650
+t	2020	3	9	25	6	25092020	admindb	admindb	1617774650	1617774650
+t	2020	3	9	26	7	26092020	admindb	admindb	1617774650	1617774650
+t	2020	3	9	27	1	27092020	admindb	admindb	1617774650	1617774650
+t	2020	3	9	28	2	28092020	admindb	admindb	1617774650	1617774650
+t	2020	3	9	29	3	29092020	admindb	admindb	1617774650	1617774650
+t	2020	3	9	30	4	30092020	admindb	admindb	1617774650	1617774650
+t	2020	4	10	1	5	01102020	admindb	admindb	1617774650	1617774650
+t	2020	4	10	2	6	02102020	admindb	admindb	1617774650	1617774650
+t	2020	4	10	3	7	03102020	admindb	admindb	1617774650	1617774650
+t	2020	4	10	4	1	04102020	admindb	admindb	1617774650	1617774650
+t	2020	4	10	5	2	05102020	admindb	admindb	1617774650	1617774650
+t	2020	4	10	6	3	06102020	admindb	admindb	1617774650	1617774650
+t	2020	4	10	7	4	07102020	admindb	admindb	1617774650	1617774650
+t	2020	4	10	8	5	08102020	admindb	admindb	1617774650	1617774650
+t	2020	4	10	9	6	09102020	admindb	admindb	1617774650	1617774650
+t	2020	4	10	10	7	10102020	admindb	admindb	1617774650	1617774650
+t	2020	4	10	11	1	11102020	admindb	admindb	1617774650	1617774650
+t	2020	4	10	12	2	12102020	admindb	admindb	1617774650	1617774650
+t	2020	4	10	13	3	13102020	admindb	admindb	1617774650	1617774650
+t	2020	4	10	14	4	14102020	admindb	admindb	1617774650	1617774650
+t	2020	4	10	15	5	15102020	admindb	admindb	1617774650	1617774650
+t	2020	4	10	16	6	16102020	admindb	admindb	1617774650	1617774650
+t	2020	4	10	17	7	17102020	admindb	admindb	1617774650	1617774650
+t	2020	4	10	18	1	18102020	admindb	admindb	1617774650	1617774650
+t	2020	4	10	19	2	19102020	admindb	admindb	1617774650	1617774650
+t	2020	4	10	20	3	20102020	admindb	admindb	1617774650	1617774650
+t	2020	4	10	21	4	21102020	admindb	admindb	1617774650	1617774650
+t	2020	4	10	22	5	22102020	admindb	admindb	1617774650	1617774650
+t	2020	4	10	23	6	23102020	admindb	admindb	1617774650	1617774650
+t	2020	4	10	24	7	24102020	admindb	admindb	1617774650	1617774650
+t	2020	4	10	25	1	25102020	admindb	admindb	1617774650	1617774650
+t	2020	4	10	26	2	26102020	admindb	admindb	1617774650	1617774650
+t	2020	4	10	27	3	27102020	admindb	admindb	1617774650	1617774650
+t	2020	4	10	28	4	28102020	admindb	admindb	1617774650	1617774650
+t	2020	4	10	29	5	29102020	admindb	admindb	1617774650	1617774650
+t	2020	4	10	30	6	30102020	admindb	admindb	1617774650	1617774650
+t	2020	4	10	31	7	31102020	admindb	admindb	1617774650	1617774650
+t	2020	4	11	1	1	01112020	admindb	admindb	1617774650	1617774650
+t	2020	4	11	2	2	02112020	admindb	admindb	1617774650	1617774650
+t	2020	4	11	3	3	03112020	admindb	admindb	1617774650	1617774650
+t	2020	4	11	4	4	04112020	admindb	admindb	1617774650	1617774650
+t	2020	4	11	5	5	05112020	admindb	admindb	1617774650	1617774650
+t	2020	4	11	6	6	06112020	admindb	admindb	1617774650	1617774650
+t	2020	4	11	7	7	07112020	admindb	admindb	1617774650	1617774650
+t	2020	4	11	8	1	08112020	admindb	admindb	1617774650	1617774650
+t	2020	4	11	9	2	09112020	admindb	admindb	1617774650	1617774650
+t	2020	4	11	10	3	10112020	admindb	admindb	1617774650	1617774650
+t	2020	4	11	11	4	11112020	admindb	admindb	1617774650	1617774650
+t	2020	4	11	12	5	12112020	admindb	admindb	1617774650	1617774650
+t	2020	4	11	13	6	13112020	admindb	admindb	1617774650	1617774650
+t	2020	4	11	14	7	14112020	admindb	admindb	1617774650	1617774650
+t	2020	4	11	15	1	15112020	admindb	admindb	1617774650	1617774650
+t	2020	4	11	16	2	16112020	admindb	admindb	1617774650	1617774650
+t	2020	4	11	17	3	17112020	admindb	admindb	1617774650	1617774650
+t	2020	4	11	18	4	18112020	admindb	admindb	1617774650	1617774650
+t	2020	4	11	19	5	19112020	admindb	admindb	1617774650	1617774650
+t	2020	4	11	20	6	20112020	admindb	admindb	1617774650	1617774650
+t	2020	4	11	21	7	21112020	admindb	admindb	1617774650	1617774650
+t	2020	4	11	22	1	22112020	admindb	admindb	1617774650	1617774650
+t	2020	4	11	23	2	23112020	admindb	admindb	1617774650	1617774650
+t	2020	4	11	24	3	24112020	admindb	admindb	1617774650	1617774650
+t	2020	4	11	25	4	25112020	admindb	admindb	1617774650	1617774650
+t	2020	4	11	26	5	26112020	admindb	admindb	1617774650	1617774650
+t	2020	4	11	27	6	27112020	admindb	admindb	1617774650	1617774650
+t	2020	4	11	28	7	28112020	admindb	admindb	1617774650	1617774650
+t	2020	4	11	29	1	29112020	admindb	admindb	1617774650	1617774650
+t	2020	4	11	30	2	30112020	admindb	admindb	1617774650	1617774650
+t	2020	4	12	1	3	01122020	admindb	admindb	1617774650	1617774650
+t	2020	4	12	2	4	02122020	admindb	admindb	1617774650	1617774650
+t	2020	4	12	3	5	03122020	admindb	admindb	1617774650	1617774650
+t	2020	4	12	4	6	04122020	admindb	admindb	1617774650	1617774650
+t	2020	4	12	5	7	05122020	admindb	admindb	1617774650	1617774650
+t	2020	4	12	6	1	06122020	admindb	admindb	1617774650	1617774650
+t	2020	4	12	7	2	07122020	admindb	admindb	1617774650	1617774650
+t	2020	4	12	8	3	08122020	admindb	admindb	1617774650	1617774650
+t	2020	4	12	9	4	09122020	admindb	admindb	1617774650	1617774650
+t	2020	4	12	10	5	10122020	admindb	admindb	1617774650	1617774650
+t	2020	4	12	11	6	11122020	admindb	admindb	1617774650	1617774650
+t	2020	4	12	12	7	12122020	admindb	admindb	1617774650	1617774650
+t	2020	4	12	13	1	13122020	admindb	admindb	1617774650	1617774650
+t	2020	4	12	14	2	14122020	admindb	admindb	1617774650	1617774650
+t	2020	4	12	15	3	15122020	admindb	admindb	1617774650	1617774650
+t	2020	4	12	16	4	16122020	admindb	admindb	1617774650	1617774650
+t	2020	4	12	17	5	17122020	admindb	admindb	1617774650	1617774650
+t	2020	4	12	18	6	18122020	admindb	admindb	1617774650	1617774650
+t	2020	4	12	19	7	19122020	admindb	admindb	1617774650	1617774650
+t	2020	4	12	20	1	20122020	admindb	admindb	1617774650	1617774650
+t	2020	4	12	21	2	21122020	admindb	admindb	1617774650	1617774650
+t	2020	4	12	22	3	22122020	admindb	admindb	1617774650	1617774650
+t	2020	4	12	23	4	23122020	admindb	admindb	1617774650	1617774650
+t	2020	4	12	24	5	24122020	admindb	admindb	1617774650	1617774650
+t	2020	4	12	25	6	25122020	admindb	admindb	1617774650	1617774650
+t	2020	4	12	26	7	26122020	admindb	admindb	1617774650	1617774650
+t	2020	4	12	27	1	27122020	admindb	admindb	1617774650	1617774650
+t	2020	4	12	28	2	28122020	admindb	admindb	1617774650	1617774650
+t	2020	4	12	29	3	29122020	admindb	admindb	1617774650	1617774650
+t	2020	4	12	30	4	30122020	admindb	admindb	1617774650	1617774650
+t	2020	4	12	31	5	31122020	admindb	admindb	1617774650	1617774650
+f	2021	1	1	1	6	01012021	admindb	admindb	1617774650	1617774650
+f	2021	1	1	2	7	02012021	admindb	admindb	1617774650	1617774650
+f	2021	1	1	3	1	03012021	admindb	admindb	1617774650	1617774650
+f	2021	1	1	4	2	04012021	admindb	admindb	1617774650	1617774650
+f	2021	1	1	5	3	05012021	admindb	admindb	1617774650	1617774650
+f	2021	1	1	6	4	06012021	admindb	admindb	1617774650	1617774650
+f	2021	1	1	7	5	07012021	admindb	admindb	1617774650	1617774650
+f	2021	1	1	8	6	08012021	admindb	admindb	1617774650	1617774650
+f	2021	1	1	9	7	09012021	admindb	admindb	1617774650	1617774650
+f	2021	1	1	10	1	10012021	admindb	admindb	1617774650	1617774650
+f	2021	1	1	11	2	11012021	admindb	admindb	1617774650	1617774650
+f	2021	1	1	12	3	12012021	admindb	admindb	1617774650	1617774650
+f	2021	1	1	13	4	13012021	admindb	admindb	1617774650	1617774650
+f	2021	1	1	14	5	14012021	admindb	admindb	1617774650	1617774650
+f	2021	1	1	15	6	15012021	admindb	admindb	1617774650	1617774650
+f	2021	1	1	16	7	16012021	admindb	admindb	1617774650	1617774650
+f	2021	1	1	17	1	17012021	admindb	admindb	1617774650	1617774650
+f	2021	1	1	18	2	18012021	admindb	admindb	1617774650	1617774650
+f	2021	1	1	19	3	19012021	admindb	admindb	1617774650	1617774650
+f	2021	1	1	20	4	20012021	admindb	admindb	1617774650	1617774650
+f	2021	1	1	21	5	21012021	admindb	admindb	1617774650	1617774650
+f	2021	1	1	22	6	22012021	admindb	admindb	1617774650	1617774650
+f	2021	1	1	23	7	23012021	admindb	admindb	1617774650	1617774650
+f	2021	1	1	24	1	24012021	admindb	admindb	1617774650	1617774650
+f	2021	1	1	25	2	25012021	admindb	admindb	1617774650	1617774650
+f	2021	1	1	26	3	26012021	admindb	admindb	1617774650	1617774650
+f	2021	1	1	27	4	27012021	admindb	admindb	1617774650	1617774650
+f	2021	1	1	28	5	28012021	admindb	admindb	1617774650	1617774650
+f	2021	1	1	29	6	29012021	admindb	admindb	1617774650	1617774650
+f	2021	1	1	30	7	30012021	admindb	admindb	1617774650	1617774650
+f	2021	1	1	31	1	31012021	admindb	admindb	1617774650	1617774650
+f	2021	1	2	1	2	01022021	admindb	admindb	1617774650	1617774650
+f	2021	1	2	2	3	02022021	admindb	admindb	1617774650	1617774650
+f	2021	1	2	3	4	03022021	admindb	admindb	1617774650	1617774650
+f	2021	1	2	4	5	04022021	admindb	admindb	1617774650	1617774650
+f	2021	1	2	5	6	05022021	admindb	admindb	1617774650	1617774650
+f	2021	1	2	6	7	06022021	admindb	admindb	1617774650	1617774650
+f	2021	1	2	7	1	07022021	admindb	admindb	1617774650	1617774650
+f	2021	1	2	8	2	08022021	admindb	admindb	1617774650	1617774650
+f	2021	1	2	9	3	09022021	admindb	admindb	1617774650	1617774650
+f	2021	1	2	10	4	10022021	admindb	admindb	1617774650	1617774650
+f	2021	1	2	11	5	11022021	admindb	admindb	1617774650	1617774650
+f	2021	1	2	12	6	12022021	admindb	admindb	1617774650	1617774650
+f	2021	1	2	13	7	13022021	admindb	admindb	1617774650	1617774650
+f	2021	1	2	14	1	14022021	admindb	admindb	1617774650	1617774650
+f	2021	1	2	15	2	15022021	admindb	admindb	1617774650	1617774650
+f	2021	1	2	16	3	16022021	admindb	admindb	1617774650	1617774650
+f	2021	1	2	17	4	17022021	admindb	admindb	1617774650	1617774650
+f	2021	1	2	18	5	18022021	admindb	admindb	1617774650	1617774650
+f	2021	1	2	19	6	19022021	admindb	admindb	1617774650	1617774650
+f	2021	1	2	20	7	20022021	admindb	admindb	1617774650	1617774650
+f	2021	1	2	21	1	21022021	admindb	admindb	1617774650	1617774650
+f	2021	1	2	22	2	22022021	admindb	admindb	1617774650	1617774650
+f	2021	1	2	23	3	23022021	admindb	admindb	1617774650	1617774650
+f	2021	1	2	24	4	24022021	admindb	admindb	1617774650	1617774650
+f	2021	1	2	25	5	25022021	admindb	admindb	1617774650	1617774650
+f	2021	1	2	26	6	26022021	admindb	admindb	1617774650	1617774650
+f	2021	1	2	27	7	27022021	admindb	admindb	1617774650	1617774650
+f	2021	1	2	28	1	28022021	admindb	admindb	1617774650	1617774650
+f	2021	1	3	1	2	01032021	admindb	admindb	1617774650	1617774650
+f	2021	1	3	2	3	02032021	admindb	admindb	1617774650	1617774650
+f	2021	1	3	3	4	03032021	admindb	admindb	1617774650	1617774650
+f	2021	1	3	4	5	04032021	admindb	admindb	1617774650	1617774650
+f	2021	1	3	5	6	05032021	admindb	admindb	1617774650	1617774650
+f	2021	1	3	6	7	06032021	admindb	admindb	1617774650	1617774650
+f	2021	1	3	7	1	07032021	admindb	admindb	1617774650	1617774650
+f	2021	1	3	8	2	08032021	admindb	admindb	1617774650	1617774650
+f	2021	1	3	9	3	09032021	admindb	admindb	1617774650	1617774650
+f	2021	1	3	10	4	10032021	admindb	admindb	1617774650	1617774650
+f	2021	1	3	11	5	11032021	admindb	admindb	1617774650	1617774650
+f	2021	1	3	12	6	12032021	admindb	admindb	1617774650	1617774650
+f	2021	1	3	13	7	13032021	admindb	admindb	1617774650	1617774650
+f	2021	1	3	14	1	14032021	admindb	admindb	1617774650	1617774650
+f	2021	1	3	15	2	15032021	admindb	admindb	1617774650	1617774650
+f	2021	1	3	16	3	16032021	admindb	admindb	1617774650	1617774650
+f	2021	1	3	17	4	17032021	admindb	admindb	1617774650	1617774650
+f	2021	1	3	18	5	18032021	admindb	admindb	1617774650	1617774650
+f	2021	1	3	19	6	19032021	admindb	admindb	1617774650	1617774650
+f	2021	1	3	20	7	20032021	admindb	admindb	1617774650	1617774650
+f	2021	1	3	21	1	21032021	admindb	admindb	1617774650	1617774650
+f	2021	1	3	22	2	22032021	admindb	admindb	1617774650	1617774650
+f	2021	1	3	23	3	23032021	admindb	admindb	1617774650	1617774650
+f	2021	1	3	24	4	24032021	admindb	admindb	1617774650	1617774650
+f	2021	1	3	25	5	25032021	admindb	admindb	1617774650	1617774650
+f	2021	1	3	26	6	26032021	admindb	admindb	1617774650	1617774650
+f	2021	1	3	27	7	27032021	admindb	admindb	1617774650	1617774650
+f	2021	1	3	28	1	28032021	admindb	admindb	1617774650	1617774650
+f	2021	1	3	29	2	29032021	admindb	admindb	1617774650	1617774650
+f	2021	1	3	30	3	30032021	admindb	admindb	1617774650	1617774650
+f	2021	1	3	31	4	31032021	admindb	admindb	1617774650	1617774650
+f	2021	2	4	1	5	01042021	admindb	admindb	1617774650	1617774650
+f	2021	2	4	2	6	02042021	admindb	admindb	1617774650	1617774650
+f	2021	2	4	3	7	03042021	admindb	admindb	1617774650	1617774650
+f	2021	2	4	4	1	04042021	admindb	admindb	1617774650	1617774650
+f	2021	2	4	5	2	05042021	admindb	admindb	1617774650	1617774650
+f	2021	2	4	6	3	06042021	admindb	admindb	1617774650	1617774650
+f	2021	2	4	7	4	07042021	admindb	admindb	1617774650	1617774650
+f	2021	2	4	8	5	08042021	admindb	admindb	1617774650	1617774650
+f	2021	2	4	9	6	09042021	admindb	admindb	1617774650	1617774650
+f	2021	2	4	10	7	10042021	admindb	admindb	1617774650	1617774650
+f	2021	2	4	11	1	11042021	admindb	admindb	1617774650	1617774650
+f	2021	2	4	12	2	12042021	admindb	admindb	1617774650	1617774650
+f	2021	2	4	13	3	13042021	admindb	admindb	1617774650	1617774650
+f	2021	2	4	14	4	14042021	admindb	admindb	1617774650	1617774650
+f	2021	2	4	15	5	15042021	admindb	admindb	1617774650	1617774650
+f	2021	2	4	16	6	16042021	admindb	admindb	1617774650	1617774650
+f	2021	2	4	17	7	17042021	admindb	admindb	1617774650	1617774650
+f	2021	2	4	18	1	18042021	admindb	admindb	1617774650	1617774650
+f	2021	2	4	19	2	19042021	admindb	admindb	1617774650	1617774650
+f	2021	2	4	20	3	20042021	admindb	admindb	1617774650	1617774650
+f	2021	2	4	21	4	21042021	admindb	admindb	1617774650	1617774650
+f	2021	2	4	22	5	22042021	admindb	admindb	1617774650	1617774650
+f	2021	2	4	23	6	23042021	admindb	admindb	1617774650	1617774650
+f	2021	2	4	24	7	24042021	admindb	admindb	1617774650	1617774650
+f	2021	2	4	25	1	25042021	admindb	admindb	1617774650	1617774650
+f	2021	2	4	26	2	26042021	admindb	admindb	1617774650	1617774650
+f	2021	2	4	27	3	27042021	admindb	admindb	1617774650	1617774650
+f	2021	2	4	28	4	28042021	admindb	admindb	1617774650	1617774650
+f	2021	2	4	29	5	29042021	admindb	admindb	1617774650	1617774650
+f	2021	2	4	30	6	30042021	admindb	admindb	1617774650	1617774650
+f	2021	2	5	1	7	01052021	admindb	admindb	1617774650	1617774650
+f	2021	2	5	2	1	02052021	admindb	admindb	1617774650	1617774650
+f	2021	2	5	3	2	03052021	admindb	admindb	1617774650	1617774650
+f	2021	2	5	4	3	04052021	admindb	admindb	1617774650	1617774650
+f	2021	2	5	5	4	05052021	admindb	admindb	1617774650	1617774650
+f	2021	2	5	6	5	06052021	admindb	admindb	1617774650	1617774650
+f	2021	2	5	7	6	07052021	admindb	admindb	1617774650	1617774650
+f	2021	2	5	8	7	08052021	admindb	admindb	1617774650	1617774650
+f	2021	2	5	9	1	09052021	admindb	admindb	1617774650	1617774650
+f	2021	2	5	10	2	10052021	admindb	admindb	1617774650	1617774650
+f	2021	2	5	11	3	11052021	admindb	admindb	1617774650	1617774650
+f	2021	2	5	12	4	12052021	admindb	admindb	1617774650	1617774650
+f	2021	2	5	13	5	13052021	admindb	admindb	1617774650	1617774650
+f	2021	2	5	14	6	14052021	admindb	admindb	1617774650	1617774650
+f	2021	2	5	15	7	15052021	admindb	admindb	1617774650	1617774650
+f	2021	2	5	16	1	16052021	admindb	admindb	1617774650	1617774650
+f	2021	2	5	17	2	17052021	admindb	admindb	1617774650	1617774650
+f	2021	2	5	18	3	18052021	admindb	admindb	1617774650	1617774650
+f	2021	2	5	19	4	19052021	admindb	admindb	1617774650	1617774650
+f	2021	2	5	20	5	20052021	admindb	admindb	1617774650	1617774650
+f	2021	2	5	21	6	21052021	admindb	admindb	1617774650	1617774650
+f	2021	2	5	22	7	22052021	admindb	admindb	1617774650	1617774650
+f	2021	2	5	23	1	23052021	admindb	admindb	1617774650	1617774650
+f	2021	2	5	24	2	24052021	admindb	admindb	1617774650	1617774650
+f	2021	2	5	25	3	25052021	admindb	admindb	1617774650	1617774650
+f	2021	2	5	26	4	26052021	admindb	admindb	1617774650	1617774650
+f	2021	2	5	27	5	27052021	admindb	admindb	1617774650	1617774650
+f	2021	2	5	28	6	28052021	admindb	admindb	1617774650	1617774650
+f	2021	2	5	29	7	29052021	admindb	admindb	1617774650	1617774650
+f	2021	2	5	30	1	30052021	admindb	admindb	1617774650	1617774650
+f	2021	2	5	31	2	31052021	admindb	admindb	1617774650	1617774650
+f	2021	2	6	1	3	01062021	admindb	admindb	1617774650	1617774650
+f	2021	2	6	2	4	02062021	admindb	admindb	1617774650	1617774650
+f	2021	2	6	3	5	03062021	admindb	admindb	1617774650	1617774650
+f	2021	2	6	4	6	04062021	admindb	admindb	1617774650	1617774650
+f	2021	2	6	5	7	05062021	admindb	admindb	1617774650	1617774650
+f	2021	2	6	6	1	06062021	admindb	admindb	1617774650	1617774650
+f	2021	2	6	7	2	07062021	admindb	admindb	1617774650	1617774650
+f	2021	2	6	8	3	08062021	admindb	admindb	1617774650	1617774650
+f	2021	2	6	9	4	09062021	admindb	admindb	1617774650	1617774650
+f	2021	2	6	10	5	10062021	admindb	admindb	1617774650	1617774650
+f	2021	2	6	11	6	11062021	admindb	admindb	1617774650	1617774650
+f	2021	2	6	12	7	12062021	admindb	admindb	1617774650	1617774650
+f	2021	2	6	13	1	13062021	admindb	admindb	1617774650	1617774650
+f	2021	2	6	14	2	14062021	admindb	admindb	1617774650	1617774650
+f	2021	2	6	15	3	15062021	admindb	admindb	1617774650	1617774650
+f	2021	2	6	16	4	16062021	admindb	admindb	1617774650	1617774650
+f	2021	2	6	17	5	17062021	admindb	admindb	1617774650	1617774650
+f	2021	2	6	18	6	18062021	admindb	admindb	1617774650	1617774650
+f	2021	2	6	19	7	19062021	admindb	admindb	1617774650	1617774650
+f	2021	2	6	20	1	20062021	admindb	admindb	1617774650	1617774650
+f	2021	2	6	21	2	21062021	admindb	admindb	1617774650	1617774650
+f	2021	2	6	22	3	22062021	admindb	admindb	1617774650	1617774650
+f	2021	2	6	23	4	23062021	admindb	admindb	1617774650	1617774650
+f	2021	2	6	24	5	24062021	admindb	admindb	1617774650	1617774650
+f	2021	2	6	25	6	25062021	admindb	admindb	1617774650	1617774650
+f	2021	2	6	26	7	26062021	admindb	admindb	1617774650	1617774650
+f	2021	2	6	27	1	27062021	admindb	admindb	1617774650	1617774650
+f	2021	2	6	28	2	28062021	admindb	admindb	1617774650	1617774650
+f	2021	2	6	29	3	29062021	admindb	admindb	1617774650	1617774650
+f	2021	2	6	30	4	30062021	admindb	admindb	1617774650	1617774650
+f	2021	3	7	1	5	01072021	admindb	admindb	1617774650	1617774650
+f	2021	3	7	2	6	02072021	admindb	admindb	1617774650	1617774650
+f	2021	3	7	3	7	03072021	admindb	admindb	1617774650	1617774650
+f	2021	3	7	4	1	04072021	admindb	admindb	1617774650	1617774650
+f	2021	3	7	5	2	05072021	admindb	admindb	1617774650	1617774650
+f	2021	3	7	6	3	06072021	admindb	admindb	1617774650	1617774650
+f	2021	3	7	7	4	07072021	admindb	admindb	1617774650	1617774650
+f	2021	3	7	8	5	08072021	admindb	admindb	1617774650	1617774650
+f	2021	3	7	9	6	09072021	admindb	admindb	1617774650	1617774650
+f	2021	3	7	10	7	10072021	admindb	admindb	1617774650	1617774650
+f	2021	3	7	11	1	11072021	admindb	admindb	1617774650	1617774650
+f	2021	3	7	12	2	12072021	admindb	admindb	1617774650	1617774650
+f	2021	3	7	13	3	13072021	admindb	admindb	1617774650	1617774650
+f	2021	3	7	14	4	14072021	admindb	admindb	1617774650	1617774650
+f	2021	3	7	15	5	15072021	admindb	admindb	1617774650	1617774650
+f	2021	3	7	16	6	16072021	admindb	admindb	1617774650	1617774650
+f	2021	3	7	17	7	17072021	admindb	admindb	1617774650	1617774650
+f	2021	3	7	18	1	18072021	admindb	admindb	1617774650	1617774650
+f	2021	3	7	19	2	19072021	admindb	admindb	1617774650	1617774650
+f	2021	3	7	20	3	20072021	admindb	admindb	1617774650	1617774650
+f	2021	3	7	21	4	21072021	admindb	admindb	1617774650	1617774650
+f	2021	3	7	22	5	22072021	admindb	admindb	1617774650	1617774650
+f	2021	3	7	23	6	23072021	admindb	admindb	1617774650	1617774650
+f	2021	3	7	24	7	24072021	admindb	admindb	1617774650	1617774650
+f	2021	3	7	25	1	25072021	admindb	admindb	1617774650	1617774650
+f	2021	3	7	26	2	26072021	admindb	admindb	1617774650	1617774650
+f	2021	3	7	27	3	27072021	admindb	admindb	1617774650	1617774650
+f	2021	3	7	28	4	28072021	admindb	admindb	1617774650	1617774650
+f	2021	3	7	29	5	29072021	admindb	admindb	1617774650	1617774650
+f	2021	3	7	30	6	30072021	admindb	admindb	1617774650	1617774650
+f	2021	3	7	31	7	31072021	admindb	admindb	1617774650	1617774650
+f	2021	3	8	1	1	01082021	admindb	admindb	1617774650	1617774650
+f	2021	3	8	2	2	02082021	admindb	admindb	1617774650	1617774650
+f	2021	3	8	3	3	03082021	admindb	admindb	1617774650	1617774650
+f	2021	3	8	4	4	04082021	admindb	admindb	1617774650	1617774650
+f	2021	3	8	5	5	05082021	admindb	admindb	1617774650	1617774650
+f	2021	3	8	6	6	06082021	admindb	admindb	1617774650	1617774650
+f	2021	3	8	7	7	07082021	admindb	admindb	1617774650	1617774650
+f	2021	3	8	8	1	08082021	admindb	admindb	1617774650	1617774650
+f	2021	3	8	9	2	09082021	admindb	admindb	1617774650	1617774650
+f	2021	3	8	10	3	10082021	admindb	admindb	1617774650	1617774650
+f	2021	3	8	11	4	11082021	admindb	admindb	1617774650	1617774650
+f	2021	3	8	12	5	12082021	admindb	admindb	1617774650	1617774650
+f	2021	3	8	13	6	13082021	admindb	admindb	1617774650	1617774650
+f	2021	3	8	14	7	14082021	admindb	admindb	1617774650	1617774650
+f	2021	3	8	15	1	15082021	admindb	admindb	1617774650	1617774650
+f	2021	3	8	16	2	16082021	admindb	admindb	1617774650	1617774650
+f	2021	3	8	17	3	17082021	admindb	admindb	1617774650	1617774650
+f	2021	3	8	18	4	18082021	admindb	admindb	1617774650	1617774650
+f	2021	3	8	19	5	19082021	admindb	admindb	1617774650	1617774650
+f	2021	3	8	20	6	20082021	admindb	admindb	1617774650	1617774650
+f	2021	3	8	21	7	21082021	admindb	admindb	1617774650	1617774650
+f	2021	3	8	22	1	22082021	admindb	admindb	1617774650	1617774650
+f	2021	3	8	23	2	23082021	admindb	admindb	1617774650	1617774650
+f	2021	3	8	24	3	24082021	admindb	admindb	1617774650	1617774650
+f	2021	3	8	25	4	25082021	admindb	admindb	1617774650	1617774650
+f	2021	3	8	26	5	26082021	admindb	admindb	1617774650	1617774650
+f	2021	3	8	27	6	27082021	admindb	admindb	1617774650	1617774650
+f	2021	3	8	28	7	28082021	admindb	admindb	1617774650	1617774650
+f	2021	3	8	29	1	29082021	admindb	admindb	1617774650	1617774650
+f	2021	3	8	30	2	30082021	admindb	admindb	1617774650	1617774650
+f	2021	3	8	31	3	31082021	admindb	admindb	1617774650	1617774650
+f	2021	3	9	1	4	01092021	admindb	admindb	1617774650	1617774650
+f	2021	3	9	2	5	02092021	admindb	admindb	1617774650	1617774650
+f	2021	3	9	3	6	03092021	admindb	admindb	1617774650	1617774650
+f	2021	3	9	4	7	04092021	admindb	admindb	1617774650	1617774650
+f	2021	3	9	5	1	05092021	admindb	admindb	1617774650	1617774650
+f	2021	3	9	6	2	06092021	admindb	admindb	1617774650	1617774650
+f	2021	3	9	7	3	07092021	admindb	admindb	1617774650	1617774650
+f	2021	3	9	8	4	08092021	admindb	admindb	1617774650	1617774650
+f	2021	3	9	9	5	09092021	admindb	admindb	1617774650	1617774650
+f	2021	3	9	10	6	10092021	admindb	admindb	1617774650	1617774650
+f	2021	3	9	11	7	11092021	admindb	admindb	1617774650	1617774650
+f	2021	3	9	12	1	12092021	admindb	admindb	1617774650	1617774650
+f	2021	3	9	13	2	13092021	admindb	admindb	1617774650	1617774650
+f	2021	3	9	14	3	14092021	admindb	admindb	1617774650	1617774650
+f	2021	3	9	15	4	15092021	admindb	admindb	1617774650	1617774650
+f	2021	3	9	16	5	16092021	admindb	admindb	1617774650	1617774650
+f	2021	3	9	17	6	17092021	admindb	admindb	1617774650	1617774650
+f	2021	3	9	18	7	18092021	admindb	admindb	1617774650	1617774650
+f	2021	3	9	19	1	19092021	admindb	admindb	1617774650	1617774650
+f	2021	3	9	20	2	20092021	admindb	admindb	1617774650	1617774650
+f	2021	3	9	21	3	21092021	admindb	admindb	1617774650	1617774650
+f	2021	3	9	22	4	22092021	admindb	admindb	1617774650	1617774650
+f	2021	3	9	23	5	23092021	admindb	admindb	1617774650	1617774650
+f	2021	3	9	24	6	24092021	admindb	admindb	1617774650	1617774650
+f	2021	3	9	25	7	25092021	admindb	admindb	1617774650	1617774650
+f	2021	3	9	26	1	26092021	admindb	admindb	1617774650	1617774650
+f	2021	3	9	27	2	27092021	admindb	admindb	1617774650	1617774650
+f	2021	3	9	28	3	28092021	admindb	admindb	1617774650	1617774650
+f	2021	3	9	29	4	29092021	admindb	admindb	1617774650	1617774650
+f	2021	3	9	30	5	30092021	admindb	admindb	1617774650	1617774650
+f	2021	4	10	1	6	01102021	admindb	admindb	1617774650	1617774650
+f	2021	4	10	2	7	02102021	admindb	admindb	1617774650	1617774650
+f	2021	4	10	3	1	03102021	admindb	admindb	1617774650	1617774650
+f	2021	4	10	4	2	04102021	admindb	admindb	1617774650	1617774650
+f	2021	4	10	5	3	05102021	admindb	admindb	1617774650	1617774650
+f	2021	4	10	6	4	06102021	admindb	admindb	1617774650	1617774650
+f	2021	4	10	7	5	07102021	admindb	admindb	1617774650	1617774650
+f	2021	4	10	8	6	08102021	admindb	admindb	1617774650	1617774650
+f	2021	4	10	9	7	09102021	admindb	admindb	1617774650	1617774650
+f	2021	4	10	10	1	10102021	admindb	admindb	1617774650	1617774650
+f	2021	4	10	11	2	11102021	admindb	admindb	1617774650	1617774650
+f	2021	4	10	12	3	12102021	admindb	admindb	1617774650	1617774650
+f	2021	4	10	13	4	13102021	admindb	admindb	1617774650	1617774650
+f	2021	4	10	14	5	14102021	admindb	admindb	1617774650	1617774650
+f	2021	4	10	15	6	15102021	admindb	admindb	1617774650	1617774650
+f	2021	4	10	16	7	16102021	admindb	admindb	1617774650	1617774650
+f	2021	4	10	17	1	17102021	admindb	admindb	1617774650	1617774650
+f	2021	4	10	18	2	18102021	admindb	admindb	1617774650	1617774650
+f	2021	4	10	19	3	19102021	admindb	admindb	1617774650	1617774650
+f	2021	4	10	20	4	20102021	admindb	admindb	1617774650	1617774650
+f	2021	4	10	21	5	21102021	admindb	admindb	1617774650	1617774650
+f	2021	4	10	22	6	22102021	admindb	admindb	1617774650	1617774650
+f	2021	4	10	23	7	23102021	admindb	admindb	1617774650	1617774650
+f	2021	4	10	24	1	24102021	admindb	admindb	1617774650	1617774650
+f	2021	4	10	25	2	25102021	admindb	admindb	1617774650	1617774650
+f	2021	4	10	26	3	26102021	admindb	admindb	1617774650	1617774650
+f	2021	4	10	27	4	27102021	admindb	admindb	1617774650	1617774650
+f	2021	4	10	28	5	28102021	admindb	admindb	1617774650	1617774650
+f	2021	4	10	29	6	29102021	admindb	admindb	1617774650	1617774650
+f	2021	4	10	30	7	30102021	admindb	admindb	1617774650	1617774650
+f	2021	4	10	31	1	31102021	admindb	admindb	1617774650	1617774650
+f	2021	4	11	1	2	01112021	admindb	admindb	1617774650	1617774650
+f	2021	4	11	2	3	02112021	admindb	admindb	1617774650	1617774650
+f	2021	4	11	3	4	03112021	admindb	admindb	1617774650	1617774650
+f	2021	4	11	4	5	04112021	admindb	admindb	1617774650	1617774650
+f	2021	4	11	5	6	05112021	admindb	admindb	1617774650	1617774650
+f	2021	4	11	6	7	06112021	admindb	admindb	1617774650	1617774650
+f	2021	4	11	7	1	07112021	admindb	admindb	1617774650	1617774650
+f	2021	4	11	8	2	08112021	admindb	admindb	1617774650	1617774650
+f	2021	4	11	9	3	09112021	admindb	admindb	1617774650	1617774650
+f	2021	4	11	10	4	10112021	admindb	admindb	1617774650	1617774650
+f	2021	4	11	11	5	11112021	admindb	admindb	1617774650	1617774650
+f	2021	4	11	12	6	12112021	admindb	admindb	1617774650	1617774650
+f	2021	4	11	13	7	13112021	admindb	admindb	1617774650	1617774650
+f	2021	4	11	14	1	14112021	admindb	admindb	1617774650	1617774650
+f	2021	4	11	15	2	15112021	admindb	admindb	1617774650	1617774650
+f	2021	4	11	16	3	16112021	admindb	admindb	1617774650	1617774650
+f	2021	4	11	17	4	17112021	admindb	admindb	1617774650	1617774650
+f	2021	4	11	18	5	18112021	admindb	admindb	1617774650	1617774650
+f	2021	4	11	19	6	19112021	admindb	admindb	1617774650	1617774650
+f	2021	4	11	20	7	20112021	admindb	admindb	1617774650	1617774650
+f	2021	4	11	21	1	21112021	admindb	admindb	1617774650	1617774650
+f	2021	4	11	22	2	22112021	admindb	admindb	1617774650	1617774650
+f	2021	4	11	23	3	23112021	admindb	admindb	1617774650	1617774650
+f	2021	4	11	24	4	24112021	admindb	admindb	1617774650	1617774650
+f	2021	4	11	25	5	25112021	admindb	admindb	1617774650	1617774650
+f	2021	4	11	26	6	26112021	admindb	admindb	1617774650	1617774650
+f	2021	4	11	27	7	27112021	admindb	admindb	1617774650	1617774650
+f	2021	4	11	28	1	28112021	admindb	admindb	1617774650	1617774650
+f	2021	4	11	29	2	29112021	admindb	admindb	1617774650	1617774650
+f	2021	4	11	30	3	30112021	admindb	admindb	1617774650	1617774650
+f	2021	4	12	1	4	01122021	admindb	admindb	1617774650	1617774650
+f	2021	4	12	2	5	02122021	admindb	admindb	1617774650	1617774650
+f	2021	4	12	3	6	03122021	admindb	admindb	1617774650	1617774650
+f	2021	4	12	4	7	04122021	admindb	admindb	1617774650	1617774650
+f	2021	4	12	5	1	05122021	admindb	admindb	1617774650	1617774650
+f	2021	4	12	6	2	06122021	admindb	admindb	1617774650	1617774650
+f	2021	4	12	7	3	07122021	admindb	admindb	1617774650	1617774650
+f	2021	4	12	8	4	08122021	admindb	admindb	1617774650	1617774650
+f	2021	4	12	9	5	09122021	admindb	admindb	1617774650	1617774650
+f	2021	4	12	10	6	10122021	admindb	admindb	1617774650	1617774650
+f	2021	4	12	11	7	11122021	admindb	admindb	1617774650	1617774650
+f	2021	4	12	12	1	12122021	admindb	admindb	1617774650	1617774650
+f	2021	4	12	13	2	13122021	admindb	admindb	1617774650	1617774650
+f	2021	4	12	14	3	14122021	admindb	admindb	1617774650	1617774650
+f	2021	4	12	15	4	15122021	admindb	admindb	1617774650	1617774650
+f	2021	4	12	16	5	16122021	admindb	admindb	1617774650	1617774650
+f	2021	4	12	17	6	17122021	admindb	admindb	1617774650	1617774650
+f	2021	4	12	18	7	18122021	admindb	admindb	1617774650	1617774650
+f	2021	4	12	19	1	19122021	admindb	admindb	1617774650	1617774650
+f	2021	4	12	20	2	20122021	admindb	admindb	1617774650	1617774650
+f	2021	4	12	21	3	21122021	admindb	admindb	1617774650	1617774650
+f	2021	4	12	22	4	22122021	admindb	admindb	1617774650	1617774650
+f	2021	4	12	23	5	23122021	admindb	admindb	1617774650	1617774650
+f	2021	4	12	24	6	24122021	admindb	admindb	1617774650	1617774650
+f	2021	4	12	25	7	25122021	admindb	admindb	1617774650	1617774650
+f	2021	4	12	26	1	26122021	admindb	admindb	1617774650	1617774650
+f	2021	4	12	27	2	27122021	admindb	admindb	1617774650	1617774650
+f	2021	4	12	28	3	28122021	admindb	admindb	1617774650	1617774650
+f	2021	4	12	29	4	29122021	admindb	admindb	1617774650	1617774650
+f	2021	4	12	30	5	30122021	admindb	admindb	1617774650	1617774650
+f	2021	4	12	31	6	31122021	admindb	admindb	1617774650	1617774650
+f	2022	1	1	1	7	01012022	admindb	admindb	1617774650	1617774650
+f	2022	1	1	2	1	02012022	admindb	admindb	1617774650	1617774650
+f	2022	1	1	3	2	03012022	admindb	admindb	1617774650	1617774650
+f	2022	1	1	4	3	04012022	admindb	admindb	1617774650	1617774650
+f	2022	1	1	5	4	05012022	admindb	admindb	1617774650	1617774650
+f	2022	1	1	6	5	06012022	admindb	admindb	1617774650	1617774650
+f	2022	1	1	7	6	07012022	admindb	admindb	1617774650	1617774650
+f	2022	1	1	8	7	08012022	admindb	admindb	1617774650	1617774650
+f	2022	1	1	9	1	09012022	admindb	admindb	1617774650	1617774650
+f	2022	1	1	10	2	10012022	admindb	admindb	1617774650	1617774650
+f	2022	1	1	11	3	11012022	admindb	admindb	1617774650	1617774650
+f	2022	1	1	12	4	12012022	admindb	admindb	1617774650	1617774650
+f	2022	1	1	13	5	13012022	admindb	admindb	1617774650	1617774650
+f	2022	1	1	14	6	14012022	admindb	admindb	1617774650	1617774650
+f	2022	1	1	15	7	15012022	admindb	admindb	1617774650	1617774650
+f	2022	1	1	16	1	16012022	admindb	admindb	1617774650	1617774650
+f	2022	1	1	17	2	17012022	admindb	admindb	1617774650	1617774650
+f	2022	1	1	18	3	18012022	admindb	admindb	1617774650	1617774650
+f	2022	1	1	19	4	19012022	admindb	admindb	1617774650	1617774650
+f	2022	1	1	20	5	20012022	admindb	admindb	1617774650	1617774650
+f	2022	1	1	21	6	21012022	admindb	admindb	1617774650	1617774650
+f	2022	1	1	22	7	22012022	admindb	admindb	1617774650	1617774650
+f	2022	1	1	23	1	23012022	admindb	admindb	1617774650	1617774650
+f	2022	1	1	24	2	24012022	admindb	admindb	1617774650	1617774650
+f	2022	1	1	25	3	25012022	admindb	admindb	1617774650	1617774650
+f	2022	1	1	26	4	26012022	admindb	admindb	1617774650	1617774650
+f	2022	1	1	27	5	27012022	admindb	admindb	1617774650	1617774650
+f	2022	1	1	28	6	28012022	admindb	admindb	1617774650	1617774650
+f	2022	1	1	29	7	29012022	admindb	admindb	1617774650	1617774650
+f	2022	1	1	30	1	30012022	admindb	admindb	1617774650	1617774650
+f	2022	1	1	31	2	31012022	admindb	admindb	1617774650	1617774650
+f	2022	1	2	1	3	01022022	admindb	admindb	1617774650	1617774650
+f	2022	1	2	2	4	02022022	admindb	admindb	1617774650	1617774650
+f	2022	1	2	3	5	03022022	admindb	admindb	1617774650	1617774650
+f	2022	1	2	4	6	04022022	admindb	admindb	1617774650	1617774650
+f	2022	1	2	5	7	05022022	admindb	admindb	1617774650	1617774650
+f	2022	1	2	6	1	06022022	admindb	admindb	1617774650	1617774650
+f	2022	1	2	7	2	07022022	admindb	admindb	1617774650	1617774650
+f	2022	1	2	8	3	08022022	admindb	admindb	1617774650	1617774650
+f	2022	1	2	9	4	09022022	admindb	admindb	1617774650	1617774650
+f	2022	1	2	10	5	10022022	admindb	admindb	1617774650	1617774650
+f	2022	1	2	11	6	11022022	admindb	admindb	1617774650	1617774650
+f	2022	1	2	12	7	12022022	admindb	admindb	1617774650	1617774650
+f	2022	1	2	13	1	13022022	admindb	admindb	1617774650	1617774650
+f	2022	1	2	14	2	14022022	admindb	admindb	1617774650	1617774650
+f	2022	1	2	15	3	15022022	admindb	admindb	1617774650	1617774650
+f	2022	1	2	16	4	16022022	admindb	admindb	1617774650	1617774650
+f	2022	1	2	17	5	17022022	admindb	admindb	1617774650	1617774650
+f	2022	1	2	18	6	18022022	admindb	admindb	1617774650	1617774650
+f	2022	1	2	19	7	19022022	admindb	admindb	1617774650	1617774650
+f	2022	1	2	20	1	20022022	admindb	admindb	1617774650	1617774650
+f	2022	1	2	21	2	21022022	admindb	admindb	1617774650	1617774650
+f	2022	1	2	22	3	22022022	admindb	admindb	1617774650	1617774650
+f	2022	1	2	23	4	23022022	admindb	admindb	1617774650	1617774650
+f	2022	1	2	24	5	24022022	admindb	admindb	1617774650	1617774650
+f	2022	1	2	25	6	25022022	admindb	admindb	1617774650	1617774650
+f	2022	1	2	26	7	26022022	admindb	admindb	1617774650	1617774650
+f	2022	1	2	27	1	27022022	admindb	admindb	1617774650	1617774650
+f	2022	1	2	28	2	28022022	admindb	admindb	1617774650	1617774650
+f	2022	1	3	1	3	01032022	admindb	admindb	1617774650	1617774650
+f	2022	1	3	2	4	02032022	admindb	admindb	1617774650	1617774650
+f	2022	1	3	3	5	03032022	admindb	admindb	1617774650	1617774650
+f	2022	1	3	4	6	04032022	admindb	admindb	1617774650	1617774650
+f	2022	1	3	5	7	05032022	admindb	admindb	1617774650	1617774650
+f	2022	1	3	6	1	06032022	admindb	admindb	1617774650	1617774650
+f	2022	1	3	7	2	07032022	admindb	admindb	1617774650	1617774650
+f	2022	1	3	8	3	08032022	admindb	admindb	1617774650	1617774650
+f	2022	1	3	9	4	09032022	admindb	admindb	1617774650	1617774650
+f	2022	1	3	10	5	10032022	admindb	admindb	1617774650	1617774650
+f	2022	1	3	11	6	11032022	admindb	admindb	1617774650	1617774650
+f	2022	1	3	12	7	12032022	admindb	admindb	1617774650	1617774650
+f	2022	1	3	13	1	13032022	admindb	admindb	1617774650	1617774650
+f	2022	1	3	14	2	14032022	admindb	admindb	1617774650	1617774650
+f	2022	1	3	15	3	15032022	admindb	admindb	1617774650	1617774650
+f	2022	1	3	16	4	16032022	admindb	admindb	1617774650	1617774650
+f	2022	1	3	17	5	17032022	admindb	admindb	1617774650	1617774650
+f	2022	1	3	18	6	18032022	admindb	admindb	1617774650	1617774650
+f	2022	1	3	19	7	19032022	admindb	admindb	1617774650	1617774650
+f	2022	1	3	20	1	20032022	admindb	admindb	1617774650	1617774650
+f	2022	1	3	21	2	21032022	admindb	admindb	1617774650	1617774650
+f	2022	1	3	22	3	22032022	admindb	admindb	1617774650	1617774650
+f	2022	1	3	23	4	23032022	admindb	admindb	1617774650	1617774650
+f	2022	1	3	24	5	24032022	admindb	admindb	1617774650	1617774650
+f	2022	1	3	25	6	25032022	admindb	admindb	1617774650	1617774650
+f	2022	1	3	26	7	26032022	admindb	admindb	1617774650	1617774650
+f	2022	1	3	27	1	27032022	admindb	admindb	1617774650	1617774650
+f	2022	1	3	28	2	28032022	admindb	admindb	1617774650	1617774650
+f	2022	1	3	29	3	29032022	admindb	admindb	1617774650	1617774650
+f	2022	1	3	30	4	30032022	admindb	admindb	1617774650	1617774650
+f	2022	1	3	31	5	31032022	admindb	admindb	1617774650	1617774650
+f	2022	2	4	1	6	01042022	admindb	admindb	1617774650	1617774650
+f	2022	2	4	2	7	02042022	admindb	admindb	1617774650	1617774650
+f	2022	2	4	3	1	03042022	admindb	admindb	1617774650	1617774650
+f	2022	2	4	4	2	04042022	admindb	admindb	1617774650	1617774650
+f	2022	2	4	5	3	05042022	admindb	admindb	1617774650	1617774650
+f	2022	2	4	6	4	06042022	admindb	admindb	1617774650	1617774650
+f	2022	2	4	7	5	07042022	admindb	admindb	1617774650	1617774650
+f	2022	2	4	8	6	08042022	admindb	admindb	1617774650	1617774650
+f	2022	2	4	9	7	09042022	admindb	admindb	1617774650	1617774650
+f	2022	2	4	10	1	10042022	admindb	admindb	1617774650	1617774650
+f	2022	2	4	11	2	11042022	admindb	admindb	1617774650	1617774650
+f	2022	2	4	12	3	12042022	admindb	admindb	1617774650	1617774650
+f	2022	2	4	13	4	13042022	admindb	admindb	1617774650	1617774650
+f	2022	2	4	14	5	14042022	admindb	admindb	1617774650	1617774650
+f	2022	2	4	15	6	15042022	admindb	admindb	1617774650	1617774650
+f	2022	2	4	16	7	16042022	admindb	admindb	1617774650	1617774650
+f	2022	2	4	17	1	17042022	admindb	admindb	1617774650	1617774650
+f	2022	2	4	18	2	18042022	admindb	admindb	1617774650	1617774650
+f	2022	2	4	19	3	19042022	admindb	admindb	1617774650	1617774650
+f	2022	2	4	20	4	20042022	admindb	admindb	1617774650	1617774650
+f	2022	2	4	21	5	21042022	admindb	admindb	1617774650	1617774650
+f	2022	2	4	22	6	22042022	admindb	admindb	1617774650	1617774650
+f	2022	2	4	23	7	23042022	admindb	admindb	1617774650	1617774650
+f	2022	2	4	24	1	24042022	admindb	admindb	1617774650	1617774650
+f	2022	2	4	25	2	25042022	admindb	admindb	1617774650	1617774650
+f	2022	2	4	26	3	26042022	admindb	admindb	1617774650	1617774650
+f	2022	2	4	27	4	27042022	admindb	admindb	1617774650	1617774650
+f	2022	2	4	28	5	28042022	admindb	admindb	1617774650	1617774650
+f	2022	2	4	29	6	29042022	admindb	admindb	1617774650	1617774650
+f	2022	2	4	30	7	30042022	admindb	admindb	1617774650	1617774650
+f	2022	2	5	1	1	01052022	admindb	admindb	1617774650	1617774650
+f	2022	2	5	2	2	02052022	admindb	admindb	1617774650	1617774650
+f	2022	2	5	3	3	03052022	admindb	admindb	1617774650	1617774650
+f	2022	2	5	4	4	04052022	admindb	admindb	1617774650	1617774650
+f	2022	2	5	5	5	05052022	admindb	admindb	1617774650	1617774650
+f	2022	2	5	6	6	06052022	admindb	admindb	1617774650	1617774650
+f	2022	2	5	7	7	07052022	admindb	admindb	1617774650	1617774650
+f	2022	2	5	8	1	08052022	admindb	admindb	1617774650	1617774650
+f	2022	2	5	9	2	09052022	admindb	admindb	1617774650	1617774650
+f	2022	2	5	10	3	10052022	admindb	admindb	1617774650	1617774650
+f	2022	2	5	11	4	11052022	admindb	admindb	1617774650	1617774650
+f	2022	2	5	12	5	12052022	admindb	admindb	1617774650	1617774650
+f	2022	2	5	13	6	13052022	admindb	admindb	1617774650	1617774650
+f	2022	2	5	14	7	14052022	admindb	admindb	1617774650	1617774650
+f	2022	2	5	15	1	15052022	admindb	admindb	1617774650	1617774650
+f	2022	2	5	16	2	16052022	admindb	admindb	1617774650	1617774650
+f	2022	2	5	17	3	17052022	admindb	admindb	1617774650	1617774650
+f	2022	2	5	18	4	18052022	admindb	admindb	1617774650	1617774650
+f	2022	2	5	19	5	19052022	admindb	admindb	1617774650	1617774650
+f	2022	2	5	20	6	20052022	admindb	admindb	1617774650	1617774650
+f	2022	2	5	21	7	21052022	admindb	admindb	1617774650	1617774650
+f	2022	2	5	22	1	22052022	admindb	admindb	1617774650	1617774650
+f	2022	2	5	23	2	23052022	admindb	admindb	1617774650	1617774650
+f	2022	2	5	24	3	24052022	admindb	admindb	1617774650	1617774650
+f	2022	2	5	25	4	25052022	admindb	admindb	1617774650	1617774650
+f	2022	2	5	26	5	26052022	admindb	admindb	1617774650	1617774650
+f	2022	2	5	27	6	27052022	admindb	admindb	1617774650	1617774650
+f	2022	2	5	28	7	28052022	admindb	admindb	1617774650	1617774650
+f	2022	2	5	29	1	29052022	admindb	admindb	1617774650	1617774650
+f	2022	2	5	30	2	30052022	admindb	admindb	1617774650	1617774650
+f	2022	2	5	31	3	31052022	admindb	admindb	1617774650	1617774650
+f	2022	2	6	1	4	01062022	admindb	admindb	1617774650	1617774650
+f	2022	2	6	2	5	02062022	admindb	admindb	1617774650	1617774650
+f	2022	2	6	3	6	03062022	admindb	admindb	1617774650	1617774650
+f	2022	2	6	4	7	04062022	admindb	admindb	1617774650	1617774650
+f	2022	2	6	5	1	05062022	admindb	admindb	1617774650	1617774650
+f	2022	2	6	6	2	06062022	admindb	admindb	1617774650	1617774650
+f	2022	2	6	7	3	07062022	admindb	admindb	1617774650	1617774650
+f	2022	2	6	8	4	08062022	admindb	admindb	1617774650	1617774650
+f	2022	2	6	9	5	09062022	admindb	admindb	1617774650	1617774650
+f	2022	2	6	10	6	10062022	admindb	admindb	1617774650	1617774650
+f	2022	2	6	11	7	11062022	admindb	admindb	1617774650	1617774650
+f	2022	2	6	12	1	12062022	admindb	admindb	1617774650	1617774650
+f	2022	2	6	13	2	13062022	admindb	admindb	1617774650	1617774650
+f	2022	2	6	14	3	14062022	admindb	admindb	1617774650	1617774650
+f	2022	2	6	15	4	15062022	admindb	admindb	1617774650	1617774650
+f	2022	2	6	16	5	16062022	admindb	admindb	1617774650	1617774650
+f	2022	2	6	17	6	17062022	admindb	admindb	1617774650	1617774650
+f	2022	2	6	18	7	18062022	admindb	admindb	1617774650	1617774650
+f	2022	2	6	19	1	19062022	admindb	admindb	1617774650	1617774650
+f	2022	2	6	20	2	20062022	admindb	admindb	1617774650	1617774650
+f	2022	2	6	21	3	21062022	admindb	admindb	1617774650	1617774650
+f	2022	2	6	22	4	22062022	admindb	admindb	1617774650	1617774650
+f	2022	2	6	23	5	23062022	admindb	admindb	1617774650	1617774650
+f	2022	2	6	24	6	24062022	admindb	admindb	1617774650	1617774650
+f	2022	2	6	25	7	25062022	admindb	admindb	1617774650	1617774650
+f	2022	2	6	26	1	26062022	admindb	admindb	1617774650	1617774650
+f	2022	2	6	27	2	27062022	admindb	admindb	1617774650	1617774650
+f	2022	2	6	28	3	28062022	admindb	admindb	1617774650	1617774650
+f	2022	2	6	29	4	29062022	admindb	admindb	1617774650	1617774650
+f	2022	2	6	30	5	30062022	admindb	admindb	1617774650	1617774650
+f	2022	3	7	1	6	01072022	admindb	admindb	1617774650	1617774650
+f	2022	3	7	2	7	02072022	admindb	admindb	1617774650	1617774650
+f	2022	3	7	3	1	03072022	admindb	admindb	1617774650	1617774650
+f	2022	3	7	4	2	04072022	admindb	admindb	1617774650	1617774650
+f	2022	3	7	5	3	05072022	admindb	admindb	1617774650	1617774650
+f	2022	3	7	6	4	06072022	admindb	admindb	1617774650	1617774650
+f	2022	3	7	7	5	07072022	admindb	admindb	1617774650	1617774650
+f	2022	3	7	8	6	08072022	admindb	admindb	1617774650	1617774650
+f	2022	3	7	9	7	09072022	admindb	admindb	1617774650	1617774650
+f	2022	3	7	10	1	10072022	admindb	admindb	1617774650	1617774650
+f	2022	3	7	11	2	11072022	admindb	admindb	1617774650	1617774650
+f	2022	3	7	12	3	12072022	admindb	admindb	1617774650	1617774650
+f	2022	3	7	13	4	13072022	admindb	admindb	1617774650	1617774650
+f	2022	3	7	14	5	14072022	admindb	admindb	1617774650	1617774650
+f	2022	3	7	15	6	15072022	admindb	admindb	1617774650	1617774650
+f	2022	3	7	16	7	16072022	admindb	admindb	1617774650	1617774650
+f	2022	3	7	17	1	17072022	admindb	admindb	1617774650	1617774650
+f	2022	3	7	18	2	18072022	admindb	admindb	1617774650	1617774650
+f	2022	3	7	19	3	19072022	admindb	admindb	1617774650	1617774650
+f	2022	3	7	20	4	20072022	admindb	admindb	1617774650	1617774650
+f	2022	3	7	21	5	21072022	admindb	admindb	1617774650	1617774650
+f	2022	3	7	22	6	22072022	admindb	admindb	1617774650	1617774650
+f	2022	3	7	23	7	23072022	admindb	admindb	1617774650	1617774650
+f	2022	3	7	24	1	24072022	admindb	admindb	1617774650	1617774650
+f	2022	3	7	25	2	25072022	admindb	admindb	1617774650	1617774650
+f	2022	3	7	26	3	26072022	admindb	admindb	1617774650	1617774650
+f	2022	3	7	27	4	27072022	admindb	admindb	1617774650	1617774650
+f	2022	3	7	28	5	28072022	admindb	admindb	1617774650	1617774650
+f	2022	3	7	29	6	29072022	admindb	admindb	1617774650	1617774650
+f	2022	3	7	30	7	30072022	admindb	admindb	1617774650	1617774650
+f	2022	3	7	31	1	31072022	admindb	admindb	1617774650	1617774650
+f	2022	3	8	1	2	01082022	admindb	admindb	1617774650	1617774650
+f	2022	3	8	2	3	02082022	admindb	admindb	1617774650	1617774650
+f	2022	3	8	3	4	03082022	admindb	admindb	1617774650	1617774650
+f	2022	3	8	4	5	04082022	admindb	admindb	1617774650	1617774650
+f	2022	3	8	5	6	05082022	admindb	admindb	1617774650	1617774650
+f	2022	3	8	6	7	06082022	admindb	admindb	1617774650	1617774650
+f	2022	3	8	7	1	07082022	admindb	admindb	1617774650	1617774650
+f	2022	3	8	8	2	08082022	admindb	admindb	1617774650	1617774650
+f	2022	3	8	9	3	09082022	admindb	admindb	1617774650	1617774650
+f	2022	3	8	10	4	10082022	admindb	admindb	1617774650	1617774650
+f	2022	3	8	11	5	11082022	admindb	admindb	1617774650	1617774650
+f	2022	3	8	12	6	12082022	admindb	admindb	1617774650	1617774650
+f	2022	3	8	13	7	13082022	admindb	admindb	1617774650	1617774650
+f	2022	3	8	14	1	14082022	admindb	admindb	1617774650	1617774650
+f	2022	3	8	15	2	15082022	admindb	admindb	1617774650	1617774650
+f	2022	3	8	16	3	16082022	admindb	admindb	1617774650	1617774650
+f	2022	3	8	17	4	17082022	admindb	admindb	1617774650	1617774650
+f	2022	3	8	18	5	18082022	admindb	admindb	1617774650	1617774650
+f	2022	3	8	19	6	19082022	admindb	admindb	1617774650	1617774650
+f	2022	3	8	20	7	20082022	admindb	admindb	1617774650	1617774650
+f	2022	3	8	21	1	21082022	admindb	admindb	1617774650	1617774650
+f	2022	3	8	22	2	22082022	admindb	admindb	1617774650	1617774650
+f	2022	3	8	23	3	23082022	admindb	admindb	1617774650	1617774650
+f	2022	3	8	24	4	24082022	admindb	admindb	1617774650	1617774650
+f	2022	3	8	25	5	25082022	admindb	admindb	1617774650	1617774650
+f	2022	3	8	26	6	26082022	admindb	admindb	1617774650	1617774650
+f	2022	3	8	27	7	27082022	admindb	admindb	1617774650	1617774650
+f	2022	3	8	28	1	28082022	admindb	admindb	1617774650	1617774650
+f	2022	3	8	29	2	29082022	admindb	admindb	1617774650	1617774650
+f	2022	3	8	30	3	30082022	admindb	admindb	1617774650	1617774650
+f	2022	3	8	31	4	31082022	admindb	admindb	1617774650	1617774650
+f	2022	3	9	1	5	01092022	admindb	admindb	1617774650	1617774650
+f	2022	3	9	2	6	02092022	admindb	admindb	1617774650	1617774650
+f	2022	3	9	3	7	03092022	admindb	admindb	1617774650	1617774650
+f	2022	3	9	4	1	04092022	admindb	admindb	1617774650	1617774650
+f	2022	3	9	5	2	05092022	admindb	admindb	1617774650	1617774650
+f	2022	3	9	6	3	06092022	admindb	admindb	1617774650	1617774650
+f	2022	3	9	7	4	07092022	admindb	admindb	1617774650	1617774650
+f	2022	3	9	8	5	08092022	admindb	admindb	1617774650	1617774650
+f	2022	3	9	9	6	09092022	admindb	admindb	1617774650	1617774650
+f	2022	3	9	10	7	10092022	admindb	admindb	1617774650	1617774650
+f	2022	3	9	11	1	11092022	admindb	admindb	1617774650	1617774650
+f	2022	3	9	12	2	12092022	admindb	admindb	1617774650	1617774650
+f	2022	3	9	13	3	13092022	admindb	admindb	1617774650	1617774650
+f	2022	3	9	14	4	14092022	admindb	admindb	1617774650	1617774650
+f	2022	3	9	15	5	15092022	admindb	admindb	1617774650	1617774650
+f	2022	3	9	16	6	16092022	admindb	admindb	1617774650	1617774650
+f	2022	3	9	17	7	17092022	admindb	admindb	1617774650	1617774650
+f	2022	3	9	18	1	18092022	admindb	admindb	1617774650	1617774650
+f	2022	3	9	19	2	19092022	admindb	admindb	1617774650	1617774650
+f	2022	3	9	20	3	20092022	admindb	admindb	1617774650	1617774650
+f	2022	3	9	21	4	21092022	admindb	admindb	1617774650	1617774650
+f	2022	3	9	22	5	22092022	admindb	admindb	1617774650	1617774650
+f	2022	3	9	23	6	23092022	admindb	admindb	1617774650	1617774650
+f	2022	3	9	24	7	24092022	admindb	admindb	1617774650	1617774650
+f	2022	3	9	25	1	25092022	admindb	admindb	1617774650	1617774650
+f	2022	3	9	26	2	26092022	admindb	admindb	1617774650	1617774650
+f	2022	3	9	27	3	27092022	admindb	admindb	1617774650	1617774650
+f	2022	3	9	28	4	28092022	admindb	admindb	1617774650	1617774650
+f	2022	3	9	29	5	29092022	admindb	admindb	1617774650	1617774650
+f	2022	3	9	30	6	30092022	admindb	admindb	1617774650	1617774650
+f	2022	4	10	1	7	01102022	admindb	admindb	1617774650	1617774650
+f	2022	4	10	2	1	02102022	admindb	admindb	1617774650	1617774650
+f	2022	4	10	3	2	03102022	admindb	admindb	1617774650	1617774650
+f	2022	4	10	4	3	04102022	admindb	admindb	1617774650	1617774650
+f	2022	4	10	5	4	05102022	admindb	admindb	1617774650	1617774650
+f	2022	4	10	6	5	06102022	admindb	admindb	1617774650	1617774650
+f	2022	4	10	7	6	07102022	admindb	admindb	1617774650	1617774650
+f	2022	4	10	8	7	08102022	admindb	admindb	1617774650	1617774650
+f	2022	4	10	9	1	09102022	admindb	admindb	1617774650	1617774650
+f	2022	4	10	10	2	10102022	admindb	admindb	1617774650	1617774650
+f	2022	4	10	11	3	11102022	admindb	admindb	1617774650	1617774650
+f	2022	4	10	12	4	12102022	admindb	admindb	1617774650	1617774650
+f	2022	4	10	13	5	13102022	admindb	admindb	1617774650	1617774650
+f	2022	4	10	14	6	14102022	admindb	admindb	1617774650	1617774650
+f	2022	4	10	15	7	15102022	admindb	admindb	1617774650	1617774650
+f	2022	4	10	16	1	16102022	admindb	admindb	1617774650	1617774650
+f	2022	4	10	17	2	17102022	admindb	admindb	1617774650	1617774650
+f	2022	4	10	18	3	18102022	admindb	admindb	1617774650	1617774650
+f	2022	4	10	19	4	19102022	admindb	admindb	1617774650	1617774650
+f	2022	4	10	20	5	20102022	admindb	admindb	1617774650	1617774650
+f	2022	4	10	21	6	21102022	admindb	admindb	1617774650	1617774650
+f	2022	4	10	22	7	22102022	admindb	admindb	1617774650	1617774650
+f	2022	4	10	23	1	23102022	admindb	admindb	1617774650	1617774650
+f	2022	4	10	24	2	24102022	admindb	admindb	1617774650	1617774650
+f	2022	4	10	25	3	25102022	admindb	admindb	1617774650	1617774650
+f	2022	4	10	26	4	26102022	admindb	admindb	1617774650	1617774650
+f	2022	4	10	27	5	27102022	admindb	admindb	1617774650	1617774650
+f	2022	4	10	28	6	28102022	admindb	admindb	1617774650	1617774650
+f	2022	4	10	29	7	29102022	admindb	admindb	1617774650	1617774650
+f	2022	4	10	30	1	30102022	admindb	admindb	1617774650	1617774650
+f	2022	4	10	31	2	31102022	admindb	admindb	1617774650	1617774650
+f	2022	4	11	1	3	01112022	admindb	admindb	1617774650	1617774650
+f	2022	4	11	2	4	02112022	admindb	admindb	1617774650	1617774650
+f	2022	4	11	3	5	03112022	admindb	admindb	1617774650	1617774650
+f	2022	4	11	4	6	04112022	admindb	admindb	1617774650	1617774650
+f	2022	4	11	5	7	05112022	admindb	admindb	1617774650	1617774650
+f	2022	4	11	6	1	06112022	admindb	admindb	1617774650	1617774650
+f	2022	4	11	7	2	07112022	admindb	admindb	1617774650	1617774650
+f	2022	4	11	8	3	08112022	admindb	admindb	1617774650	1617774650
+f	2022	4	11	9	4	09112022	admindb	admindb	1617774650	1617774650
+f	2022	4	11	10	5	10112022	admindb	admindb	1617774650	1617774650
+f	2022	4	11	11	6	11112022	admindb	admindb	1617774650	1617774650
+f	2022	4	11	12	7	12112022	admindb	admindb	1617774650	1617774650
+f	2022	4	11	13	1	13112022	admindb	admindb	1617774650	1617774650
+f	2022	4	11	14	2	14112022	admindb	admindb	1617774650	1617774650
+f	2022	4	11	15	3	15112022	admindb	admindb	1617774650	1617774650
+f	2022	4	11	16	4	16112022	admindb	admindb	1617774650	1617774650
+f	2022	4	11	17	5	17112022	admindb	admindb	1617774650	1617774650
+f	2022	4	11	18	6	18112022	admindb	admindb	1617774650	1617774650
+f	2022	4	11	19	7	19112022	admindb	admindb	1617774650	1617774650
+f	2022	4	11	20	1	20112022	admindb	admindb	1617774650	1617774650
+f	2022	4	11	21	2	21112022	admindb	admindb	1617774650	1617774650
+f	2022	4	11	22	3	22112022	admindb	admindb	1617774650	1617774650
+f	2022	4	11	23	4	23112022	admindb	admindb	1617774650	1617774650
+f	2022	4	11	24	5	24112022	admindb	admindb	1617774650	1617774650
+f	2022	4	11	25	6	25112022	admindb	admindb	1617774650	1617774650
+f	2022	4	11	26	7	26112022	admindb	admindb	1617774650	1617774650
+f	2022	4	11	27	1	27112022	admindb	admindb	1617774650	1617774650
+f	2022	4	11	28	2	28112022	admindb	admindb	1617774650	1617774650
+f	2022	4	11	29	3	29112022	admindb	admindb	1617774650	1617774650
+f	2022	4	11	30	4	30112022	admindb	admindb	1617774650	1617774650
+f	2022	4	12	1	5	01122022	admindb	admindb	1617774650	1617774650
+f	2022	4	12	2	6	02122022	admindb	admindb	1617774650	1617774650
+f	2022	4	12	3	7	03122022	admindb	admindb	1617774650	1617774650
+f	2022	4	12	4	1	04122022	admindb	admindb	1617774650	1617774650
+f	2022	4	12	5	2	05122022	admindb	admindb	1617774650	1617774650
+f	2022	4	12	6	3	06122022	admindb	admindb	1617774650	1617774650
+f	2022	4	12	7	4	07122022	admindb	admindb	1617774650	1617774650
+f	2022	4	12	8	5	08122022	admindb	admindb	1617774650	1617774650
+f	2022	4	12	9	6	09122022	admindb	admindb	1617774650	1617774650
+f	2022	4	12	10	7	10122022	admindb	admindb	1617774650	1617774650
+f	2022	4	12	11	1	11122022	admindb	admindb	1617774650	1617774650
+f	2022	4	12	12	2	12122022	admindb	admindb	1617774650	1617774650
+f	2022	4	12	13	3	13122022	admindb	admindb	1617774650	1617774650
+f	2022	4	12	14	4	14122022	admindb	admindb	1617774650	1617774650
+f	2022	4	12	15	5	15122022	admindb	admindb	1617774650	1617774650
+f	2022	4	12	16	6	16122022	admindb	admindb	1617774650	1617774650
+f	2022	4	12	17	7	17122022	admindb	admindb	1617774650	1617774650
+f	2022	4	12	18	1	18122022	admindb	admindb	1617774650	1617774650
+f	2022	4	12	19	2	19122022	admindb	admindb	1617774650	1617774650
+f	2022	4	12	20	3	20122022	admindb	admindb	1617774650	1617774650
+f	2022	4	12	21	4	21122022	admindb	admindb	1617774650	1617774650
+f	2022	4	12	22	5	22122022	admindb	admindb	1617774650	1617774650
+f	2022	4	12	23	6	23122022	admindb	admindb	1617774650	1617774650
+f	2022	4	12	24	7	24122022	admindb	admindb	1617774650	1617774650
+f	2022	4	12	25	1	25122022	admindb	admindb	1617774650	1617774650
+f	2022	4	12	26	2	26122022	admindb	admindb	1617774650	1617774650
+f	2022	4	12	27	3	27122022	admindb	admindb	1617774650	1617774650
+f	2022	4	12	28	4	28122022	admindb	admindb	1617774650	1617774650
+f	2022	4	12	29	5	29122022	admindb	admindb	1617774650	1617774650
+f	2022	4	12	30	6	30122022	admindb	admindb	1617774650	1617774650
+f	2022	4	12	31	7	31122022	admindb	admindb	1617774650	1617774650
 \.
 
 
@@ -33994,7 +33312,7 @@ COPY mne_catalog.blobcols (blobrelid, blobnum) FROM stdin;
 --
 
 COPY mne_catalog.id_count (index, id, lasttime) FROM stdin;
-0	32768	1610719678
+0	32769	1615812496
 \.
 
 
@@ -40187,14 +39505,6 @@ ALTER TABLE ONLY mne_application.customerfunctions
 
 
 --
--- Name: folder folder_pkey; Type: CONSTRAINT; Schema: mne_application; Owner: admindb
---
-
-ALTER TABLE ONLY mne_application.folder
-    ADD CONSTRAINT folder_pkey PRIMARY KEY (folderid);
-
-
---
 -- Name: htmlcompose htmlcompose_pkey; Type: CONSTRAINT; Schema: mne_application; Owner: admindb
 --
 
@@ -40328,14 +39638,6 @@ ALTER TABLE ONLY mne_application.reportscache
 
 ALTER TABLE ONLY mne_application.selectlist
     ADD CONSTRAINT selectlist_pkey PRIMARY KEY (name, value);
-
-
---
--- Name: server server_pkey; Type: CONSTRAINT; Schema: mne_application; Owner: admindb
---
-
-ALTER TABLE ONLY mne_application.server
-    ADD CONSTRAINT server_pkey PRIMARY KEY (serverid);
 
 
 --
@@ -41267,20 +40569,6 @@ ALTER TABLE ONLY public.test
 
 
 --
--- Name: folder_second; Type: INDEX; Schema: mne_application; Owner: admindb
---
-
-CREATE UNIQUE INDEX folder_second ON mne_application.folder USING btree (hostname, location);
-
-
---
--- Name: folder_third; Type: INDEX; Schema: mne_application; Owner: admindb
---
-
-CREATE UNIQUE INDEX folder_third ON mne_application.folder USING btree (hostname, name);
-
-
---
 -- Name: htmlcompose_name; Type: INDEX; Schema: mne_application; Owner: admindb
 --
 
@@ -41848,13 +41136,6 @@ CREATE OR REPLACE VIEW mne_builddiary.persontime AS
 --
 
 CREATE TRIGGER mne_history AFTER DELETE OR UPDATE ON mne_application.applications FOR EACH ROW EXECUTE FUNCTION mne_application.mne_history_applications();
-
-
---
--- Name: folder mne_history; Type: TRIGGER; Schema: mne_application; Owner: admindb
---
-
-CREATE TRIGGER mne_history AFTER DELETE OR UPDATE ON mne_application.folder FOR EACH ROW EXECUTE FUNCTION mne_application.mne_history_folder();
 
 
 --
@@ -43520,7 +42801,7 @@ GRANT USAGE ON SCHEMA mne_personnal TO PUBLIC;
 --
 
 GRANT USAGE ON SCHEMA mne_repository TO erprepository;
-GRANT USAGE ON SCHEMA mne_repository TO adminrepository;
+GRANT USAGE ON SCHEMA mne_repository TO admerprepository;
 GRANT USAGE ON SCHEMA mne_repository TO PUBLIC;
 
 
@@ -43535,7 +42816,7 @@ GRANT USAGE ON SCHEMA mne_sabredav TO PUBLIC;
 -- Name: SCHEMA mne_shipment; Type: ACL; Schema: -; Owner: admindb
 --
 
-GRANT ALL ON SCHEMA mne_shipment TO adminshipment;
+GRANT ALL ON SCHEMA mne_shipment TO admerpshipment;
 GRANT USAGE ON SCHEMA mne_shipment TO erpshipment;
 GRANT USAGE ON SCHEMA mne_shipment TO PUBLIC;
 
@@ -43544,7 +42825,7 @@ GRANT USAGE ON SCHEMA mne_shipment TO PUBLIC;
 -- Name: SCHEMA mne_warehouse; Type: ACL; Schema: -; Owner: admindb
 --
 
-GRANT USAGE ON SCHEMA mne_warehouse TO admincrm;
+GRANT USAGE ON SCHEMA mne_warehouse TO admerpcrm;
 GRANT USAGE ON SCHEMA mne_warehouse TO erpcrm;
 GRANT USAGE ON SCHEMA mne_warehouse TO PUBLIC;
 
@@ -43554,7 +42835,7 @@ GRANT USAGE ON SCHEMA mne_warehouse TO PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION mne_builddiary.bdtime_del(p_timeid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_builddiary.bdtime_del(p_timeid character varying) TO adminbuilddiary;
+GRANT ALL ON FUNCTION mne_builddiary.bdtime_del(p_timeid character varying) TO admerpbuilddiary;
 
 
 --
@@ -43562,7 +42843,7 @@ GRANT ALL ON FUNCTION mne_builddiary.bdtime_del(p_timeid character varying) TO a
 --
 
 REVOKE ALL ON FUNCTION mne_builddiary.bdtime_ok(p_timeid character varying, p_orderid character varying, p_start integer, p_duration integer, p_weather character varying, p_temperature integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_builddiary.bdtime_ok(p_timeid character varying, p_orderid character varying, p_start integer, p_duration integer, p_weather character varying, p_temperature integer) TO adminbuilddiary;
+GRANT ALL ON FUNCTION mne_builddiary.bdtime_ok(p_timeid character varying, p_orderid character varying, p_start integer, p_duration integer, p_weather character varying, p_temperature integer) TO admerpbuilddiary;
 
 
 --
@@ -43570,7 +42851,7 @@ GRANT ALL ON FUNCTION mne_builddiary.bdtime_ok(p_timeid character varying, p_ord
 --
 
 REVOKE ALL ON FUNCTION mne_builddiary.comment_mod(p_commentid character varying, p_timeid character varying, p_typ character varying, p_comment character varying, p_important boolean) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_builddiary.comment_mod(p_commentid character varying, p_timeid character varying, p_typ character varying, p_comment character varying, p_important boolean) TO adminbuilddiary;
+GRANT ALL ON FUNCTION mne_builddiary.comment_mod(p_commentid character varying, p_timeid character varying, p_typ character varying, p_comment character varying, p_important boolean) TO admerpbuilddiary;
 
 
 --
@@ -43578,7 +42859,7 @@ GRANT ALL ON FUNCTION mne_builddiary.comment_mod(p_commentid character varying, 
 --
 
 REVOKE ALL ON FUNCTION mne_builddiary.present_mod(p_presentid character varying, p_personid character varying, p_timeid character varying, p_present boolean, p_selfpresent boolean, p_typ integer, p_count integer, p_role character varying, p_comment character varying, p_important boolean) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_builddiary.present_mod(p_presentid character varying, p_personid character varying, p_timeid character varying, p_present boolean, p_selfpresent boolean, p_typ integer, p_count integer, p_role character varying, p_comment character varying, p_important boolean) TO adminbuilddiary;
+GRANT ALL ON FUNCTION mne_builddiary.present_mod(p_presentid character varying, p_personid character varying, p_timeid character varying, p_present boolean, p_selfpresent boolean, p_typ integer, p_count integer, p_role character varying, p_comment character varying, p_important boolean) TO admerpbuilddiary;
 
 
 --
@@ -43586,7 +42867,7 @@ GRANT ALL ON FUNCTION mne_builddiary.present_mod(p_presentid character varying, 
 --
 
 REVOKE ALL ON FUNCTION mne_builddiary.time_del(p_timeid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_builddiary.time_del(p_timeid character varying) TO adminbuilddiary;
+GRANT ALL ON FUNCTION mne_builddiary.time_del(p_timeid character varying) TO admerpbuilddiary;
 
 
 --
@@ -43594,10 +42875,10 @@ GRANT ALL ON FUNCTION mne_builddiary.time_del(p_timeid character varying) TO adm
 --
 
 REVOKE ALL ON FUNCTION mne_builddiary.time_mod(p_presentid character varying, p_timeid character varying, p_orderproducttimeid character varying, p_userid character varying, p_start integer, p_duration integer, p_comment character varying, p_bstart integer, p_bduration integer, p_weather character varying, p_temperature integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_builddiary.time_mod(p_presentid character varying, p_timeid character varying, p_orderproducttimeid character varying, p_userid character varying, p_start integer, p_duration integer, p_comment character varying, p_bstart integer, p_bduration integer, p_weather character varying, p_temperature integer) TO adminbuilddiary;
+GRANT ALL ON FUNCTION mne_builddiary.time_mod(p_presentid character varying, p_timeid character varying, p_orderproducttimeid character varying, p_userid character varying, p_start integer, p_duration integer, p_comment character varying, p_bstart integer, p_bduration integer, p_weather character varying, p_temperature integer) TO admerpbuilddiary;
 GRANT ALL ON FUNCTION mne_builddiary.time_mod(p_presentid character varying, p_timeid character varying, p_orderproducttimeid character varying, p_userid character varying, p_start integer, p_duration integer, p_comment character varying, p_bstart integer, p_bduration integer, p_weather character varying, p_temperature integer) TO erppersonnal;
-GRANT ALL ON FUNCTION mne_builddiary.time_mod(p_presentid character varying, p_timeid character varying, p_orderproducttimeid character varying, p_userid character varying, p_start integer, p_duration integer, p_comment character varying, p_bstart integer, p_bduration integer, p_weather character varying, p_temperature integer) TO adminpersonnal;
-GRANT ALL ON FUNCTION mne_builddiary.time_mod(p_presentid character varying, p_timeid character varying, p_orderproducttimeid character varying, p_userid character varying, p_start integer, p_duration integer, p_comment character varying, p_bstart integer, p_bduration integer, p_weather character varying, p_temperature integer) TO adminpersonnaltime;
+GRANT ALL ON FUNCTION mne_builddiary.time_mod(p_presentid character varying, p_timeid character varying, p_orderproducttimeid character varying, p_userid character varying, p_start integer, p_duration integer, p_comment character varying, p_bstart integer, p_bduration integer, p_weather character varying, p_temperature integer) TO admerppersonnal;
+GRANT ALL ON FUNCTION mne_builddiary.time_mod(p_presentid character varying, p_timeid character varying, p_orderproducttimeid character varying, p_userid character varying, p_start integer, p_duration integer, p_comment character varying, p_bstart integer, p_bduration integer, p_weather character varying, p_temperature integer) TO admerppersonnaltime;
 
 
 --
@@ -43606,15 +42887,7 @@ GRANT ALL ON FUNCTION mne_builddiary.time_mod(p_presentid character varying, p_t
 
 REVOKE ALL ON FUNCTION mne_builddiary.time_person(p_timeid character varying, p_role character varying) FROM PUBLIC;
 GRANT ALL ON FUNCTION mne_builddiary.time_person(p_timeid character varying, p_role character varying) TO erpbuilddiary;
-GRANT ALL ON FUNCTION mne_builddiary.time_person(p_timeid character varying, p_role character varying) TO adminbuilddiary;
-
-
---
--- Name: FUNCTION folder_del(p_folderid character varying); Type: ACL; Schema: mne_catalog; Owner: admindb
---
-
-REVOKE ALL ON FUNCTION mne_catalog.folder_del(p_folderid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_catalog.folder_del(p_folderid character varying) TO adminsystem;
+GRANT ALL ON FUNCTION mne_builddiary.time_person(p_timeid character varying, p_role character varying) TO admerpbuilddiary;
 
 
 --
@@ -43741,7 +43014,7 @@ REVOKE ALL ON FUNCTION mne_catalog.userdel(p_username character varying) FROM PU
 --
 
 REVOKE ALL ON FUNCTION mne_catalog.usergroupadd(p_user character varying, p_group character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_catalog.usergroupadd(p_user character varying, p_group character varying) TO adminpersonnal;
+GRANT ALL ON FUNCTION mne_catalog.usergroupadd(p_user character varying, p_group character varying) TO admerppersonnal;
 
 
 --
@@ -43749,7 +43022,7 @@ GRANT ALL ON FUNCTION mne_catalog.usergroupadd(p_user character varying, p_group
 --
 
 REVOKE ALL ON FUNCTION mne_catalog.usergroupdel(p_user character varying, p_group character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_catalog.usergroupdel(p_user character varying, p_group character varying) TO adminpersonnal;
+GRANT ALL ON FUNCTION mne_catalog.usergroupdel(p_user character varying, p_group character varying) TO admerppersonnal;
 
 
 --
@@ -43793,7 +43066,7 @@ GRANT SELECT ON TABLE mne_application.yearday TO PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION mne_crm.company_add(p_name character varying, p_sorting character varying, p_ownerid character varying, p_categorie character varying, p_email character varying, p_fax character varying, p_http character varying, p_language character varying, p_telefon character varying, p_mobile character varying, p_postbox character varying, p_street character varying, p_cityid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_crm.company_add(p_name character varying, p_sorting character varying, p_ownerid character varying, p_categorie character varying, p_email character varying, p_fax character varying, p_http character varying, p_language character varying, p_telefon character varying, p_mobile character varying, p_postbox character varying, p_street character varying, p_cityid character varying) TO admincrm;
+GRANT ALL ON FUNCTION mne_crm.company_add(p_name character varying, p_sorting character varying, p_ownerid character varying, p_categorie character varying, p_email character varying, p_fax character varying, p_http character varying, p_language character varying, p_telefon character varying, p_mobile character varying, p_postbox character varying, p_street character varying, p_cityid character varying) TO admerpcrm;
 
 
 --
@@ -43801,7 +43074,7 @@ GRANT ALL ON FUNCTION mne_crm.company_add(p_name character varying, p_sorting ch
 --
 
 REVOKE ALL ON FUNCTION mne_crm.company_del(p_companyid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_crm.company_del(p_companyid character varying) TO admincrm;
+GRANT ALL ON FUNCTION mne_crm.company_del(p_companyid character varying) TO admerpcrm;
 
 
 --
@@ -43809,7 +43082,7 @@ GRANT ALL ON FUNCTION mne_crm.company_del(p_companyid character varying) TO admi
 --
 
 REVOKE ALL ON FUNCTION mne_crm.company_mod(p_companyid character varying, p_name character varying, p_sorting character varying, p_ownerid character varying, p_categorie character varying, p_email character varying, p_fax character varying, p_http character varying, p_language character varying, p_telefon character varying, p_mobile character varying, p_postbox character varying, p_street character varying, p_cityid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_crm.company_mod(p_companyid character varying, p_name character varying, p_sorting character varying, p_ownerid character varying, p_categorie character varying, p_email character varying, p_fax character varying, p_http character varying, p_language character varying, p_telefon character varying, p_mobile character varying, p_postbox character varying, p_street character varying, p_cityid character varying) TO admincrm;
+GRANT ALL ON FUNCTION mne_crm.company_mod(p_companyid character varying, p_name character varying, p_sorting character varying, p_ownerid character varying, p_categorie character varying, p_email character varying, p_fax character varying, p_http character varying, p_language character varying, p_telefon character varying, p_mobile character varying, p_postbox character varying, p_street character varying, p_cityid character varying) TO admerpcrm;
 
 
 --
@@ -43817,8 +43090,7 @@ GRANT ALL ON FUNCTION mne_crm.company_mod(p_companyid character varying, p_name 
 --
 
 REVOKE ALL ON FUNCTION mne_crm.company_vcard(p_companyid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_crm.company_vcard(p_companyid character varying) TO admincrm;
-GRANT ALL ON FUNCTION mne_crm.company_vcard(p_companyid character varying) TO adminshare;
+GRANT ALL ON FUNCTION mne_crm.company_vcard(p_companyid character varying) TO admerpcrm;
 GRANT ALL ON FUNCTION mne_crm.company_vcard(p_companyid character varying) TO erpcrm;
 GRANT ALL ON FUNCTION mne_crm.company_vcard(p_companyid character varying) TO erpdav;
 
@@ -43828,7 +43100,7 @@ GRANT ALL ON FUNCTION mne_crm.company_vcard(p_companyid character varying) TO er
 --
 
 REVOKE ALL ON FUNCTION mne_crm.file_getsecondref(p_fileid character varying, langid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_crm.file_getsecondref(p_fileid character varying, langid character varying) TO admincrm;
+GRANT ALL ON FUNCTION mne_crm.file_getsecondref(p_fileid character varying, langid character varying) TO admerpcrm;
 GRANT ALL ON FUNCTION mne_crm.file_getsecondref(p_fileid character varying, langid character varying) TO erpcrm;
 
 
@@ -43837,14 +43109,14 @@ GRANT ALL ON FUNCTION mne_crm.file_getsecondref(p_fileid character varying, lang
 --
 
 REVOKE ALL ON FUNCTION mne_crm.offer_add(p_offerid character varying, add_offerid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_crm.offer_add(p_offerid character varying, add_offerid character varying) TO admincrm;
+GRANT ALL ON FUNCTION mne_crm.offer_add(p_offerid character varying, add_offerid character varying) TO admerpcrm;
 
 
 --
 -- Name: TABLE offerproduct; Type: ACL; Schema: mne_crm; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.offerproduct TO admincrm;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.offerproduct TO admerpcrm;
 GRANT SELECT ON TABLE mne_crm.offerproduct TO erpcrm;
 
 
@@ -43853,7 +43125,7 @@ GRANT SELECT ON TABLE mne_crm.offerproduct TO erpcrm;
 --
 
 REVOKE ALL ON FUNCTION mne_crm.offer_add_product_add(p_offerid character varying, p mne_crm.offerproduct, acttime integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_crm.offer_add_product_add(p_offerid character varying, p mne_crm.offerproduct, acttime integer) TO admincrm;
+GRANT ALL ON FUNCTION mne_crm.offer_add_product_add(p_offerid character varying, p mne_crm.offerproduct, acttime integer) TO admerpcrm;
 
 
 --
@@ -43861,7 +43133,7 @@ GRANT ALL ON FUNCTION mne_crm.offer_add_product_add(p_offerid character varying,
 --
 
 REVOKE ALL ON FUNCTION mne_crm.offer_copy(p_offerid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_crm.offer_copy(p_offerid character varying) TO admincrm;
+GRANT ALL ON FUNCTION mne_crm.offer_copy(p_offerid character varying) TO admerpcrm;
 
 
 --
@@ -43869,7 +43141,7 @@ GRANT ALL ON FUNCTION mne_crm.offer_copy(p_offerid character varying) TO admincr
 --
 
 REVOKE ALL ON FUNCTION mne_crm.offer_del(p_offerid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_crm.offer_del(p_offerid character varying) TO admincrm;
+GRANT ALL ON FUNCTION mne_crm.offer_del(p_offerid character varying) TO admerpcrm;
 
 
 --
@@ -43877,7 +43149,7 @@ GRANT ALL ON FUNCTION mne_crm.offer_del(p_offerid character varying) TO admincrm
 --
 
 REVOKE ALL ON FUNCTION mne_crm.offer_ok(p_offerid character varying, p_ownerid character varying, p_contactid character varying, p_refid character varying, p_offernumber character varying, p_version integer, p_description character varying, p_text character varying, p_language character varying, p_withvat integer, p_lumpsum integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_crm.offer_ok(p_offerid character varying, p_ownerid character varying, p_contactid character varying, p_refid character varying, p_offernumber character varying, p_version integer, p_description character varying, p_text character varying, p_language character varying, p_withvat integer, p_lumpsum integer) TO admincrm;
+GRANT ALL ON FUNCTION mne_crm.offer_ok(p_offerid character varying, p_ownerid character varying, p_contactid character varying, p_refid character varying, p_offernumber character varying, p_version integer, p_description character varying, p_text character varying, p_language character varying, p_withvat integer, p_lumpsum integer) TO admerpcrm;
 
 
 --
@@ -43885,7 +43157,7 @@ GRANT ALL ON FUNCTION mne_crm.offer_ok(p_offerid character varying, p_ownerid ch
 --
 
 REVOKE ALL ON FUNCTION mne_crm.offer_order(p_offerid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_crm.offer_order(p_offerid character varying) TO admincrm;
+GRANT ALL ON FUNCTION mne_crm.offer_order(p_offerid character varying) TO admerpcrm;
 
 
 --
@@ -43893,7 +43165,7 @@ GRANT ALL ON FUNCTION mne_crm.offer_order(p_offerid character varying) TO adminc
 --
 
 REVOKE ALL ON FUNCTION mne_crm.offerproduct_add(p_offerid character varying, p_offerproducttype character varying, p_productid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_crm.offerproduct_add(p_offerid character varying, p_offerproducttype character varying, p_productid character varying) TO admincrm;
+GRANT ALL ON FUNCTION mne_crm.offerproduct_add(p_offerid character varying, p_offerproducttype character varying, p_productid character varying) TO admerpcrm;
 
 
 --
@@ -43901,7 +43173,7 @@ GRANT ALL ON FUNCTION mne_crm.offerproduct_add(p_offerid character varying, p_of
 --
 
 REVOKE ALL ON FUNCTION mne_crm.offerproduct_calculate(p_offerproductid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_crm.offerproduct_calculate(p_offerproductid character varying) TO admincrm;
+GRANT ALL ON FUNCTION mne_crm.offerproduct_calculate(p_offerproductid character varying) TO admerpcrm;
 
 
 --
@@ -43909,14 +43181,14 @@ GRANT ALL ON FUNCTION mne_crm.offerproduct_calculate(p_offerproductid character 
 --
 
 REVOKE ALL ON FUNCTION mne_crm.offerproduct_calculate_all(p_offerid character varying, p_offerproducttype character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_crm.offerproduct_calculate_all(p_offerid character varying, p_offerproducttype character varying) TO admincrm;
+GRANT ALL ON FUNCTION mne_crm.offerproduct_calculate_all(p_offerid character varying, p_offerproducttype character varying) TO admerpcrm;
 
 
 --
 -- Name: FUNCTION offerproduct_cost(p_offerproductid character varying); Type: ACL; Schema: mne_crm; Owner: admindb
 --
 
-GRANT ALL ON FUNCTION mne_crm.offerproduct_cost(p_offerproductid character varying) TO admincrm;
+GRANT ALL ON FUNCTION mne_crm.offerproduct_cost(p_offerproductid character varying) TO admerpcrm;
 GRANT ALL ON FUNCTION mne_crm.offerproduct_cost(p_offerproductid character varying) TO erpcrm;
 
 
@@ -43925,7 +43197,7 @@ GRANT ALL ON FUNCTION mne_crm.offerproduct_cost(p_offerproductid character varyi
 --
 
 REVOKE ALL ON FUNCTION mne_crm.offerproduct_cost_set(p_offerproductid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_crm.offerproduct_cost_set(p_offerproductid character varying) TO admincrm;
+GRANT ALL ON FUNCTION mne_crm.offerproduct_cost_set(p_offerproductid character varying) TO admerpcrm;
 
 
 --
@@ -43933,14 +43205,14 @@ GRANT ALL ON FUNCTION mne_crm.offerproduct_cost_set(p_offerproductid character v
 --
 
 REVOKE ALL ON FUNCTION mne_crm.offerproduct_del(p_offerproductid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_crm.offerproduct_del(p_offerproductid character varying) TO admincrm;
+GRANT ALL ON FUNCTION mne_crm.offerproduct_del(p_offerproductid character varying) TO admerpcrm;
 
 
 --
 -- Name: FUNCTION offerproduct_standard(p_offerid character varying); Type: ACL; Schema: mne_crm; Owner: admindb
 --
 
-GRANT ALL ON FUNCTION mne_crm.offerproduct_standard(p_offerid character varying) TO admincrm;
+GRANT ALL ON FUNCTION mne_crm.offerproduct_standard(p_offerid character varying) TO admerpcrm;
 
 
 --
@@ -43948,7 +43220,7 @@ GRANT ALL ON FUNCTION mne_crm.offerproduct_standard(p_offerid character varying)
 --
 
 REVOKE ALL ON FUNCTION mne_crm.offerproduct_update(p_offerproductid character varying, p_name character varying, p_number character varying, p_count double precision, p_price double precision, p_cost double precision) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_crm.offerproduct_update(p_offerproductid character varying, p_name character varying, p_number character varying, p_count double precision, p_price double precision, p_cost double precision) TO admincrm;
+GRANT ALL ON FUNCTION mne_crm.offerproduct_update(p_offerproductid character varying, p_name character varying, p_number character varying, p_count double precision, p_price double precision, p_cost double precision) TO admerpcrm;
 
 
 --
@@ -43956,7 +43228,7 @@ GRANT ALL ON FUNCTION mne_crm.offerproduct_update(p_offerproductid character var
 --
 
 REVOKE ALL ON FUNCTION mne_crm.order_del(p_orderid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_crm.order_del(p_orderid character varying) TO admincrm;
+GRANT ALL ON FUNCTION mne_crm.order_del(p_orderid character varying) TO admerpcrm;
 
 
 --
@@ -43964,8 +43236,8 @@ GRANT ALL ON FUNCTION mne_crm.order_del(p_orderid character varying) TO admincrm
 --
 
 REVOKE ALL ON FUNCTION mne_crm.order_deliver(p_orderid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_crm.order_deliver(p_orderid character varying) TO adminshipment;
-GRANT ALL ON FUNCTION mne_crm.order_deliver(p_orderid character varying) TO admincrm;
+GRANT ALL ON FUNCTION mne_crm.order_deliver(p_orderid character varying) TO admerpshipment;
+GRANT ALL ON FUNCTION mne_crm.order_deliver(p_orderid character varying) TO admerpcrm;
 
 
 --
@@ -43973,7 +43245,7 @@ GRANT ALL ON FUNCTION mne_crm.order_deliver(p_orderid character varying) TO admi
 --
 
 REVOKE ALL ON FUNCTION mne_crm.order_ok(p_orderid character varying, p_ownerid character varying, p_contactid character varying, p_refid character varying, p_ordernumber character varying, p_description character varying, p_text character varying, p_language character varying, p_withvat integer, p_lumpsum integer, p_open boolean, p_closed boolean, p_color character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_crm.order_ok(p_orderid character varying, p_ownerid character varying, p_contactid character varying, p_refid character varying, p_ordernumber character varying, p_description character varying, p_text character varying, p_language character varying, p_withvat integer, p_lumpsum integer, p_open boolean, p_closed boolean, p_color character varying) TO admincrm;
+GRANT ALL ON FUNCTION mne_crm.order_ok(p_orderid character varying, p_ownerid character varying, p_contactid character varying, p_refid character varying, p_ordernumber character varying, p_description character varying, p_text character varying, p_language character varying, p_withvat integer, p_lumpsum integer, p_open boolean, p_closed boolean, p_color character varying) TO admerpcrm;
 
 
 --
@@ -43981,7 +43253,7 @@ GRANT ALL ON FUNCTION mne_crm.order_ok(p_orderid character varying, p_ownerid ch
 --
 
 REVOKE ALL ON FUNCTION mne_crm.orderproduct_add(p_orderid character varying, p_orderproducttype character varying, p_productid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_crm.orderproduct_add(p_orderid character varying, p_orderproducttype character varying, p_productid character varying) TO admincrm;
+GRANT ALL ON FUNCTION mne_crm.orderproduct_add(p_orderid character varying, p_orderproducttype character varying, p_productid character varying) TO admerpcrm;
 
 
 --
@@ -43990,7 +43262,7 @@ GRANT ALL ON FUNCTION mne_crm.orderproduct_add(p_orderid character varying, p_or
 
 REVOKE ALL ON FUNCTION mne_crm.orderproduct_calculate(p_orderid character varying, p_orderproducttype character varying) FROM PUBLIC;
 GRANT ALL ON FUNCTION mne_crm.orderproduct_calculate(p_orderid character varying, p_orderproducttype character varying) TO erpcrm;
-GRANT ALL ON FUNCTION mne_crm.orderproduct_calculate(p_orderid character varying, p_orderproducttype character varying) TO admincrm;
+GRANT ALL ON FUNCTION mne_crm.orderproduct_calculate(p_orderid character varying, p_orderproducttype character varying) TO admerpcrm;
 
 
 --
@@ -43998,7 +43270,7 @@ GRANT ALL ON FUNCTION mne_crm.orderproduct_calculate(p_orderid character varying
 --
 
 REVOKE ALL ON FUNCTION mne_crm.orderproduct_del(p_orderproductid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_crm.orderproduct_del(p_orderproductid character varying) TO admincrm;
+GRANT ALL ON FUNCTION mne_crm.orderproduct_del(p_orderproductid character varying) TO admerpcrm;
 
 
 --
@@ -44006,7 +43278,7 @@ GRANT ALL ON FUNCTION mne_crm.orderproduct_del(p_orderproductid character varyin
 --
 
 REVOKE ALL ON FUNCTION mne_crm.orderproduct_ok(p_orderproductid character varying, p_offerproductid character varying, p_position integer, p_withworkingstep boolean, p_productdescription character varying, p_productcurrencyid character varying, p_productid character varying, p_orderproducttype character varying, p_timeauto boolean, p_showdeliver boolean, p_productcostrecalc boolean, p_productpricecalc double precision, p_productcostcalc double precision, p_productvat double precision, p_ready boolean, p_productname character varying, p_productnumber character varying, p_count double precision, p_actcount double precision, p_productunit character varying, p_productprice double precision, p_productcost double precision) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_crm.orderproduct_ok(p_orderproductid character varying, p_offerproductid character varying, p_position integer, p_withworkingstep boolean, p_productdescription character varying, p_productcurrencyid character varying, p_productid character varying, p_orderproducttype character varying, p_timeauto boolean, p_showdeliver boolean, p_productcostrecalc boolean, p_productpricecalc double precision, p_productcostcalc double precision, p_productvat double precision, p_ready boolean, p_productname character varying, p_productnumber character varying, p_count double precision, p_actcount double precision, p_productunit character varying, p_productprice double precision, p_productcost double precision) TO admincrm;
+GRANT ALL ON FUNCTION mne_crm.orderproduct_ok(p_orderproductid character varying, p_offerproductid character varying, p_position integer, p_withworkingstep boolean, p_productdescription character varying, p_productcurrencyid character varying, p_productid character varying, p_orderproducttype character varying, p_timeauto boolean, p_showdeliver boolean, p_productcostrecalc boolean, p_productpricecalc double precision, p_productcostcalc double precision, p_productvat double precision, p_ready boolean, p_productname character varying, p_productnumber character varying, p_count double precision, p_actcount double precision, p_productunit character varying, p_productprice double precision, p_productcost double precision) TO admerpcrm;
 
 
 --
@@ -44014,7 +43286,7 @@ GRANT ALL ON FUNCTION mne_crm.orderproduct_ok(p_orderproductid character varying
 --
 
 REVOKE ALL ON FUNCTION mne_crm.orderproductcost(p_orderproductid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_crm.orderproductcost(p_orderproductid character varying) TO admincrm;
+GRANT ALL ON FUNCTION mne_crm.orderproductcost(p_orderproductid character varying) TO admerpcrm;
 GRANT ALL ON FUNCTION mne_crm.orderproductcost(p_orderproductid character varying) TO erpcrm;
 
 
@@ -44023,7 +43295,7 @@ GRANT ALL ON FUNCTION mne_crm.orderproductcost(p_orderproductid character varyin
 --
 
 REVOKE ALL ON FUNCTION mne_crm.orderproductcostact(p_orderproductid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_crm.orderproductcostact(p_orderproductid character varying) TO admincrm;
+GRANT ALL ON FUNCTION mne_crm.orderproductcostact(p_orderproductid character varying) TO admerpcrm;
 GRANT ALL ON FUNCTION mne_crm.orderproductcostact(p_orderproductid character varying) TO erpcrm;
 
 
@@ -44032,7 +43304,7 @@ GRANT ALL ON FUNCTION mne_crm.orderproductcostact(p_orderproductid character var
 --
 
 REVOKE ALL ON FUNCTION mne_crm.orderproductcostcalc(p_orderproductid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_crm.orderproductcostcalc(p_orderproductid character varying) TO admincrm;
+GRANT ALL ON FUNCTION mne_crm.orderproductcostcalc(p_orderproductid character varying) TO admerpcrm;
 GRANT ALL ON FUNCTION mne_crm.orderproductcostcalc(p_orderproductid character varying) TO erpcrm;
 
 
@@ -44041,7 +43313,7 @@ GRANT ALL ON FUNCTION mne_crm.orderproductcostcalc(p_orderproductid character va
 --
 
 REVOKE ALL ON FUNCTION mne_crm.person_add(p_firstname character varying, p_lastname character varying, p_ownerid character varying, p_sex integer, p_sign character varying, p_sorting character varying, p_birthday integer, p_email character varying, p_http character varying, p_role character varying, p_telephonoffice character varying, p_telephonpriv character varying, p_telephonmobil character varying, p_language character varying, p_addressid character varying, p_refid character varying, p_postbox character varying, p_street character varying, p_cityid character varying, p_havepicture character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_crm.person_add(p_firstname character varying, p_lastname character varying, p_ownerid character varying, p_sex integer, p_sign character varying, p_sorting character varying, p_birthday integer, p_email character varying, p_http character varying, p_role character varying, p_telephonoffice character varying, p_telephonpriv character varying, p_telephonmobil character varying, p_language character varying, p_addressid character varying, p_refid character varying, p_postbox character varying, p_street character varying, p_cityid character varying, p_havepicture character varying) TO admincrm;
+GRANT ALL ON FUNCTION mne_crm.person_add(p_firstname character varying, p_lastname character varying, p_ownerid character varying, p_sex integer, p_sign character varying, p_sorting character varying, p_birthday integer, p_email character varying, p_http character varying, p_role character varying, p_telephonoffice character varying, p_telephonpriv character varying, p_telephonmobil character varying, p_language character varying, p_addressid character varying, p_refid character varying, p_postbox character varying, p_street character varying, p_cityid character varying, p_havepicture character varying) TO admerpcrm;
 
 
 --
@@ -44049,9 +43321,8 @@ GRANT ALL ON FUNCTION mne_crm.person_add(p_firstname character varying, p_lastna
 --
 
 REVOKE ALL ON FUNCTION mne_crm.person_del(p_personid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_crm.person_del(p_personid character varying) TO admincrm;
-GRANT ALL ON FUNCTION mne_crm.person_del(p_personid character varying) TO adminsystem;
-GRANT ALL ON FUNCTION mne_crm.person_del(p_personid character varying) TO adminpersonnal;
+GRANT ALL ON FUNCTION mne_crm.person_del(p_personid character varying) TO admerpcrm;
+GRANT ALL ON FUNCTION mne_crm.person_del(p_personid character varying) TO admerppersonnal;
 
 
 --
@@ -44059,7 +43330,7 @@ GRANT ALL ON FUNCTION mne_crm.person_del(p_personid character varying) TO adminp
 --
 
 REVOKE ALL ON FUNCTION mne_crm.person_mod(p_personid character varying, p_firstname character varying, p_lastname character varying, p_ownerid character varying, p_sex integer, p_sign character varying, p_sorting character varying, p_birthday integer, p_email character varying, p_http character varying, p_role character varying, p_telephonoffice character varying, p_telephonpriv character varying, p_telephonmobil character varying, p_language character varying, p_addressid character varying, p_refid character varying, p_postbox character varying, p_street character varying, p_cityid character varying, p_havepicture character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_crm.person_mod(p_personid character varying, p_firstname character varying, p_lastname character varying, p_ownerid character varying, p_sex integer, p_sign character varying, p_sorting character varying, p_birthday integer, p_email character varying, p_http character varying, p_role character varying, p_telephonoffice character varying, p_telephonpriv character varying, p_telephonmobil character varying, p_language character varying, p_addressid character varying, p_refid character varying, p_postbox character varying, p_street character varying, p_cityid character varying, p_havepicture character varying) TO admincrm;
+GRANT ALL ON FUNCTION mne_crm.person_mod(p_personid character varying, p_firstname character varying, p_lastname character varying, p_ownerid character varying, p_sex integer, p_sign character varying, p_sorting character varying, p_birthday integer, p_email character varying, p_http character varying, p_role character varying, p_telephonoffice character varying, p_telephonpriv character varying, p_telephonmobil character varying, p_language character varying, p_addressid character varying, p_refid character varying, p_postbox character varying, p_street character varying, p_cityid character varying, p_havepicture character varying) TO admerpcrm;
 
 
 --
@@ -44068,7 +43339,7 @@ GRANT ALL ON FUNCTION mne_crm.person_mod(p_personid character varying, p_firstna
 
 REVOKE ALL ON FUNCTION mne_crm.person_vcard(p_personid character varying) FROM PUBLIC;
 GRANT ALL ON FUNCTION mne_crm.person_vcard(p_personid character varying) TO erpcrm;
-GRANT ALL ON FUNCTION mne_crm.person_vcard(p_personid character varying) TO admincrm;
+GRANT ALL ON FUNCTION mne_crm.person_vcard(p_personid character varying) TO admerpcrm;
 GRANT ALL ON FUNCTION mne_crm.person_vcard(p_personid character varying) TO erpdav;
 
 
@@ -44091,9 +43362,7 @@ REVOKE ALL ON FUNCTION mne_crm.personowndata_del(p_personowndataid character var
 --
 
 REVOKE ALL ON FUNCTION mne_crm.personsharepasswd_ok(p_personid character varying, p_loginname character varying, p_passwd character varying, p_validuntil integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_crm.personsharepasswd_ok(p_personid character varying, p_loginname character varying, p_passwd character varying, p_validuntil integer) TO admincrm;
-GRANT ALL ON FUNCTION mne_crm.personsharepasswd_ok(p_personid character varying, p_loginname character varying, p_passwd character varying, p_validuntil integer) TO adminsystem;
-GRANT ALL ON FUNCTION mne_crm.personsharepasswd_ok(p_personid character varying, p_loginname character varying, p_passwd character varying, p_validuntil integer) TO adminshare;
+GRANT ALL ON FUNCTION mne_crm.personsharepasswd_ok(p_personid character varying, p_loginname character varying, p_passwd character varying, p_validuntil integer) TO admerpcrm;
 
 
 --
@@ -44101,7 +43370,7 @@ GRANT ALL ON FUNCTION mne_crm.personsharepasswd_ok(p_personid character varying,
 --
 
 REVOKE ALL ON FUNCTION mne_crm.product_add(p_name character varying, p_productnumber character varying, p_description character varying, p_withworkingstep boolean, p_parentid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_crm.product_add(p_name character varying, p_productnumber character varying, p_description character varying, p_withworkingstep boolean, p_parentid character varying) TO admincrm;
+GRANT ALL ON FUNCTION mne_crm.product_add(p_name character varying, p_productnumber character varying, p_description character varying, p_withworkingstep boolean, p_parentid character varying) TO admerpcrm;
 
 
 --
@@ -44109,7 +43378,7 @@ GRANT ALL ON FUNCTION mne_crm.product_add(p_name character varying, p_productnum
 --
 
 REVOKE ALL ON FUNCTION mne_crm.product_del(p_productid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_crm.product_del(p_productid character varying) TO admincrm;
+GRANT ALL ON FUNCTION mne_crm.product_del(p_productid character varying) TO admerpcrm;
 
 
 --
@@ -44117,7 +43386,7 @@ GRANT ALL ON FUNCTION mne_crm.product_del(p_productid character varying) TO admi
 --
 
 REVOKE ALL ON FUNCTION mne_crm.product_mod(p_productid character varying, p_name character varying, p_productnumber character varying, p_description character varying, p_withworkingstep boolean, p_parentid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_crm.product_mod(p_productid character varying, p_name character varying, p_productnumber character varying, p_description character varying, p_withworkingstep boolean, p_parentid character varying) TO admincrm;
+GRANT ALL ON FUNCTION mne_crm.product_mod(p_productid character varying, p_name character varying, p_productnumber character varying, p_description character varying, p_withworkingstep boolean, p_parentid character varying) TO admerpcrm;
 
 
 --
@@ -44125,7 +43394,7 @@ GRANT ALL ON FUNCTION mne_crm.product_mod(p_productid character varying, p_name 
 --
 
 REVOKE ALL ON FUNCTION mne_crm.productcost(p_productid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_crm.productcost(p_productid character varying) TO admincrm;
+GRANT ALL ON FUNCTION mne_crm.productcost(p_productid character varying) TO admerpcrm;
 
 
 --
@@ -44133,7 +43402,7 @@ GRANT ALL ON FUNCTION mne_crm.productcost(p_productid character varying) TO admi
 --
 
 REVOKE ALL ON FUNCTION mne_crm.productcost_update(p_productid character varying, p_cost double precision) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_crm.productcost_update(p_productid character varying, p_cost double precision) TO admincrm;
+GRANT ALL ON FUNCTION mne_crm.productcost_update(p_productid character varying, p_cost double precision) TO admerpcrm;
 
 
 --
@@ -44141,7 +43410,7 @@ GRANT ALL ON FUNCTION mne_crm.productcost_update(p_productid character varying, 
 --
 
 REVOKE ALL ON FUNCTION mne_crm.productprice_del(p_productid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_crm.productprice_del(p_productid character varying) TO admincrm;
+GRANT ALL ON FUNCTION mne_crm.productprice_del(p_productid character varying) TO admerpcrm;
 
 
 --
@@ -44149,7 +43418,7 @@ GRANT ALL ON FUNCTION mne_crm.productprice_del(p_productid character varying) TO
 --
 
 REVOKE ALL ON FUNCTION mne_crm.productprice_ok(p_productid character varying, p_unitcost double precision, p_unitprice double precision, p_unit character varying, p_vat double precision, p_currencyid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_crm.productprice_ok(p_productid character varying, p_unitcost double precision, p_unitprice double precision, p_unit character varying, p_vat double precision, p_currencyid character varying) TO admincrm;
+GRANT ALL ON FUNCTION mne_crm.productprice_ok(p_productid character varying, p_unitcost double precision, p_unitprice double precision, p_unit character varying, p_vat double precision, p_currencyid character varying) TO admerpcrm;
 
 
 --
@@ -44157,15 +43426,15 @@ GRANT ALL ON FUNCTION mne_crm.productprice_ok(p_productid character varying, p_u
 --
 
 REVOKE ALL ON FUNCTION mne_crm.productprice_update(p_productid character varying, p_price double precision) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_crm.productprice_update(p_productid character varying, p_price double precision) TO admincrm;
-GRANT ALL ON FUNCTION mne_crm.productprice_update(p_productid character varying, p_price double precision) TO adminwarehouse;
+GRANT ALL ON FUNCTION mne_crm.productprice_update(p_productid character varying, p_price double precision) TO admerpcrm;
+GRANT ALL ON FUNCTION mne_crm.productprice_update(p_productid character varying, p_price double precision) TO admerpwarehouse;
 
 
 --
 -- Name: TABLE producttree; Type: ACL; Schema: mne_crm; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.producttree TO admincrm;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.producttree TO admerpcrm;
 GRANT SELECT ON TABLE mne_crm.producttree TO erpcrm;
 GRANT SELECT ON TABLE mne_crm.producttree TO erpshipment;
 
@@ -44175,7 +43444,7 @@ GRANT SELECT ON TABLE mne_crm.producttree TO erpshipment;
 --
 
 REVOKE ALL ON FUNCTION mne_crm.producttree_leaf(p_parentid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_crm.producttree_leaf(p_parentid character varying) TO admincrm;
+GRANT ALL ON FUNCTION mne_crm.producttree_leaf(p_parentid character varying) TO admerpcrm;
 GRANT ALL ON FUNCTION mne_crm.producttree_leaf(p_parentid character varying) TO erpcrm;
 
 
@@ -44185,7 +43454,7 @@ GRANT ALL ON FUNCTION mne_crm.producttree_leaf(p_parentid character varying) TO 
 
 REVOKE ALL ON FUNCTION mne_crm.vcard_parse(p_vcard character varying) FROM PUBLIC;
 GRANT ALL ON FUNCTION mne_crm.vcard_parse(p_vcard character varying) TO erpdav;
-GRANT ALL ON FUNCTION mne_crm.vcard_parse(p_vcard character varying) TO admincrm;
+GRANT ALL ON FUNCTION mne_crm.vcard_parse(p_vcard character varying) TO admerpcrm;
 
 
 --
@@ -44193,7 +43462,7 @@ GRANT ALL ON FUNCTION mne_crm.vcard_parse(p_vcard character varying) TO admincrm
 --
 
 REVOKE ALL ON FUNCTION mne_fixture.fixture_add(p_fixturenumber character varying, p_description character varying, p_fixturetypeid character varying, p_ownerid character varying, p_partid character varying, p_purchasedeliveryid character varying, p_parentid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_fixture.fixture_add(p_fixturenumber character varying, p_description character varying, p_fixturetypeid character varying, p_ownerid character varying, p_partid character varying, p_purchasedeliveryid character varying, p_parentid character varying) TO adminfixture;
+GRANT ALL ON FUNCTION mne_fixture.fixture_add(p_fixturenumber character varying, p_description character varying, p_fixturetypeid character varying, p_ownerid character varying, p_partid character varying, p_purchasedeliveryid character varying, p_parentid character varying) TO admerpfixture;
 
 
 --
@@ -44201,7 +43470,7 @@ GRANT ALL ON FUNCTION mne_fixture.fixture_add(p_fixturenumber character varying,
 --
 
 REVOKE ALL ON FUNCTION mne_fixture.fixture_del(p_fixtureid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_fixture.fixture_del(p_fixtureid character varying) TO adminfixture;
+GRANT ALL ON FUNCTION mne_fixture.fixture_del(p_fixtureid character varying) TO admerpfixture;
 
 
 --
@@ -44209,7 +43478,7 @@ GRANT ALL ON FUNCTION mne_fixture.fixture_del(p_fixtureid character varying) TO 
 --
 
 REVOKE ALL ON FUNCTION mne_fixture.fixture_mod(p_fixtureid character varying, p_fixturenumber character varying, p_description character varying, p_fixturetypeid character varying, p_ownerid character varying, p_partid character varying, p_purchasedeliveryid character varying, p_parentid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_fixture.fixture_mod(p_fixtureid character varying, p_fixturenumber character varying, p_description character varying, p_fixturetypeid character varying, p_ownerid character varying, p_partid character varying, p_purchasedeliveryid character varying, p_parentid character varying) TO adminfixture;
+GRANT ALL ON FUNCTION mne_fixture.fixture_mod(p_fixtureid character varying, p_fixturenumber character varying, p_description character varying, p_fixturetypeid character varying, p_ownerid character varying, p_partid character varying, p_purchasedeliveryid character varying, p_parentid character varying) TO admerpfixture;
 
 
 --
@@ -44217,7 +43486,7 @@ GRANT ALL ON FUNCTION mne_fixture.fixture_mod(p_fixtureid character varying, p_f
 --
 
 REVOKE ALL ON FUNCTION mne_fixture.fixturetype_add(p_description character varying, p_fixturetype character varying, p_parentid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_fixture.fixturetype_add(p_description character varying, p_fixturetype character varying, p_parentid character varying) TO adminfixture;
+GRANT ALL ON FUNCTION mne_fixture.fixturetype_add(p_description character varying, p_fixturetype character varying, p_parentid character varying) TO admerpfixture;
 
 
 --
@@ -44225,7 +43494,7 @@ GRANT ALL ON FUNCTION mne_fixture.fixturetype_add(p_description character varyin
 --
 
 REVOKE ALL ON FUNCTION mne_fixture.fixturetype_del(p_fixturetypeid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_fixture.fixturetype_del(p_fixturetypeid character varying) TO adminfixture;
+GRANT ALL ON FUNCTION mne_fixture.fixturetype_del(p_fixturetypeid character varying) TO admerpfixture;
 
 
 --
@@ -44233,7 +43502,7 @@ GRANT ALL ON FUNCTION mne_fixture.fixturetype_del(p_fixturetypeid character vary
 --
 
 REVOKE ALL ON FUNCTION mne_fixture.fixturetype_mod(p_fixturetypeid character varying, p_description character varying, p_fixturetype character varying, p_parentid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_fixture.fixturetype_mod(p_fixturetypeid character varying, p_description character varying, p_fixturetype character varying, p_parentid character varying) TO adminfixture;
+GRANT ALL ON FUNCTION mne_fixture.fixturetype_mod(p_fixturetypeid character varying, p_description character varying, p_fixturetype character varying, p_parentid character varying) TO admerpfixture;
 
 
 --
@@ -44241,7 +43510,7 @@ GRANT ALL ON FUNCTION mne_fixture.fixturetype_mod(p_fixturetypeid character vary
 --
 
 REVOKE ALL ON FUNCTION mne_fixture.fixturetypecost_del(p_fixturetypecostid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_fixture.fixturetypecost_del(p_fixturetypecostid character varying) TO adminfixture;
+GRANT ALL ON FUNCTION mne_fixture.fixturetypecost_del(p_fixturetypecostid character varying) TO admerpfixture;
 
 
 --
@@ -44249,7 +43518,7 @@ GRANT ALL ON FUNCTION mne_fixture.fixturetypecost_del(p_fixturetypecostid charac
 --
 
 REVOKE ALL ON FUNCTION mne_fixture.fixturetypecost_ok(p_fixturetypecostid character varying, p_fixturetypeid character varying, p_unitcost double precision, p_unit character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_fixture.fixturetypecost_ok(p_fixturetypecostid character varying, p_fixturetypeid character varying, p_unitcost double precision, p_unit character varying) TO adminfixture;
+GRANT ALL ON FUNCTION mne_fixture.fixturetypecost_ok(p_fixturetypecostid character varying, p_fixturetypeid character varying, p_unitcost double precision, p_unit character varying) TO admerpfixture;
 
 
 --
@@ -44257,7 +43526,7 @@ GRANT ALL ON FUNCTION mne_fixture.fixturetypecost_ok(p_fixturetypecostid charact
 --
 
 REVOKE ALL ON FUNCTION mne_hoai.offerhoai_ok(p_offerid character varying, p_law character varying, p_leistung double precision, p_zuschlag double precision, p_zeit double precision, p_besonders double precision, p_zusatz double precision, p_neben double precision, p_l1 double precision, p_l2 double precision, p_l3 double precision, p_l4 double precision, p_l5 double precision, p_l6 double precision, p_l7 double precision, p_l8 double precision, p_l9 double precision, pauschal boolean) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_hoai.offerhoai_ok(p_offerid character varying, p_law character varying, p_leistung double precision, p_zuschlag double precision, p_zeit double precision, p_besonders double precision, p_zusatz double precision, p_neben double precision, p_l1 double precision, p_l2 double precision, p_l3 double precision, p_l4 double precision, p_l5 double precision, p_l6 double precision, p_l7 double precision, p_l8 double precision, p_l9 double precision, pauschal boolean) TO admincrm;
+GRANT ALL ON FUNCTION mne_hoai.offerhoai_ok(p_offerid character varying, p_law character varying, p_leistung double precision, p_zuschlag double precision, p_zeit double precision, p_besonders double precision, p_zusatz double precision, p_neben double precision, p_l1 double precision, p_l2 double precision, p_l3 double precision, p_l4 double precision, p_l5 double precision, p_l6 double precision, p_l7 double precision, p_l8 double precision, p_l9 double precision, pauschal boolean) TO admerpcrm;
 
 
 --
@@ -44265,7 +43534,7 @@ GRANT ALL ON FUNCTION mne_hoai.offerhoai_ok(p_offerid character varying, p_law c
 --
 
 REVOKE ALL ON FUNCTION mne_hoai.offerhoaisingle_ok(p_offerid character varying, p_productid character varying, p_productnumber character varying, p_productname character varying, p_price double precision, acttime integer, p_pauschal boolean) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_hoai.offerhoaisingle_ok(p_offerid character varying, p_productid character varying, p_productnumber character varying, p_productname character varying, p_price double precision, acttime integer, p_pauschal boolean) TO admincrm;
+GRANT ALL ON FUNCTION mne_hoai.offerhoaisingle_ok(p_offerid character varying, p_productid character varying, p_productnumber character varying, p_productname character varying, p_price double precision, acttime integer, p_pauschal boolean) TO admerpcrm;
 
 
 --
@@ -44273,7 +43542,7 @@ GRANT ALL ON FUNCTION mne_hoai.offerhoaisingle_ok(p_offerid character varying, p
 --
 
 REVOKE ALL ON FUNCTION mne_hoai.orderhoai_ok(p_orderid character varying, p_law character varying, p_leistung double precision, p_zuschlag double precision, p_zeit double precision, p_besonders double precision, p_zusatz double precision, p_neben double precision, p_l1 double precision, p_l2 double precision, p_l3 double precision, p_l4 double precision, p_l5 double precision, p_l6 double precision, p_l7 double precision, p_l8 double precision, p_l9 double precision, p_pauschal boolean) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_hoai.orderhoai_ok(p_orderid character varying, p_law character varying, p_leistung double precision, p_zuschlag double precision, p_zeit double precision, p_besonders double precision, p_zusatz double precision, p_neben double precision, p_l1 double precision, p_l2 double precision, p_l3 double precision, p_l4 double precision, p_l5 double precision, p_l6 double precision, p_l7 double precision, p_l8 double precision, p_l9 double precision, p_pauschal boolean) TO admincrm;
+GRANT ALL ON FUNCTION mne_hoai.orderhoai_ok(p_orderid character varying, p_law character varying, p_leistung double precision, p_zuschlag double precision, p_zeit double precision, p_besonders double precision, p_zusatz double precision, p_neben double precision, p_l1 double precision, p_l2 double precision, p_l3 double precision, p_l4 double precision, p_l5 double precision, p_l6 double precision, p_l7 double precision, p_l8 double precision, p_l9 double precision, p_pauschal boolean) TO admerpcrm;
 
 
 --
@@ -44281,7 +43550,7 @@ GRANT ALL ON FUNCTION mne_hoai.orderhoai_ok(p_orderid character varying, p_law c
 --
 
 REVOKE ALL ON FUNCTION mne_hoai.orderhoaisingle_ok(p_orderid character varying, p_productid character varying, p_productnumber character varying, p_productname character varying, p_price double precision, acttime integer, p_pauschal boolean) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_hoai.orderhoaisingle_ok(p_orderid character varying, p_productid character varying, p_productnumber character varying, p_productname character varying, p_price double precision, acttime integer, p_pauschal boolean) TO admincrm;
+GRANT ALL ON FUNCTION mne_hoai.orderhoaisingle_ok(p_orderid character varying, p_productid character varying, p_productnumber character varying, p_productname character varying, p_price double precision, acttime integer, p_pauschal boolean) TO admerpcrm;
 
 
 --
@@ -44289,7 +43558,7 @@ GRANT ALL ON FUNCTION mne_hoai.orderhoaisingle_ok(p_orderid character varying, p
 --
 
 REVOKE ALL ON FUNCTION mne_hoai.workphase_ok(p_law character varying, p_phase1name character varying, p_value1 double precision, p_phase2name character varying, p_value2 double precision, p_phase3name character varying, p_value3 double precision, p_phase4name character varying, p_value4 double precision, p_phase5name character varying, p_value5 double precision, p_phase6name character varying, p_value6 double precision, p_phase7name character varying, p_value7 double precision, p_phase8name character varying, p_value8 double precision, p_phase9name character varying, p_value9 double precision, productid1 character varying, productid2 character varying, productid3 character varying, productid4 character varying, productid5 character varying, productid6 character varying, productid7 character varying, productid8 character varying, productid9 character varying, productnumber1 character varying, productnumber2 character varying, productnumber3 character varying, productnumber4 character varying, productnumber5 character varying, productnumber6 character varying, productnumber7 character varying, productnumber8 character varying, productnumber9 character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_hoai.workphase_ok(p_law character varying, p_phase1name character varying, p_value1 double precision, p_phase2name character varying, p_value2 double precision, p_phase3name character varying, p_value3 double precision, p_phase4name character varying, p_value4 double precision, p_phase5name character varying, p_value5 double precision, p_phase6name character varying, p_value6 double precision, p_phase7name character varying, p_value7 double precision, p_phase8name character varying, p_value8 double precision, p_phase9name character varying, p_value9 double precision, productid1 character varying, productid2 character varying, productid3 character varying, productid4 character varying, productid5 character varying, productid6 character varying, productid7 character varying, productid8 character varying, productid9 character varying, productnumber1 character varying, productnumber2 character varying, productnumber3 character varying, productnumber4 character varying, productnumber5 character varying, productnumber6 character varying, productnumber7 character varying, productnumber8 character varying, productnumber9 character varying) TO admincrm;
+GRANT ALL ON FUNCTION mne_hoai.workphase_ok(p_law character varying, p_phase1name character varying, p_value1 double precision, p_phase2name character varying, p_value2 double precision, p_phase3name character varying, p_value3 double precision, p_phase4name character varying, p_value4 double precision, p_phase5name character varying, p_value5 double precision, p_phase6name character varying, p_value6 double precision, p_phase7name character varying, p_value7 double precision, p_phase8name character varying, p_value8 double precision, p_phase9name character varying, p_value9 double precision, productid1 character varying, productid2 character varying, productid3 character varying, productid4 character varying, productid5 character varying, productid6 character varying, productid7 character varying, productid8 character varying, productid9 character varying, productnumber1 character varying, productnumber2 character varying, productnumber3 character varying, productnumber4 character varying, productnumber5 character varying, productnumber6 character varying, productnumber7 character varying, productnumber8 character varying, productnumber9 character varying) TO admerpcrm;
 
 
 --
@@ -44297,7 +43566,7 @@ GRANT ALL ON FUNCTION mne_hoai.workphase_ok(p_law character varying, p_phase1nam
 --
 
 REVOKE ALL ON FUNCTION mne_hoai.workphasesingle_ok(p_law character varying, p_phasename character varying, p_value double precision, p_productid character varying, p_productnumber character varying, p_phase integer, acttime integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_hoai.workphasesingle_ok(p_law character varying, p_phasename character varying, p_value double precision, p_productid character varying, p_productnumber character varying, p_phase integer, acttime integer) TO admincrm;
+GRANT ALL ON FUNCTION mne_hoai.workphasesingle_ok(p_law character varying, p_phasename character varying, p_value double precision, p_productid character varying, p_productnumber character varying, p_phase integer, acttime integer) TO admerpcrm;
 
 
 --
@@ -44305,7 +43574,7 @@ GRANT ALL ON FUNCTION mne_hoai.workphasesingle_ok(p_law character varying, p_pha
 --
 
 REVOKE ALL ON FUNCTION mne_mail.imapfolder_rescan(p_imapmailboxid character varying, p_folder character varying, p_name character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_mail.imapfolder_rescan(p_imapmailboxid character varying, p_folder character varying, p_name character varying) TO adminmail;
+GRANT ALL ON FUNCTION mne_mail.imapfolder_rescan(p_imapmailboxid character varying, p_folder character varying, p_name character varying) TO admerpmail;
 
 
 --
@@ -44313,7 +43582,7 @@ GRANT ALL ON FUNCTION mne_mail.imapfolder_rescan(p_imapmailboxid character varyi
 --
 
 REVOKE ALL ON FUNCTION mne_mail.imapmailbox_del(p_imapmailboxid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_mail.imapmailbox_del(p_imapmailboxid character varying) TO adminmail;
+GRANT ALL ON FUNCTION mne_mail.imapmailbox_del(p_imapmailboxid character varying) TO admerpmail;
 
 
 --
@@ -44321,7 +43590,7 @@ GRANT ALL ON FUNCTION mne_mail.imapmailbox_del(p_imapmailboxid character varying
 --
 
 REVOKE ALL ON FUNCTION mne_mail.imapmailbox_ok(p_imapmailboxid character varying, p_server character varying, p_login character varying, p_passwd character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_mail.imapmailbox_ok(p_imapmailboxid character varying, p_server character varying, p_login character varying, p_passwd character varying) TO adminmail;
+GRANT ALL ON FUNCTION mne_mail.imapmailbox_ok(p_imapmailboxid character varying, p_server character varying, p_login character varying, p_passwd character varying) TO admerpmail;
 
 
 --
@@ -44329,8 +43598,8 @@ GRANT ALL ON FUNCTION mne_mail.imapmailbox_ok(p_imapmailboxid character varying,
 --
 
 REVOKE ALL ON FUNCTION mne_personnal.offerproducttime_calc(p_offerproductid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_personnal.offerproducttime_calc(p_offerproductid character varying) TO admincrm;
-GRANT ALL ON FUNCTION mne_personnal.offerproducttime_calc(p_offerproductid character varying) TO adminpersonnal;
+GRANT ALL ON FUNCTION mne_personnal.offerproducttime_calc(p_offerproductid character varying) TO admerpcrm;
+GRANT ALL ON FUNCTION mne_personnal.offerproducttime_calc(p_offerproductid character varying) TO admerppersonnal;
 
 
 --
@@ -44338,8 +43607,8 @@ GRANT ALL ON FUNCTION mne_personnal.offerproducttime_calc(p_offerproductid chara
 --
 
 REVOKE ALL ON FUNCTION mne_personnal.offerproducttime_del(p_offerproducttimeid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_personnal.offerproducttime_del(p_offerproducttimeid character varying) TO admincrm;
-GRANT ALL ON FUNCTION mne_personnal.offerproducttime_del(p_offerproducttimeid character varying) TO adminpersonnal;
+GRANT ALL ON FUNCTION mne_personnal.offerproducttime_del(p_offerproducttimeid character varying) TO admerpcrm;
+GRANT ALL ON FUNCTION mne_personnal.offerproducttime_del(p_offerproducttimeid character varying) TO admerppersonnal;
 
 
 --
@@ -44347,8 +43616,8 @@ GRANT ALL ON FUNCTION mne_personnal.offerproducttime_del(p_offerproducttimeid ch
 --
 
 REVOKE ALL ON FUNCTION mne_personnal.offerproducttime_ok(p_offerproducttimeid character varying, p_offerproductid character varying, p_skillid character varying, p_setduration integer, p_step integer, p_description character varying, p_longdesc character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_personnal.offerproducttime_ok(p_offerproducttimeid character varying, p_offerproductid character varying, p_skillid character varying, p_setduration integer, p_step integer, p_description character varying, p_longdesc character varying) TO admincrm;
-GRANT ALL ON FUNCTION mne_personnal.offerproducttime_ok(p_offerproducttimeid character varying, p_offerproductid character varying, p_skillid character varying, p_setduration integer, p_step integer, p_description character varying, p_longdesc character varying) TO adminpersonnal;
+GRANT ALL ON FUNCTION mne_personnal.offerproducttime_ok(p_offerproducttimeid character varying, p_offerproductid character varying, p_skillid character varying, p_setduration integer, p_step integer, p_description character varying, p_longdesc character varying) TO admerpcrm;
+GRANT ALL ON FUNCTION mne_personnal.offerproducttime_ok(p_offerproducttimeid character varying, p_offerproductid character varying, p_skillid character varying, p_setduration integer, p_step integer, p_description character varying, p_longdesc character varying) TO admerppersonnal;
 
 
 --
@@ -44356,8 +43625,8 @@ GRANT ALL ON FUNCTION mne_personnal.offerproducttime_ok(p_offerproducttimeid cha
 --
 
 REVOKE ALL ON FUNCTION mne_personnal.orderproducttime_calc(p_orderproductid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_personnal.orderproducttime_calc(p_orderproductid character varying) TO admincrm;
-GRANT ALL ON FUNCTION mne_personnal.orderproducttime_calc(p_orderproductid character varying) TO adminpersonnal;
+GRANT ALL ON FUNCTION mne_personnal.orderproducttime_calc(p_orderproductid character varying) TO admerpcrm;
+GRANT ALL ON FUNCTION mne_personnal.orderproducttime_calc(p_orderproductid character varying) TO admerppersonnal;
 
 
 --
@@ -44365,8 +43634,8 @@ GRANT ALL ON FUNCTION mne_personnal.orderproducttime_calc(p_orderproductid chara
 --
 
 REVOKE ALL ON FUNCTION mne_personnal.orderproducttime_del(p_orderproducttimeid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_personnal.orderproducttime_del(p_orderproducttimeid character varying) TO admincrm;
-GRANT ALL ON FUNCTION mne_personnal.orderproducttime_del(p_orderproducttimeid character varying) TO adminpersonnal;
+GRANT ALL ON FUNCTION mne_personnal.orderproducttime_del(p_orderproducttimeid character varying) TO admerpcrm;
+GRANT ALL ON FUNCTION mne_personnal.orderproducttime_del(p_orderproducttimeid character varying) TO admerppersonnal;
 
 
 --
@@ -44374,8 +43643,8 @@ GRANT ALL ON FUNCTION mne_personnal.orderproducttime_del(p_orderproducttimeid ch
 --
 
 REVOKE ALL ON FUNCTION mne_personnal.orderproducttime_ok(p_orderproducttimeid character varying, p_orderproductid character varying, p_skillid character varying, p_setduration integer, p_step integer, p_description character varying, p_longdesc character varying, p_ready integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_personnal.orderproducttime_ok(p_orderproducttimeid character varying, p_orderproductid character varying, p_skillid character varying, p_setduration integer, p_step integer, p_description character varying, p_longdesc character varying, p_ready integer) TO admincrm;
-GRANT ALL ON FUNCTION mne_personnal.orderproducttime_ok(p_orderproducttimeid character varying, p_orderproductid character varying, p_skillid character varying, p_setduration integer, p_step integer, p_description character varying, p_longdesc character varying, p_ready integer) TO adminpersonnal;
+GRANT ALL ON FUNCTION mne_personnal.orderproducttime_ok(p_orderproducttimeid character varying, p_orderproductid character varying, p_skillid character varying, p_setduration integer, p_step integer, p_description character varying, p_longdesc character varying, p_ready integer) TO admerpcrm;
+GRANT ALL ON FUNCTION mne_personnal.orderproducttime_ok(p_orderproducttimeid character varying, p_orderproductid character varying, p_skillid character varying, p_setduration integer, p_step integer, p_description character varying, p_longdesc character varying, p_ready integer) TO admerppersonnal;
 
 
 --
@@ -44383,7 +43652,7 @@ GRANT ALL ON FUNCTION mne_personnal.orderproducttime_ok(p_orderproducttimeid cha
 --
 
 REVOKE ALL ON FUNCTION mne_personnal.personowndata_add(p_personid character varying, p_loginname character varying, p_active boolean, p_canlogin boolean, p_validuntil integer, p_color character varying, p_unitcost double precision, p_wtime integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_personnal.personowndata_add(p_personid character varying, p_loginname character varying, p_active boolean, p_canlogin boolean, p_validuntil integer, p_color character varying, p_unitcost double precision, p_wtime integer) TO adminpersonnal;
+GRANT ALL ON FUNCTION mne_personnal.personowndata_add(p_personid character varying, p_loginname character varying, p_active boolean, p_canlogin boolean, p_validuntil integer, p_color character varying, p_unitcost double precision, p_wtime integer) TO admerppersonnal;
 
 
 --
@@ -44391,7 +43660,7 @@ GRANT ALL ON FUNCTION mne_personnal.personowndata_add(p_personid character varyi
 --
 
 REVOKE ALL ON FUNCTION mne_personnal.personowndata_del(p_personowndataid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_personnal.personowndata_del(p_personowndataid character varying) TO adminpersonnal;
+GRANT ALL ON FUNCTION mne_personnal.personowndata_del(p_personowndataid character varying) TO admerppersonnal;
 
 
 --
@@ -44399,7 +43668,7 @@ GRANT ALL ON FUNCTION mne_personnal.personowndata_del(p_personowndataid characte
 --
 
 REVOKE ALL ON FUNCTION mne_personnal.personowndata_mod(p_personowndataid character varying, p_personid character varying, p_loginname character varying, p_active boolean, p_canlogin boolean, p_validuntil integer, p_color character varying, p_unitcost double precision, p_wtime integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_personnal.personowndata_mod(p_personowndataid character varying, p_personid character varying, p_loginname character varying, p_active boolean, p_canlogin boolean, p_validuntil integer, p_color character varying, p_unitcost double precision, p_wtime integer) TO adminpersonnal;
+GRANT ALL ON FUNCTION mne_personnal.personowndata_mod(p_personowndataid character varying, p_personid character varying, p_loginname character varying, p_active boolean, p_canlogin boolean, p_validuntil integer, p_color character varying, p_unitcost double precision, p_wtime integer) TO admerppersonnal;
 
 
 --
@@ -44407,8 +43676,8 @@ GRANT ALL ON FUNCTION mne_personnal.personowndata_mod(p_personowndataid characte
 --
 
 REVOKE ALL ON FUNCTION mne_personnal.producttime_del(p_producttimeid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_personnal.producttime_del(p_producttimeid character varying) TO admincrm;
-GRANT ALL ON FUNCTION mne_personnal.producttime_del(p_producttimeid character varying) TO adminpersonnal;
+GRANT ALL ON FUNCTION mne_personnal.producttime_del(p_producttimeid character varying) TO admerpcrm;
+GRANT ALL ON FUNCTION mne_personnal.producttime_del(p_producttimeid character varying) TO admerppersonnal;
 
 
 --
@@ -44416,8 +43685,8 @@ GRANT ALL ON FUNCTION mne_personnal.producttime_del(p_producttimeid character va
 --
 
 REVOKE ALL ON FUNCTION mne_personnal.producttime_ok(p_producttimeid character varying, p_productid character varying, p_skillid character varying, p_setduration integer, p_step integer, p_description character varying, p_longdesc character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_personnal.producttime_ok(p_producttimeid character varying, p_productid character varying, p_skillid character varying, p_setduration integer, p_step integer, p_description character varying, p_longdesc character varying) TO admincrm;
-GRANT ALL ON FUNCTION mne_personnal.producttime_ok(p_producttimeid character varying, p_productid character varying, p_skillid character varying, p_setduration integer, p_step integer, p_description character varying, p_longdesc character varying) TO adminpersonnal;
+GRANT ALL ON FUNCTION mne_personnal.producttime_ok(p_producttimeid character varying, p_productid character varying, p_skillid character varying, p_setduration integer, p_step integer, p_description character varying, p_longdesc character varying) TO admerpcrm;
+GRANT ALL ON FUNCTION mne_personnal.producttime_ok(p_producttimeid character varying, p_productid character varying, p_skillid character varying, p_setduration integer, p_step integer, p_description character varying, p_longdesc character varying) TO admerppersonnal;
 
 
 --
@@ -44425,8 +43694,8 @@ GRANT ALL ON FUNCTION mne_personnal.producttime_ok(p_producttimeid character var
 --
 
 REVOKE ALL ON FUNCTION mne_personnal.producttime_update(p_producttimeid character varying, p_setduration integer, p_step integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_personnal.producttime_update(p_producttimeid character varying, p_setduration integer, p_step integer) TO admincrm;
-GRANT ALL ON FUNCTION mne_personnal.producttime_update(p_producttimeid character varying, p_setduration integer, p_step integer) TO adminpersonnal;
+GRANT ALL ON FUNCTION mne_personnal.producttime_update(p_producttimeid character varying, p_setduration integer, p_step integer) TO admerpcrm;
+GRANT ALL ON FUNCTION mne_personnal.producttime_update(p_producttimeid character varying, p_setduration integer, p_step integer) TO admerppersonnal;
 
 
 --
@@ -44434,8 +43703,8 @@ GRANT ALL ON FUNCTION mne_personnal.producttime_update(p_producttimeid character
 --
 
 REVOKE ALL ON FUNCTION mne_personnal.producttimeopt_del(p_producttimeoptid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_personnal.producttimeopt_del(p_producttimeoptid character varying) TO admincrm;
-GRANT ALL ON FUNCTION mne_personnal.producttimeopt_del(p_producttimeoptid character varying) TO adminpersonnal;
+GRANT ALL ON FUNCTION mne_personnal.producttimeopt_del(p_producttimeoptid character varying) TO admerpcrm;
+GRANT ALL ON FUNCTION mne_personnal.producttimeopt_del(p_producttimeoptid character varying) TO admerppersonnal;
 
 
 --
@@ -44443,31 +43712,23 @@ GRANT ALL ON FUNCTION mne_personnal.producttimeopt_del(p_producttimeoptid charac
 --
 
 REVOKE ALL ON FUNCTION mne_personnal.producttimeopt_ok(p_producttimeoptid character varying, p_productid character varying, p_skillid character varying, p_setduration integer, p_step integer, p_description character varying, p_longdesc character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_personnal.producttimeopt_ok(p_producttimeoptid character varying, p_productid character varying, p_skillid character varying, p_setduration integer, p_step integer, p_description character varying, p_longdesc character varying) TO admincrm;
-GRANT ALL ON FUNCTION mne_personnal.producttimeopt_ok(p_producttimeoptid character varying, p_productid character varying, p_skillid character varying, p_setduration integer, p_step integer, p_description character varying, p_longdesc character varying) TO adminpersonnal;
+GRANT ALL ON FUNCTION mne_personnal.producttimeopt_ok(p_producttimeoptid character varying, p_productid character varying, p_skillid character varying, p_setduration integer, p_step integer, p_description character varying, p_longdesc character varying) TO admerpcrm;
+GRANT ALL ON FUNCTION mne_personnal.producttimeopt_ok(p_producttimeoptid character varying, p_productid character varying, p_skillid character varying, p_setduration integer, p_step integer, p_description character varying, p_longdesc character varying) TO admerppersonnal;
 
 
 --
 -- Name: FUNCTION producttimeopt_update(p_producttimeid character varying, p_setduration integer, p_step integer); Type: ACL; Schema: mne_personnal; Owner: admindb
 --
 
-GRANT ALL ON FUNCTION mne_personnal.producttimeopt_update(p_producttimeid character varying, p_setduration integer, p_step integer) TO admincrm;
-GRANT ALL ON FUNCTION mne_personnal.producttimeopt_update(p_producttimeid character varying, p_setduration integer, p_step integer) TO adminpersonnal;
-
-
---
--- Name: FUNCTION sharepasswd(p_personid character varying, p_username character varying, p_passwd character varying, p_valid integer); Type: ACL; Schema: mne_personnal; Owner: admindb
---
-
-REVOKE ALL ON FUNCTION mne_personnal.sharepasswd(p_personid character varying, p_username character varying, p_passwd character varying, p_valid integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_personnal.sharepasswd(p_personid character varying, p_username character varying, p_passwd character varying, p_valid integer) TO adminshare;
+GRANT ALL ON FUNCTION mne_personnal.producttimeopt_update(p_producttimeid character varying, p_setduration integer, p_step integer) TO admerpcrm;
+GRANT ALL ON FUNCTION mne_personnal.producttimeopt_update(p_producttimeid character varying, p_setduration integer, p_step integer) TO admerppersonnal;
 
 
 --
 -- Name: FUNCTION skill_update(p_skillid character varying); Type: ACL; Schema: mne_personnal; Owner: admindb
 --
 
-GRANT ALL ON FUNCTION mne_personnal.skill_update(p_skillid character varying) TO adminpersonnal;
+GRANT ALL ON FUNCTION mne_personnal.skill_update(p_skillid character varying) TO admerppersonnal;
 
 
 --
@@ -44476,8 +43737,8 @@ GRANT ALL ON FUNCTION mne_personnal.skill_update(p_skillid character varying) TO
 
 REVOKE ALL ON FUNCTION mne_personnal.time_del(pi_timeid character varying) FROM PUBLIC;
 GRANT ALL ON FUNCTION mne_personnal.time_del(pi_timeid character varying) TO erppersonnal;
-GRANT ALL ON FUNCTION mne_personnal.time_del(pi_timeid character varying) TO adminpersonnal;
-GRANT ALL ON FUNCTION mne_personnal.time_del(pi_timeid character varying) TO adminpersonnaltime;
+GRANT ALL ON FUNCTION mne_personnal.time_del(pi_timeid character varying) TO admerppersonnal;
+GRANT ALL ON FUNCTION mne_personnal.time_del(pi_timeid character varying) TO admerppersonnaltime;
 
 
 --
@@ -44486,8 +43747,8 @@ GRANT ALL ON FUNCTION mne_personnal.time_del(pi_timeid character varying) TO adm
 
 REVOKE ALL ON FUNCTION mne_personnal.time_mod(pi_timeid character varying, pi_orderproducttimeid character varying, pi_userid character varying, pi_start integer, pi_duration integer, pi_comment character varying) FROM PUBLIC;
 GRANT ALL ON FUNCTION mne_personnal.time_mod(pi_timeid character varying, pi_orderproducttimeid character varying, pi_userid character varying, pi_start integer, pi_duration integer, pi_comment character varying) TO erppersonnal;
-GRANT ALL ON FUNCTION mne_personnal.time_mod(pi_timeid character varying, pi_orderproducttimeid character varying, pi_userid character varying, pi_start integer, pi_duration integer, pi_comment character varying) TO adminpersonnal;
-GRANT ALL ON FUNCTION mne_personnal.time_mod(pi_timeid character varying, pi_orderproducttimeid character varying, pi_userid character varying, pi_start integer, pi_duration integer, pi_comment character varying) TO adminpersonnaltime;
+GRANT ALL ON FUNCTION mne_personnal.time_mod(pi_timeid character varying, pi_orderproducttimeid character varying, pi_userid character varying, pi_start integer, pi_duration integer, pi_comment character varying) TO admerppersonnal;
+GRANT ALL ON FUNCTION mne_personnal.time_mod(pi_timeid character varying, pi_orderproducttimeid character varying, pi_userid character varying, pi_start integer, pi_duration integer, pi_comment character varying) TO admerppersonnaltime;
 
 
 --
@@ -44495,7 +43756,7 @@ GRANT ALL ON FUNCTION mne_personnal.time_mod(pi_timeid character varying, pi_ord
 --
 
 REVOKE ALL ON FUNCTION mne_personnal.timemanagement_cleanup() FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_personnal.timemanagement_cleanup() TO adminpersonnal;
+GRANT ALL ON FUNCTION mne_personnal.timemanagement_cleanup() TO admerppersonnal;
 
 
 --
@@ -44503,7 +43764,7 @@ GRANT ALL ON FUNCTION mne_personnal.timemanagement_cleanup() TO adminpersonnal;
 --
 
 REVOKE ALL ON FUNCTION mne_personnal.timemanagement_del(p_timemanagementid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_personnal.timemanagement_del(p_timemanagementid character varying) TO adminpersonnal;
+GRANT ALL ON FUNCTION mne_personnal.timemanagement_del(p_timemanagementid character varying) TO admerppersonnal;
 
 
 --
@@ -44511,7 +43772,7 @@ GRANT ALL ON FUNCTION mne_personnal.timemanagement_del(p_timemanagementid charac
 --
 
 REVOKE ALL ON FUNCTION mne_personnal.timemanagement_mod(pi_timemanagementid character varying, pi_timetyp integer, pi_userid character varying, pi_start integer, pi_duration integer, pi_orderproducttimeid character varying, pi_note character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_personnal.timemanagement_mod(pi_timemanagementid character varying, pi_timetyp integer, pi_userid character varying, pi_start integer, pi_duration integer, pi_orderproducttimeid character varying, pi_note character varying) TO adminpersonnal;
+GRANT ALL ON FUNCTION mne_personnal.timemanagement_mod(pi_timemanagementid character varying, pi_timetyp integer, pi_userid character varying, pi_start integer, pi_duration integer, pi_orderproducttimeid character varying, pi_note character varying) TO admerppersonnal;
 
 
 --
@@ -44527,7 +43788,7 @@ GRANT ALL ON FUNCTION mne_personnal.timemanagement_vcal(p_timemanagementid chara
 --
 
 REVOKE ALL ON FUNCTION mne_repository.fileinterests_del(p_repositoryid character varying, p_filename character varying, p_personid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_repository.fileinterests_del(p_repositoryid character varying, p_filename character varying, p_personid character varying) TO admincrm;
+GRANT ALL ON FUNCTION mne_repository.fileinterests_del(p_repositoryid character varying, p_filename character varying, p_personid character varying) TO admerpcrm;
 
 
 --
@@ -44535,7 +43796,7 @@ GRANT ALL ON FUNCTION mne_repository.fileinterests_del(p_repositoryid character 
 --
 
 REVOKE ALL ON FUNCTION mne_repository.fileinterests_mod(p_repositoryid character varying, p_filename character varying, p_personid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_repository.fileinterests_mod(p_repositoryid character varying, p_filename character varying, p_personid character varying) TO admincrm;
+GRANT ALL ON FUNCTION mne_repository.fileinterests_mod(p_repositoryid character varying, p_filename character varying, p_personid character varying) TO admerpcrm;
 
 
 --
@@ -44564,7 +43825,7 @@ REVOKE ALL ON FUNCTION mne_sabredav.cards() FROM PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION mne_shipment.deliverynote_del(p_deliverynoteid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_shipment.deliverynote_del(p_deliverynoteid character varying) TO adminshipment;
+GRANT ALL ON FUNCTION mne_shipment.deliverynote_del(p_deliverynoteid character varying) TO admerpshipment;
 
 
 --
@@ -44572,7 +43833,7 @@ GRANT ALL ON FUNCTION mne_shipment.deliverynote_del(p_deliverynoteid character v
 --
 
 REVOKE ALL ON FUNCTION mne_shipment.deliverynote_invoice(p_deliverynoteid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_shipment.deliverynote_invoice(p_deliverynoteid character varying) TO adminshipment;
+GRANT ALL ON FUNCTION mne_shipment.deliverynote_invoice(p_deliverynoteid character varying) TO admerpshipment;
 
 
 --
@@ -44580,7 +43841,7 @@ GRANT ALL ON FUNCTION mne_shipment.deliverynote_invoice(p_deliverynoteid charact
 --
 
 REVOKE ALL ON FUNCTION mne_shipment.deliverynote_ok(p_deliverynoteid character varying, p_ownerid character varying, p_contactid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_shipment.deliverynote_ok(p_deliverynoteid character varying, p_ownerid character varying, p_contactid character varying) TO adminshipment;
+GRANT ALL ON FUNCTION mne_shipment.deliverynote_ok(p_deliverynoteid character varying, p_ownerid character varying, p_contactid character varying) TO admerpshipment;
 
 
 --
@@ -44588,7 +43849,7 @@ GRANT ALL ON FUNCTION mne_shipment.deliverynote_ok(p_deliverynoteid character va
 --
 
 REVOKE ALL ON FUNCTION mne_shipment.deliverynote_ready(p_deliverynoteid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_shipment.deliverynote_ready(p_deliverynoteid character varying) TO adminshipment;
+GRANT ALL ON FUNCTION mne_shipment.deliverynote_ready(p_deliverynoteid character varying) TO admerpshipment;
 
 
 --
@@ -44596,7 +43857,7 @@ GRANT ALL ON FUNCTION mne_shipment.deliverynote_ready(p_deliverynoteid character
 --
 
 REVOKE ALL ON FUNCTION mne_shipment.invoice_autoready(p_invoiceid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_shipment.invoice_autoready(p_invoiceid character varying) TO adminshipment;
+GRANT ALL ON FUNCTION mne_shipment.invoice_autoready(p_invoiceid character varying) TO admerpshipment;
 
 
 --
@@ -44604,7 +43865,7 @@ GRANT ALL ON FUNCTION mne_shipment.invoice_autoready(p_invoiceid character varyi
 --
 
 REVOKE ALL ON FUNCTION mne_shipment.invoice_autoreminder1ready(p_invoiceid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_shipment.invoice_autoreminder1ready(p_invoiceid character varying) TO adminshipment;
+GRANT ALL ON FUNCTION mne_shipment.invoice_autoreminder1ready(p_invoiceid character varying) TO admerpshipment;
 
 
 --
@@ -44612,7 +43873,7 @@ GRANT ALL ON FUNCTION mne_shipment.invoice_autoreminder1ready(p_invoiceid charac
 --
 
 REVOKE ALL ON FUNCTION mne_shipment.invoice_autoreminder2ready(p_invoiceid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_shipment.invoice_autoreminder2ready(p_invoiceid character varying) TO adminshipment;
+GRANT ALL ON FUNCTION mne_shipment.invoice_autoreminder2ready(p_invoiceid character varying) TO admerpshipment;
 
 
 --
@@ -44620,7 +43881,7 @@ GRANT ALL ON FUNCTION mne_shipment.invoice_autoreminder2ready(p_invoiceid charac
 --
 
 REVOKE ALL ON FUNCTION mne_shipment.invoice_autoreminder3ready(p_invoiceid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_shipment.invoice_autoreminder3ready(p_invoiceid character varying) TO adminshipment;
+GRANT ALL ON FUNCTION mne_shipment.invoice_autoreminder3ready(p_invoiceid character varying) TO admerpshipment;
 
 
 --
@@ -44628,7 +43889,7 @@ GRANT ALL ON FUNCTION mne_shipment.invoice_autoreminder3ready(p_invoiceid charac
 --
 
 REVOKE ALL ON FUNCTION mne_shipment.invoice_del(p_invoiceid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_shipment.invoice_del(p_invoiceid character varying) TO adminshipment;
+GRANT ALL ON FUNCTION mne_shipment.invoice_del(p_invoiceid character varying) TO admerpshipment;
 
 
 --
@@ -44636,7 +43897,7 @@ GRANT ALL ON FUNCTION mne_shipment.invoice_del(p_invoiceid character varying) TO
 --
 
 REVOKE ALL ON FUNCTION mne_shipment.invoice_ok(p_invoiceid character varying, p_ownerid character varying, p_textid character varying, p_condid character varying, p_withtimesheet boolean, p_paysum double precision, p_invoicetime integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_shipment.invoice_ok(p_invoiceid character varying, p_ownerid character varying, p_textid character varying, p_condid character varying, p_withtimesheet boolean, p_paysum double precision, p_invoicetime integer) TO adminshipment;
+GRANT ALL ON FUNCTION mne_shipment.invoice_ok(p_invoiceid character varying, p_ownerid character varying, p_textid character varying, p_condid character varying, p_withtimesheet boolean, p_paysum double precision, p_invoicetime integer) TO admerpshipment;
 
 
 --
@@ -44644,7 +43905,7 @@ GRANT ALL ON FUNCTION mne_shipment.invoice_ok(p_invoiceid character varying, p_o
 --
 
 REVOKE ALL ON FUNCTION mne_shipment.invoice_payed(p_invoiceid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_shipment.invoice_payed(p_invoiceid character varying) TO adminshipment;
+GRANT ALL ON FUNCTION mne_shipment.invoice_payed(p_invoiceid character varying) TO admerpshipment;
 
 
 --
@@ -44652,7 +43913,7 @@ GRANT ALL ON FUNCTION mne_shipment.invoice_payed(p_invoiceid character varying) 
 --
 
 REVOKE ALL ON FUNCTION mne_shipment.invoice_reminder1(p_invoiceid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_shipment.invoice_reminder1(p_invoiceid character varying) TO adminshipment;
+GRANT ALL ON FUNCTION mne_shipment.invoice_reminder1(p_invoiceid character varying) TO admerpshipment;
 
 
 --
@@ -44660,7 +43921,7 @@ GRANT ALL ON FUNCTION mne_shipment.invoice_reminder1(p_invoiceid character varyi
 --
 
 REVOKE ALL ON FUNCTION mne_shipment.invoice_reminder2(p_invoiceid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_shipment.invoice_reminder2(p_invoiceid character varying) TO adminshipment;
+GRANT ALL ON FUNCTION mne_shipment.invoice_reminder2(p_invoiceid character varying) TO admerpshipment;
 
 
 --
@@ -44668,7 +43929,7 @@ GRANT ALL ON FUNCTION mne_shipment.invoice_reminder2(p_invoiceid character varyi
 --
 
 REVOKE ALL ON FUNCTION mne_shipment.invoice_reminder3(p_invoiceid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_shipment.invoice_reminder3(p_invoiceid character varying) TO adminshipment;
+GRANT ALL ON FUNCTION mne_shipment.invoice_reminder3(p_invoiceid character varying) TO admerpshipment;
 
 
 --
@@ -44676,7 +43937,7 @@ GRANT ALL ON FUNCTION mne_shipment.invoice_reminder3(p_invoiceid character varyi
 --
 
 REVOKE ALL ON FUNCTION mne_shipment.invoice_send(p_invoiceid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_shipment.invoice_send(p_invoiceid character varying) TO adminshipment;
+GRANT ALL ON FUNCTION mne_shipment.invoice_send(p_invoiceid character varying) TO admerpshipment;
 
 
 --
@@ -44684,7 +43945,7 @@ GRANT ALL ON FUNCTION mne_shipment.invoice_send(p_invoiceid character varying) T
 --
 
 REVOKE ALL ON FUNCTION mne_shipment.invoiceref_del(p_invoicerefid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_shipment.invoiceref_del(p_invoicerefid character varying) TO adminshipment;
+GRANT ALL ON FUNCTION mne_shipment.invoiceref_del(p_invoicerefid character varying) TO admerpshipment;
 
 
 --
@@ -44692,7 +43953,7 @@ GRANT ALL ON FUNCTION mne_shipment.invoiceref_del(p_invoicerefid character varyi
 --
 
 REVOKE ALL ON FUNCTION mne_shipment.invoiceref_ok(p_invoiceid character varying, p_refid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_shipment.invoiceref_ok(p_invoiceid character varying, p_refid character varying) TO adminshipment;
+GRANT ALL ON FUNCTION mne_shipment.invoiceref_ok(p_invoiceid character varying, p_refid character varying) TO admerpshipment;
 
 
 --
@@ -44700,7 +43961,7 @@ GRANT ALL ON FUNCTION mne_shipment.invoiceref_ok(p_invoiceid character varying, 
 --
 
 REVOKE ALL ON FUNCTION mne_shipment.invoiceref_payed(p_invoicerefid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_shipment.invoiceref_payed(p_invoicerefid character varying) TO adminshipment;
+GRANT ALL ON FUNCTION mne_shipment.invoiceref_payed(p_invoicerefid character varying) TO admerpshipment;
 
 
 --
@@ -44708,7 +43969,7 @@ GRANT ALL ON FUNCTION mne_shipment.invoiceref_payed(p_invoicerefid character var
 --
 
 REVOKE ALL ON FUNCTION mne_shipment.invoiceref_paysum(p_invoicerefid character varying, p_paysum double precision) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_shipment.invoiceref_paysum(p_invoicerefid character varying, p_paysum double precision) TO adminshipment;
+GRANT ALL ON FUNCTION mne_shipment.invoiceref_paysum(p_invoicerefid character varying, p_paysum double precision) TO admerpshipment;
 
 
 --
@@ -44716,7 +43977,7 @@ GRANT ALL ON FUNCTION mne_shipment.invoiceref_paysum(p_invoicerefid character va
 --
 
 REVOKE ALL ON FUNCTION mne_shipment.invoicetime_update(p_invoicetimeid character varying, p_start character varying, p_duration character varying, p_invoicenum integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_shipment.invoicetime_update(p_invoicetimeid character varying, p_start character varying, p_duration character varying, p_invoicenum integer) TO adminshipment;
+GRANT ALL ON FUNCTION mne_shipment.invoicetime_update(p_invoicetimeid character varying, p_start character varying, p_duration character varying, p_invoicenum integer) TO admerpshipment;
 
 
 --
@@ -44724,7 +43985,7 @@ GRANT ALL ON FUNCTION mne_shipment.invoicetime_update(p_invoicetimeid character 
 --
 
 REVOKE ALL ON FUNCTION mne_shipment.invoicetransaction_refclear(p_umsatzid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_shipment.invoicetransaction_refclear(p_umsatzid character varying) TO adminshipment;
+GRANT ALL ON FUNCTION mne_shipment.invoicetransaction_refclear(p_umsatzid character varying) TO admerpshipment;
 
 
 --
@@ -44732,7 +43993,7 @@ GRANT ALL ON FUNCTION mne_shipment.invoicetransaction_refclear(p_umsatzid charac
 --
 
 REVOKE ALL ON FUNCTION mne_shipment.invoicetransaction_refno(p_umsatzid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_shipment.invoicetransaction_refno(p_umsatzid character varying) TO adminshipment;
+GRANT ALL ON FUNCTION mne_shipment.invoicetransaction_refno(p_umsatzid character varying) TO admerpshipment;
 
 
 --
@@ -44740,7 +44001,7 @@ GRANT ALL ON FUNCTION mne_shipment.invoicetransaction_refno(p_umsatzid character
 --
 
 REVOKE ALL ON FUNCTION mne_shipment.invoicetransaction_refset(p_umsatzid character varying, p_refid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_shipment.invoicetransaction_refset(p_umsatzid character varying, p_refid character varying) TO adminshipment;
+GRANT ALL ON FUNCTION mne_shipment.invoicetransaction_refset(p_umsatzid character varying, p_refid character varying) TO admerpshipment;
 
 
 --
@@ -44748,8 +44009,8 @@ GRANT ALL ON FUNCTION mne_shipment.invoicetransaction_refset(p_umsatzid characte
 --
 
 REVOKE ALL ON FUNCTION mne_warehouse.offerproductpart_del(p_offerproductpartid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_warehouse.offerproductpart_del(p_offerproductpartid character varying) TO admincrm;
-GRANT ALL ON FUNCTION mne_warehouse.offerproductpart_del(p_offerproductpartid character varying) TO adminwarehouse;
+GRANT ALL ON FUNCTION mne_warehouse.offerproductpart_del(p_offerproductpartid character varying) TO admerpcrm;
+GRANT ALL ON FUNCTION mne_warehouse.offerproductpart_del(p_offerproductpartid character varying) TO admerpwarehouse;
 
 
 --
@@ -44757,8 +44018,8 @@ GRANT ALL ON FUNCTION mne_warehouse.offerproductpart_del(p_offerproductpartid ch
 --
 
 REVOKE ALL ON FUNCTION mne_warehouse.offerproductpart_ok(p_offerproductid character varying, p_offerproductpartid character varying, p_partgroup character varying, p_partdescription character varying, p_partid character varying, p_fixturetypeid character varying, p_count double precision, p_partcost double precision, p_unit character varying, p_ownerid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_warehouse.offerproductpart_ok(p_offerproductid character varying, p_offerproductpartid character varying, p_partgroup character varying, p_partdescription character varying, p_partid character varying, p_fixturetypeid character varying, p_count double precision, p_partcost double precision, p_unit character varying, p_ownerid character varying) TO admincrm;
-GRANT ALL ON FUNCTION mne_warehouse.offerproductpart_ok(p_offerproductid character varying, p_offerproductpartid character varying, p_partgroup character varying, p_partdescription character varying, p_partid character varying, p_fixturetypeid character varying, p_count double precision, p_partcost double precision, p_unit character varying, p_ownerid character varying) TO adminwarehouse;
+GRANT ALL ON FUNCTION mne_warehouse.offerproductpart_ok(p_offerproductid character varying, p_offerproductpartid character varying, p_partgroup character varying, p_partdescription character varying, p_partid character varying, p_fixturetypeid character varying, p_count double precision, p_partcost double precision, p_unit character varying, p_ownerid character varying) TO admerpcrm;
+GRANT ALL ON FUNCTION mne_warehouse.offerproductpart_ok(p_offerproductid character varying, p_offerproductpartid character varying, p_partgroup character varying, p_partdescription character varying, p_partid character varying, p_fixturetypeid character varying, p_count double precision, p_partcost double precision, p_unit character varying, p_ownerid character varying) TO admerpwarehouse;
 
 
 --
@@ -44766,8 +44027,8 @@ GRANT ALL ON FUNCTION mne_warehouse.offerproductpart_ok(p_offerproductid charact
 --
 
 REVOKE ALL ON FUNCTION mne_warehouse.orderproductpart_del(p_orderproductpartid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_warehouse.orderproductpart_del(p_orderproductpartid character varying) TO adminwarehouse;
-GRANT ALL ON FUNCTION mne_warehouse.orderproductpart_del(p_orderproductpartid character varying) TO admincrm;
+GRANT ALL ON FUNCTION mne_warehouse.orderproductpart_del(p_orderproductpartid character varying) TO admerpwarehouse;
+GRANT ALL ON FUNCTION mne_warehouse.orderproductpart_del(p_orderproductpartid character varying) TO admerpcrm;
 
 
 --
@@ -44775,8 +44036,8 @@ GRANT ALL ON FUNCTION mne_warehouse.orderproductpart_del(p_orderproductpartid ch
 --
 
 REVOKE ALL ON FUNCTION mne_warehouse.orderproductpart_ok(p_orderproductid character varying, p_orderproductpartid character varying, p_partgroup character varying, p_partdescription character varying, p_partid character varying, p_fixturetypeid character varying, p_count double precision, p_partcost double precision, p_partcostcalc double precision, p_actcount double precision, p_unit character varying, p_ownerid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_warehouse.orderproductpart_ok(p_orderproductid character varying, p_orderproductpartid character varying, p_partgroup character varying, p_partdescription character varying, p_partid character varying, p_fixturetypeid character varying, p_count double precision, p_partcost double precision, p_partcostcalc double precision, p_actcount double precision, p_unit character varying, p_ownerid character varying) TO admincrm;
-GRANT ALL ON FUNCTION mne_warehouse.orderproductpart_ok(p_orderproductid character varying, p_orderproductpartid character varying, p_partgroup character varying, p_partdescription character varying, p_partid character varying, p_fixturetypeid character varying, p_count double precision, p_partcost double precision, p_partcostcalc double precision, p_actcount double precision, p_unit character varying, p_ownerid character varying) TO adminwarehouse;
+GRANT ALL ON FUNCTION mne_warehouse.orderproductpart_ok(p_orderproductid character varying, p_orderproductpartid character varying, p_partgroup character varying, p_partdescription character varying, p_partid character varying, p_fixturetypeid character varying, p_count double precision, p_partcost double precision, p_partcostcalc double precision, p_actcount double precision, p_unit character varying, p_ownerid character varying) TO admerpcrm;
+GRANT ALL ON FUNCTION mne_warehouse.orderproductpart_ok(p_orderproductid character varying, p_orderproductpartid character varying, p_partgroup character varying, p_partdescription character varying, p_partid character varying, p_fixturetypeid character varying, p_count double precision, p_partcost double precision, p_partcostcalc double precision, p_actcount double precision, p_unit character varying, p_ownerid character varying) TO admerpwarehouse;
 
 
 --
@@ -44784,7 +44045,7 @@ GRANT ALL ON FUNCTION mne_warehouse.orderproductpart_ok(p_orderproductid charact
 --
 
 REVOKE ALL ON FUNCTION mne_warehouse.part_add(p_part character varying, p_parttype character varying, p_partdescription character varying, p_treeparentid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_warehouse.part_add(p_part character varying, p_parttype character varying, p_partdescription character varying, p_treeparentid character varying) TO adminwarehouse;
+GRANT ALL ON FUNCTION mne_warehouse.part_add(p_part character varying, p_parttype character varying, p_partdescription character varying, p_treeparentid character varying) TO admerpwarehouse;
 
 
 --
@@ -44792,7 +44053,7 @@ GRANT ALL ON FUNCTION mne_warehouse.part_add(p_part character varying, p_parttyp
 --
 
 REVOKE ALL ON FUNCTION mne_warehouse.part_del(p_partid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_warehouse.part_del(p_partid character varying) TO adminwarehouse;
+GRANT ALL ON FUNCTION mne_warehouse.part_del(p_partid character varying) TO admerpwarehouse;
 
 
 --
@@ -44800,7 +44061,7 @@ GRANT ALL ON FUNCTION mne_warehouse.part_del(p_partid character varying) TO admi
 --
 
 REVOKE ALL ON FUNCTION mne_warehouse.part_mod(p_partid character varying, p_part character varying, p_parttype character varying, p_partdescription character varying, p_treeparentid character varying, p_treeid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_warehouse.part_mod(p_partid character varying, p_part character varying, p_parttype character varying, p_partdescription character varying, p_treeparentid character varying, p_treeid character varying) TO adminwarehouse;
+GRANT ALL ON FUNCTION mne_warehouse.part_mod(p_partid character varying, p_part character varying, p_parttype character varying, p_partdescription character varying, p_treeparentid character varying, p_treeid character varying) TO admerpwarehouse;
 
 
 --
@@ -44808,7 +44069,7 @@ GRANT ALL ON FUNCTION mne_warehouse.part_mod(p_partid character varying, p_part 
 --
 
 REVOKE ALL ON FUNCTION mne_warehouse.partcheck_count(p_partstoragelocationid character varying, p_count integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_warehouse.partcheck_count(p_partstoragelocationid character varying, p_count integer) TO adminwarehouse;
+GRANT ALL ON FUNCTION mne_warehouse.partcheck_count(p_partstoragelocationid character varying, p_count integer) TO admerpwarehouse;
 
 
 --
@@ -44816,8 +44077,8 @@ GRANT ALL ON FUNCTION mne_warehouse.partcheck_count(p_partstoragelocationid char
 --
 
 REVOKE ALL ON FUNCTION mne_warehouse.partcost_del(p_partcostid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_warehouse.partcost_del(p_partcostid character varying) TO adminwarehouse;
-GRANT ALL ON FUNCTION mne_warehouse.partcost_del(p_partcostid character varying) TO admincrm;
+GRANT ALL ON FUNCTION mne_warehouse.partcost_del(p_partcostid character varying) TO admerpwarehouse;
+GRANT ALL ON FUNCTION mne_warehouse.partcost_del(p_partcostid character varying) TO admerpcrm;
 
 
 --
@@ -44825,8 +44086,8 @@ GRANT ALL ON FUNCTION mne_warehouse.partcost_del(p_partcostid character varying)
 --
 
 REVOKE ALL ON FUNCTION mne_warehouse.partcost_ok(p_partcostid character varying, p_partid character varying, p_unitcost double precision, p_unit character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_warehouse.partcost_ok(p_partcostid character varying, p_partid character varying, p_unitcost double precision, p_unit character varying) TO adminwarehouse;
-GRANT ALL ON FUNCTION mne_warehouse.partcost_ok(p_partcostid character varying, p_partid character varying, p_unitcost double precision, p_unit character varying) TO admincrm;
+GRANT ALL ON FUNCTION mne_warehouse.partcost_ok(p_partcostid character varying, p_partid character varying, p_unitcost double precision, p_unit character varying) TO admerpwarehouse;
+GRANT ALL ON FUNCTION mne_warehouse.partcost_ok(p_partcostid character varying, p_partid character varying, p_unitcost double precision, p_unit character varying) TO admerpcrm;
 
 
 --
@@ -44834,7 +44095,7 @@ GRANT ALL ON FUNCTION mne_warehouse.partcost_ok(p_partcostid character varying, 
 --
 
 REVOKE ALL ON FUNCTION mne_warehouse.partingoing_del(p_partingoingid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_warehouse.partingoing_del(p_partingoingid character varying) TO adminwarehouse;
+GRANT ALL ON FUNCTION mne_warehouse.partingoing_del(p_partingoingid character varying) TO admerpwarehouse;
 
 
 --
@@ -44842,7 +44103,7 @@ GRANT ALL ON FUNCTION mne_warehouse.partingoing_del(p_partingoingid character va
 --
 
 REVOKE ALL ON FUNCTION mne_warehouse.partingoing_ok(p_partingoingid character varying, p_purchasedeliveryid character varying, p_partstoragelocationid character varying, p_storagelocationid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_warehouse.partingoing_ok(p_partingoingid character varying, p_purchasedeliveryid character varying, p_partstoragelocationid character varying, p_storagelocationid character varying) TO adminwarehouse;
+GRANT ALL ON FUNCTION mne_warehouse.partingoing_ok(p_partingoingid character varying, p_purchasedeliveryid character varying, p_partstoragelocationid character varying, p_storagelocationid character varying) TO admerpwarehouse;
 
 
 --
@@ -44850,7 +44111,7 @@ GRANT ALL ON FUNCTION mne_warehouse.partingoing_ok(p_partingoingid character var
 --
 
 REVOKE ALL ON FUNCTION mne_warehouse.partoutgoing_del(p_partoutgoingid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_warehouse.partoutgoing_del(p_partoutgoingid character varying) TO adminwarehouse;
+GRANT ALL ON FUNCTION mne_warehouse.partoutgoing_del(p_partoutgoingid character varying) TO admerpwarehouse;
 
 
 --
@@ -44858,7 +44119,7 @@ GRANT ALL ON FUNCTION mne_warehouse.partoutgoing_del(p_partoutgoingid character 
 --
 
 REVOKE ALL ON FUNCTION mne_warehouse.partoutgoing_fetch(p_partoutgoingid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_warehouse.partoutgoing_fetch(p_partoutgoingid character varying) TO adminwarehouse;
+GRANT ALL ON FUNCTION mne_warehouse.partoutgoing_fetch(p_partoutgoingid character varying) TO admerpwarehouse;
 
 
 --
@@ -44866,7 +44127,7 @@ GRANT ALL ON FUNCTION mne_warehouse.partoutgoing_fetch(p_partoutgoingid characte
 --
 
 REVOKE ALL ON FUNCTION mne_warehouse.partoutgoing_ok(p_partoutgoingid character varying, p_storagelocationid character varying, p_spartstoragelocationid character varying, p_orderproductpartid character varying, p_count integer, p_personid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_warehouse.partoutgoing_ok(p_partoutgoingid character varying, p_storagelocationid character varying, p_spartstoragelocationid character varying, p_orderproductpartid character varying, p_count integer, p_personid character varying) TO adminwarehouse;
+GRANT ALL ON FUNCTION mne_warehouse.partoutgoing_ok(p_partoutgoingid character varying, p_storagelocationid character varying, p_spartstoragelocationid character varying, p_orderproductpartid character varying, p_count integer, p_personid character varying) TO admerpwarehouse;
 
 
 --
@@ -44874,7 +44135,7 @@ GRANT ALL ON FUNCTION mne_warehouse.partoutgoing_ok(p_partoutgoingid character v
 --
 
 REVOKE ALL ON FUNCTION mne_warehouse.partoutgoing_order(p_partoutgoingid character varying, p_orderproductpartid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_warehouse.partoutgoing_order(p_partoutgoingid character varying, p_orderproductpartid character varying) TO adminwarehouse;
+GRANT ALL ON FUNCTION mne_warehouse.partoutgoing_order(p_partoutgoingid character varying, p_orderproductpartid character varying) TO admerpwarehouse;
 
 
 --
@@ -44882,7 +44143,7 @@ GRANT ALL ON FUNCTION mne_warehouse.partoutgoing_order(p_partoutgoingid characte
 --
 
 REVOKE ALL ON FUNCTION mne_warehouse.partsubpart_check(p_partid character varying, p_subpartid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_warehouse.partsubpart_check(p_partid character varying, p_subpartid character varying) TO adminwarehouse;
+GRANT ALL ON FUNCTION mne_warehouse.partsubpart_check(p_partid character varying, p_subpartid character varying) TO admerpwarehouse;
 GRANT ALL ON FUNCTION mne_warehouse.partsubpart_check(p_partid character varying, p_subpartid character varying) TO erpwarehouse;
 
 
@@ -44891,7 +44152,7 @@ GRANT ALL ON FUNCTION mne_warehouse.partsubpart_check(p_partid character varying
 --
 
 GRANT SELECT ON TABLE mne_warehouse.partsubpart TO erpwarehouse;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.partsubpart TO adminwarehouse;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.partsubpart TO admerpwarehouse;
 GRANT SELECT ON TABLE mne_warehouse.partsubpart TO erpfixture;
 
 
@@ -44900,7 +44161,7 @@ GRANT SELECT ON TABLE mne_warehouse.partsubpart TO erpfixture;
 --
 
 REVOKE ALL ON FUNCTION mne_warehouse.partsubpart_leaf(p_partid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_warehouse.partsubpart_leaf(p_partid character varying) TO adminwarehouse;
+GRANT ALL ON FUNCTION mne_warehouse.partsubpart_leaf(p_partid character varying) TO admerpwarehouse;
 GRANT ALL ON FUNCTION mne_warehouse.partsubpart_leaf(p_partid character varying) TO erpwarehouse;
 
 
@@ -44909,7 +44170,7 @@ GRANT ALL ON FUNCTION mne_warehouse.partsubpart_leaf(p_partid character varying)
 --
 
 REVOKE ALL ON FUNCTION mne_warehouse.partsubpart_ok(p_partsubpartid character varying, p_partid character varying, p_subpartid character varying, p_count integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_warehouse.partsubpart_ok(p_partsubpartid character varying, p_partid character varying, p_subpartid character varying, p_count integer) TO adminwarehouse;
+GRANT ALL ON FUNCTION mne_warehouse.partsubpart_ok(p_partsubpartid character varying, p_partid character varying, p_subpartid character varying, p_count integer) TO admerpwarehouse;
 
 
 --
@@ -44917,7 +44178,7 @@ GRANT ALL ON FUNCTION mne_warehouse.partsubpart_ok(p_partsubpartid character var
 --
 
 GRANT ALL ON FUNCTION mne_warehouse.parttree_havevendor(p_treeid character varying) TO erpwarehouse;
-GRANT ALL ON FUNCTION mne_warehouse.parttree_havevendor(p_treeid character varying) TO adminwarehouse;
+GRANT ALL ON FUNCTION mne_warehouse.parttree_havevendor(p_treeid character varying) TO admerpwarehouse;
 
 
 --
@@ -44925,7 +44186,7 @@ GRANT ALL ON FUNCTION mne_warehouse.parttree_havevendor(p_treeid character varyi
 --
 
 REVOKE ALL ON FUNCTION mne_warehouse.parttree_needpurchase(p_treeid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_warehouse.parttree_needpurchase(p_treeid character varying) TO adminwarehouse;
+GRANT ALL ON FUNCTION mne_warehouse.parttree_needpurchase(p_treeid character varying) TO admerpwarehouse;
 GRANT ALL ON FUNCTION mne_warehouse.parttree_needpurchase(p_treeid character varying) TO erpwarehouse;
 
 
@@ -44934,7 +44195,7 @@ GRANT ALL ON FUNCTION mne_warehouse.parttree_needpurchase(p_treeid character var
 --
 
 REVOKE ALL ON FUNCTION mne_warehouse.parttree_stocked(p_treeid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_warehouse.parttree_stocked(p_treeid character varying) TO adminwarehouse;
+GRANT ALL ON FUNCTION mne_warehouse.parttree_stocked(p_treeid character varying) TO admerpwarehouse;
 GRANT ALL ON FUNCTION mne_warehouse.parttree_stocked(p_treeid character varying) TO erpwarehouse;
 
 
@@ -44943,8 +44204,8 @@ GRANT ALL ON FUNCTION mne_warehouse.parttree_stocked(p_treeid character varying)
 --
 
 REVOKE ALL ON FUNCTION mne_warehouse.productpart_del(p_productpartid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_warehouse.productpart_del(p_productpartid character varying) TO admincrm;
-GRANT ALL ON FUNCTION mne_warehouse.productpart_del(p_productpartid character varying) TO adminwarehouse;
+GRANT ALL ON FUNCTION mne_warehouse.productpart_del(p_productpartid character varying) TO admerpcrm;
+GRANT ALL ON FUNCTION mne_warehouse.productpart_del(p_productpartid character varying) TO admerpwarehouse;
 
 
 --
@@ -44952,8 +44213,8 @@ GRANT ALL ON FUNCTION mne_warehouse.productpart_del(p_productpartid character va
 --
 
 REVOKE ALL ON FUNCTION mne_warehouse.productpart_ok(p_productpartid character varying, p_productid character varying, p_count double precision, p_partgroup character varying, p_partdescription character varying, p_partcost double precision, p_partid character varying, p_fixturetypeid character varying, p_unit character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_warehouse.productpart_ok(p_productpartid character varying, p_productid character varying, p_count double precision, p_partgroup character varying, p_partdescription character varying, p_partcost double precision, p_partid character varying, p_fixturetypeid character varying, p_unit character varying) TO adminwarehouse;
-GRANT ALL ON FUNCTION mne_warehouse.productpart_ok(p_productpartid character varying, p_productid character varying, p_count double precision, p_partgroup character varying, p_partdescription character varying, p_partcost double precision, p_partid character varying, p_fixturetypeid character varying, p_unit character varying) TO admincrm;
+GRANT ALL ON FUNCTION mne_warehouse.productpart_ok(p_productpartid character varying, p_productid character varying, p_count double precision, p_partgroup character varying, p_partdescription character varying, p_partcost double precision, p_partid character varying, p_fixturetypeid character varying, p_unit character varying) TO admerpwarehouse;
+GRANT ALL ON FUNCTION mne_warehouse.productpart_ok(p_productpartid character varying, p_productid character varying, p_count double precision, p_partgroup character varying, p_partdescription character varying, p_partcost double precision, p_partid character varying, p_fixturetypeid character varying, p_unit character varying) TO admerpcrm;
 
 
 --
@@ -44961,7 +44222,7 @@ GRANT ALL ON FUNCTION mne_warehouse.productpart_ok(p_productpartid character var
 --
 
 REVOKE ALL ON FUNCTION mne_warehouse.productpart_update(p_productpartid character varying, p_count double precision, p_partcost double precision) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_warehouse.productpart_update(p_productpartid character varying, p_count double precision, p_partcost double precision) TO admincrm;
+GRANT ALL ON FUNCTION mne_warehouse.productpart_update(p_productpartid character varying, p_count double precision, p_partcost double precision) TO admerpcrm;
 
 
 --
@@ -44969,7 +44230,7 @@ GRANT ALL ON FUNCTION mne_warehouse.productpart_update(p_productpartid character
 --
 
 REVOKE ALL ON FUNCTION mne_warehouse.purchase_del(p_purchaseid character varying, force boolean) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_warehouse.purchase_del(p_purchaseid character varying, force boolean) TO adminwarehouse;
+GRANT ALL ON FUNCTION mne_warehouse.purchase_del(p_purchaseid character varying, force boolean) TO admerpwarehouse;
 
 
 --
@@ -44977,7 +44238,7 @@ GRANT ALL ON FUNCTION mne_warehouse.purchase_del(p_purchaseid character varying,
 --
 
 REVOKE ALL ON FUNCTION mne_warehouse.purchase_mkhisthead(p_colname character varying, langid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_warehouse.purchase_mkhisthead(p_colname character varying, langid character varying) TO adminwarehouse;
+GRANT ALL ON FUNCTION mne_warehouse.purchase_mkhisthead(p_colname character varying, langid character varying) TO admerpwarehouse;
 GRANT ALL ON FUNCTION mne_warehouse.purchase_mkhisthead(p_colname character varying, langid character varying) TO erpwarehouse;
 
 
@@ -44986,7 +44247,7 @@ GRANT ALL ON FUNCTION mne_warehouse.purchase_mkhisthead(p_colname character vary
 --
 
 REVOKE ALL ON FUNCTION mne_warehouse.purchase_mkhistvalue(p_colname character varying, p_value character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_warehouse.purchase_mkhistvalue(p_colname character varying, p_value character varying) TO adminwarehouse;
+GRANT ALL ON FUNCTION mne_warehouse.purchase_mkhistvalue(p_colname character varying, p_value character varying) TO admerpwarehouse;
 GRANT ALL ON FUNCTION mne_warehouse.purchase_mkhistvalue(p_colname character varying, p_value character varying) TO erpwarehouse;
 
 
@@ -44995,7 +44256,7 @@ GRANT ALL ON FUNCTION mne_warehouse.purchase_mkhistvalue(p_colname character var
 --
 
 REVOKE ALL ON FUNCTION mne_warehouse.purchase_mknumber(p_auto boolean) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_warehouse.purchase_mknumber(p_auto boolean) TO adminwarehouse;
+GRANT ALL ON FUNCTION mne_warehouse.purchase_mknumber(p_auto boolean) TO admerpwarehouse;
 
 
 --
@@ -45003,7 +44264,7 @@ GRANT ALL ON FUNCTION mne_warehouse.purchase_mknumber(p_auto boolean) TO adminwa
 --
 
 REVOKE ALL ON FUNCTION mne_warehouse.purchase_ok(p_purchaseid character varying, p_partid character varying, p_partvendorid character varying, p_count integer, p_expected integer, p_ownerid character varying, p_crmorderid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_warehouse.purchase_ok(p_purchaseid character varying, p_partid character varying, p_partvendorid character varying, p_count integer, p_expected integer, p_ownerid character varying, p_crmorderid character varying) TO adminwarehouse;
+GRANT ALL ON FUNCTION mne_warehouse.purchase_ok(p_purchaseid character varying, p_partid character varying, p_partvendorid character varying, p_count integer, p_expected integer, p_ownerid character varying, p_crmorderid character varying) TO admerpwarehouse;
 
 
 --
@@ -45011,7 +44272,7 @@ GRANT ALL ON FUNCTION mne_warehouse.purchase_ok(p_purchaseid character varying, 
 --
 
 REVOKE ALL ON FUNCTION mne_warehouse.purchase_send(p_purchaseid character varying, p_single boolean) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_warehouse.purchase_send(p_purchaseid character varying, p_single boolean) TO adminwarehouse;
+GRANT ALL ON FUNCTION mne_warehouse.purchase_send(p_purchaseid character varying, p_single boolean) TO admerpwarehouse;
 
 
 --
@@ -45019,7 +44280,7 @@ GRANT ALL ON FUNCTION mne_warehouse.purchase_send(p_purchaseid character varying
 --
 
 REVOKE ALL ON FUNCTION mne_warehouse.purchaseinvoice_ok(p_purchaseinvoiceid character varying, p_documentnumber character varying, p_invoicenumber character varying, p_invoicedate integer, p_amount double precision, p_accountnumber character varying, p_bankcode character varying, p_remittee character varying, p_purpose character varying, p_ownaccount character varying, p_companyid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_warehouse.purchaseinvoice_ok(p_purchaseinvoiceid character varying, p_documentnumber character varying, p_invoicenumber character varying, p_invoicedate integer, p_amount double precision, p_accountnumber character varying, p_bankcode character varying, p_remittee character varying, p_purpose character varying, p_ownaccount character varying, p_companyid character varying) TO adminwarehouse;
+GRANT ALL ON FUNCTION mne_warehouse.purchaseinvoice_ok(p_purchaseinvoiceid character varying, p_documentnumber character varying, p_invoicenumber character varying, p_invoicedate integer, p_amount double precision, p_accountnumber character varying, p_bankcode character varying, p_remittee character varying, p_purpose character varying, p_ownaccount character varying, p_companyid character varying) TO admerpwarehouse;
 
 
 --
@@ -45027,7 +44288,7 @@ GRANT ALL ON FUNCTION mne_warehouse.purchaseinvoice_ok(p_purchaseinvoiceid chara
 --
 
 REVOKE ALL ON FUNCTION mne_warehouse.purchaseinvoice_pay(p_purchaseinvoiceid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_warehouse.purchaseinvoice_pay(p_purchaseinvoiceid character varying) TO adminwarehouse;
+GRANT ALL ON FUNCTION mne_warehouse.purchaseinvoice_pay(p_purchaseinvoiceid character varying) TO admerpwarehouse;
 
 
 --
@@ -45035,7 +44296,7 @@ GRANT ALL ON FUNCTION mne_warehouse.purchaseinvoice_pay(p_purchaseinvoiceid char
 --
 
 REVOKE ALL ON FUNCTION mne_warehouse.relocation_del(p_relocationid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_warehouse.relocation_del(p_relocationid character varying) TO adminwarehouse;
+GRANT ALL ON FUNCTION mne_warehouse.relocation_del(p_relocationid character varying) TO admerpwarehouse;
 
 
 --
@@ -45043,7 +44304,7 @@ GRANT ALL ON FUNCTION mne_warehouse.relocation_del(p_relocationid character vary
 --
 
 REVOKE ALL ON FUNCTION mne_warehouse.relocation_ok(p_relocationid character varying, p_partstoragelocationid character varying, p_newstoragelocationid character varying, p_personid character varying, p_count integer, p_sequence integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_warehouse.relocation_ok(p_relocationid character varying, p_partstoragelocationid character varying, p_newstoragelocationid character varying, p_personid character varying, p_count integer, p_sequence integer) TO adminwarehouse;
+GRANT ALL ON FUNCTION mne_warehouse.relocation_ok(p_relocationid character varying, p_partstoragelocationid character varying, p_newstoragelocationid character varying, p_personid character varying, p_count integer, p_sequence integer) TO admerpwarehouse;
 
 
 --
@@ -45051,7 +44312,7 @@ GRANT ALL ON FUNCTION mne_warehouse.relocation_ok(p_relocationid character varyi
 --
 
 REVOKE ALL ON FUNCTION mne_warehouse.relocation_ready(p_relocationid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_warehouse.relocation_ready(p_relocationid character varying) TO adminwarehouse;
+GRANT ALL ON FUNCTION mne_warehouse.relocation_ready(p_relocationid character varying) TO admerpwarehouse;
 
 
 --
@@ -45059,7 +44320,7 @@ GRANT ALL ON FUNCTION mne_warehouse.relocation_ready(p_relocationid character va
 --
 
 REVOKE ALL ON FUNCTION mne_warehouse.storage_del(p_storageid character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_warehouse.storage_del(p_storageid character varying) TO adminwarehouse;
+GRANT ALL ON FUNCTION mne_warehouse.storage_del(p_storageid character varying) TO admerpwarehouse;
 
 
 --
@@ -45067,14 +44328,14 @@ GRANT ALL ON FUNCTION mne_warehouse.storage_del(p_storageid character varying) T
 --
 
 REVOKE ALL ON FUNCTION mne_warehouse.storagecreate_ok(p_storageid character varying, p_xcount integer, p_ycount integer, p_zcount integer, p_xsname character varying, p_ysname character varying, p_zsname character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION mne_warehouse.storagecreate_ok(p_storageid character varying, p_xcount integer, p_ycount integer, p_zcount integer, p_xsname character varying, p_ysname character varying, p_zsname character varying) TO adminwarehouse;
+GRANT ALL ON FUNCTION mne_warehouse.storagecreate_ok(p_storageid character varying, p_xcount integer, p_ycount integer, p_zcount integer, p_xsname character varying, p_ysname character varying, p_zsname character varying) TO admerpwarehouse;
 
 
 --
 -- Name: TABLE applications; Type: ACL; Schema: mne_application; Owner: admindb
 --
 
-GRANT SELECT ON TABLE mne_application.applications TO mneerptranslate;
+GRANT SELECT ON TABLE mne_application.applications TO mne_translate;
 
 
 --
@@ -45082,17 +44343,6 @@ GRANT SELECT ON TABLE mne_application.applications TO mneerptranslate;
 --
 
 GRANT SELECT ON TABLE mne_application.customerfunctions TO PUBLIC;
-
-
---
--- Name: TABLE folder; Type: ACL; Schema: mne_application; Owner: admindb
---
-
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_application.folder TO adminshare;
-GRANT SELECT ON TABLE mne_application.folder TO erpdav;
-GRANT SELECT ON TABLE mne_application.folder TO mneerpsystem;
-GRANT SELECT ON TABLE mne_application.folder TO erpsystem;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_application.folder TO adminsystem;
 
 
 --
@@ -45205,7 +44455,7 @@ GRANT SELECT ON TABLE mne_application.reports TO PUBLIC;
 --
 
 GRANT SELECT ON TABLE mne_application.reportsauto TO PUBLIC;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_application.reportsauto TO adminshipment;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_application.reportsauto TO admerpshipment;
 
 
 --
@@ -45221,13 +44471,6 @@ GRANT SELECT ON TABLE mne_application.reportscache TO PUBLIC;
 
 GRANT SELECT ON TABLE mne_application.selectlist TO PUBLIC;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_application.selectlist TO erpdb;
-
-
---
--- Name: TABLE server; Type: ACL; Schema: mne_application; Owner: admindb
---
-
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_application.server TO mneerpsystem;
 
 
 --
@@ -45262,7 +44505,7 @@ GRANT SELECT ON TABLE mne_application.timestyle TO PUBLIC;
 -- Name: TABLE translate; Type: ACL; Schema: mne_application; Owner: admindb
 --
 
-GRANT ALL ON TABLE mne_application.translate TO mneerptranslate;
+GRANT ALL ON TABLE mne_application.translate TO mne_translate;
 GRANT SELECT ON TABLE mne_application.translate TO PUBLIC;
 
 
@@ -45326,7 +44569,7 @@ GRANT SELECT,INSERT ON TABLE mne_base.history TO PUBLIC;
 -- Name: TABLE letter; Type: ACL; Schema: mne_base; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_base.letter TO admincrm;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_base.letter TO admerpcrm;
 GRANT SELECT ON TABLE mne_base.letter TO erpcrm;
 
 
@@ -45334,7 +44577,7 @@ GRANT SELECT ON TABLE mne_base.letter TO erpcrm;
 -- Name: TABLE lettertree; Type: ACL; Schema: mne_base; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_base.lettertree TO admincrm;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_base.lettertree TO admerpcrm;
 GRANT SELECT ON TABLE mne_base.lettertree TO erpcrm;
 GRANT SELECT ON TABLE mne_base.lettertree TO PUBLIC;
 
@@ -45343,7 +44586,7 @@ GRANT SELECT ON TABLE mne_base.lettertree TO PUBLIC;
 -- Name: TABLE comment; Type: ACL; Schema: mne_builddiary; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_builddiary.comment TO adminbuilddiary;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_builddiary.comment TO admerpbuilddiary;
 GRANT SELECT ON TABLE mne_builddiary.comment TO erpbuilddiary;
 
 
@@ -45351,7 +44594,7 @@ GRANT SELECT ON TABLE mne_builddiary.comment TO erpbuilddiary;
 -- Name: TABLE present; Type: ACL; Schema: mne_builddiary; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_builddiary.present TO adminbuilddiary;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_builddiary.present TO admerpbuilddiary;
 GRANT SELECT ON TABLE mne_builddiary.present TO erpbuilddiary;
 
 
@@ -45360,7 +44603,7 @@ GRANT SELECT ON TABLE mne_builddiary.present TO erpbuilddiary;
 --
 
 GRANT SELECT ON TABLE mne_builddiary."time" TO erpbuilddiary;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_builddiary."time" TO adminbuilddiary;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_builddiary."time" TO admerpbuilddiary;
 
 
 --
@@ -45368,7 +44611,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_builddiary."time" TO adminbuilddi
 --
 
 GRANT SELECT ON TABLE mne_builddiary.lasttime TO erpbuilddiary;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_builddiary.lasttime TO adminbuilddiary;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_builddiary.lasttime TO admerpbuilddiary;
 
 
 --
@@ -45376,7 +44619,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_builddiary.lasttime TO adminbuild
 --
 
 GRANT SELECT ON TABLE mne_builddiary.persontime TO erpbuilddiary;
-GRANT SELECT ON TABLE mne_builddiary.persontime TO adminbuilddiary;
+GRANT SELECT ON TABLE mne_builddiary.persontime TO admerpbuilddiary;
 
 
 --
@@ -45384,7 +44627,7 @@ GRANT SELECT ON TABLE mne_builddiary.persontime TO adminbuilddiary;
 --
 
 GRANT SELECT ON TABLE mne_builddiary.presentpersonall TO erpbuilddiary;
-GRANT SELECT ON TABLE mne_builddiary.presentpersonall TO adminbuilddiary;
+GRANT SELECT ON TABLE mne_builddiary.presentpersonall TO admerpbuilddiary;
 
 
 --
@@ -45440,17 +44683,16 @@ GRANT SELECT ON TABLE mne_catalog.uuid TO PUBLIC;
 -- Name: TABLE address; Type: ACL; Schema: mne_crm; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.address TO admincrm;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.address TO adminpersonnal;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.address TO admerpcrm;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.address TO admerppersonnal;
 GRANT SELECT ON TABLE mne_crm.address TO PUBLIC;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.address TO adminsystem;
 
 
 --
 -- Name: TABLE addresstyp; Type: ACL; Schema: mne_crm; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.addresstyp TO admincrm;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.addresstyp TO admerpcrm;
 GRANT SELECT ON TABLE mne_crm.addresstyp TO erpcrm;
 GRANT SELECT ON TABLE mne_crm.addresstyp TO erpshipment;
 
@@ -45460,23 +44702,22 @@ GRANT SELECT ON TABLE mne_crm.addresstyp TO erpshipment;
 --
 
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.cardsinactive TO erpcrm;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.cardsinactive TO admincrm;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.cardsinactive TO admerpcrm;
 
 
 --
 -- Name: TABLE city; Type: ACL; Schema: mne_crm; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE ON TABLE mne_crm.city TO admincrm;
+GRANT SELECT,INSERT,DELETE ON TABLE mne_crm.city TO admerpcrm;
 GRANT SELECT ON TABLE mne_crm.city TO PUBLIC;
-GRANT SELECT,INSERT,DELETE ON TABLE mne_crm.city TO adminsystem;
 
 
 --
 -- Name: TABLE company; Type: ACL; Schema: mne_crm; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.company TO admincrm;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.company TO admerpcrm;
 GRANT SELECT ON TABLE mne_crm.company TO PUBLIC;
 
 
@@ -45484,7 +44725,7 @@ GRANT SELECT ON TABLE mne_crm.company TO PUBLIC;
 -- Name: TABLE companydata; Type: ACL; Schema: mne_crm; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.companydata TO admincrm;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.companydata TO admerpcrm;
 GRANT SELECT ON TABLE mne_crm.companydata TO PUBLIC;
 
 
@@ -45492,7 +44733,7 @@ GRANT SELECT ON TABLE mne_crm.companydata TO PUBLIC;
 -- Name: TABLE companydatacategorie; Type: ACL; Schema: mne_crm; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.companydatacategorie TO admincrm;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.companydatacategorie TO admerpcrm;
 GRANT SELECT ON TABLE mne_crm.companydatacategorie TO PUBLIC;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.companydatacategorie TO erpdb;
 
@@ -45501,16 +44742,16 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.companydatacategorie TO erpdb
 -- Name: TABLE companyemail; Type: ACL; Schema: mne_crm; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.companyemail TO admincrm;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.companyemail TO admerpcrm;
 GRANT SELECT ON TABLE mne_crm.companyemail TO erpcrm;
-GRANT SELECT ON TABLE mne_crm.companyemail TO mneerpmailscan;
+GRANT SELECT ON TABLE mne_crm.companyemail TO mne_mailscan;
 
 
 --
 -- Name: TABLE companyown; Type: ACL; Schema: mne_crm; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.companyown TO admincrm;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.companyown TO admerpcrm;
 GRANT SELECT ON TABLE mne_crm.companyown TO erpcrm;
 GRANT SELECT ON TABLE mne_crm.companyown TO PUBLIC;
 
@@ -45519,7 +44760,7 @@ GRANT SELECT ON TABLE mne_crm.companyown TO PUBLIC;
 -- Name: TABLE companyperson; Type: ACL; Schema: mne_crm; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.companyperson TO admincrm;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.companyperson TO admerpcrm;
 GRANT SELECT ON TABLE mne_crm.companyperson TO erpcrm;
 GRANT SELECT ON TABLE mne_crm.companyperson TO erpshipment;
 
@@ -45528,7 +44769,7 @@ GRANT SELECT ON TABLE mne_crm.companyperson TO erpshipment;
 -- Name: TABLE country; Type: ACL; Schema: mne_crm; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.country TO admincrm;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.country TO admerpcrm;
 GRANT SELECT ON TABLE mne_crm.country TO erpcrm;
 GRANT SELECT ON TABLE mne_crm.country TO PUBLIC;
 
@@ -45537,47 +44778,46 @@ GRANT SELECT ON TABLE mne_crm.country TO PUBLIC;
 -- Name: TABLE file; Type: ACL; Schema: mne_crm; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.file TO admincrm;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.file TO admerpcrm;
 GRANT SELECT ON TABLE mne_crm.file TO erpcrm;
-GRANT SELECT,INSERT ON TABLE mne_crm.file TO mneerpmailscan;
+GRANT SELECT,INSERT ON TABLE mne_crm.file TO mne_mailscan;
 
 
 --
 -- Name: TABLE offer; Type: ACL; Schema: mne_crm; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.offer TO admincrm;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.offer TO admerpcrm;
 GRANT SELECT ON TABLE mne_crm.offer TO erpcrm;
-GRANT SELECT ON TABLE mne_crm.offer TO mneerpmailscan;
+GRANT SELECT ON TABLE mne_crm.offer TO mne_mailscan;
 
 
 --
 -- Name: TABLE "order"; Type: ACL; Schema: mne_crm; Owner: admindb
 --
 
-GRANT SELECT ON TABLE mne_crm."order" TO admincrm;
+GRANT SELECT ON TABLE mne_crm."order" TO admerpcrm;
 GRANT SELECT ON TABLE mne_crm."order" TO erpcrm;
 GRANT SELECT ON TABLE mne_crm."order" TO erppersonnal;
 GRANT SELECT ON TABLE mne_crm."order" TO erpshipment;
 GRANT SELECT ON TABLE mne_crm."order" TO erpwarehouse;
-GRANT SELECT ON TABLE mne_crm."order" TO mneerpmailscan;
+GRANT SELECT ON TABLE mne_crm."order" TO mne_mailscan;
 
 
 --
 -- Name: TABLE person; Type: ACL; Schema: mne_crm; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.person TO admincrm;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.person TO admerpcrm;
 GRANT SELECT ON TABLE mne_crm.person TO PUBLIC;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.person TO adminpersonnal;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.person TO adminsystem;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.person TO admerppersonnal;
 
 
 --
 -- Name: TABLE file_secondref; Type: ACL; Schema: mne_crm; Owner: admindb
 --
 
-GRANT SELECT ON TABLE mne_crm.file_secondref TO admincrm;
+GRANT SELECT ON TABLE mne_crm.file_secondref TO admerpcrm;
 GRANT SELECT ON TABLE mne_crm.file_secondref TO erpcrm;
 
 
@@ -45586,15 +44826,15 @@ GRANT SELECT ON TABLE mne_crm.file_secondref TO erpcrm;
 --
 
 GRANT SELECT ON TABLE mne_crm.offermax TO erpcrm;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.offermax TO admincrm;
-GRANT SELECT ON TABLE mne_crm.offermax TO mneerpmailscan;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.offermax TO admerpcrm;
+GRANT SELECT ON TABLE mne_crm.offermax TO mne_mailscan;
 
 
 --
 -- Name: TABLE offerprobability; Type: ACL; Schema: mne_crm; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.offerprobability TO admincrm;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.offerprobability TO admerpcrm;
 GRANT SELECT ON TABLE mne_crm.offerprobability TO erpcrm;
 
 
@@ -45602,7 +44842,7 @@ GRANT SELECT ON TABLE mne_crm.offerprobability TO erpcrm;
 -- Name: TABLE orderproduct; Type: ACL; Schema: mne_crm; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.orderproduct TO admincrm;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.orderproduct TO admerpcrm;
 GRANT SELECT ON TABLE mne_crm.orderproduct TO erpcrm;
 GRANT SELECT ON TABLE mne_crm.orderproduct TO erppersonnal;
 GRANT SELECT ON TABLE mne_crm.orderproduct TO erpshipment;
@@ -45613,9 +44853,9 @@ GRANT SELECT ON TABLE mne_crm.orderproduct TO erpwarehouse;
 -- Name: TABLE orderaccounting_sum; Type: ACL; Schema: mne_crm; Owner: admindb
 --
 
-GRANT SELECT ON TABLE mne_crm.orderaccounting_sum TO admincrm;
+GRANT SELECT ON TABLE mne_crm.orderaccounting_sum TO admerpcrm;
 GRANT SELECT ON TABLE mne_crm.orderaccounting_sum TO erpcrm;
-GRANT SELECT ON TABLE mne_crm.orderaccounting_sum TO adminshipment;
+GRANT SELECT ON TABLE mne_crm.orderaccounting_sum TO admerpshipment;
 GRANT SELECT ON TABLE mne_crm.orderaccounting_sum TO erpshipment;
 
 
@@ -45623,20 +44863,18 @@ GRANT SELECT ON TABLE mne_crm.orderaccounting_sum TO erpshipment;
 -- Name: TABLE persondata; Type: ACL; Schema: mne_crm; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.persondata TO admincrm;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.persondata TO admerpcrm;
 GRANT SELECT ON TABLE mne_crm.persondata TO PUBLIC;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.persondata TO adminpersonnal;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.persondata TO adminsystem;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.persondata TO admerppersonnal;
 
 
 --
 -- Name: TABLE personemail; Type: ACL; Schema: mne_crm; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.personemail TO admincrm;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.personemail TO admerpcrm;
 GRANT SELECT ON TABLE mne_crm.personemail TO erpcrm;
-GRANT SELECT ON TABLE mne_crm.personemail TO mneerpmailscan;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.personemail TO adminsystem;
+GRANT SELECT ON TABLE mne_crm.personemail TO mne_mailscan;
 
 
 --
@@ -45657,10 +44895,8 @@ GRANT SELECT ON TABLE mne_crm.personorder TO erpcrm;
 -- Name: TABLE personowndata; Type: ACL; Schema: mne_crm; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.personowndata TO admincrm;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.personowndata TO adminsystem;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.personowndata TO admerpcrm;
 GRANT SELECT ON TABLE mne_crm.personowndata TO PUBLIC;
-GRANT SELECT,UPDATE ON TABLE mne_crm.personowndata TO mneerpsystem;
 
 
 --
@@ -45668,7 +44904,7 @@ GRANT SELECT,UPDATE ON TABLE mne_crm.personowndata TO mneerpsystem;
 --
 
 GRANT SELECT ON TABLE mne_fixture.fixture TO erpfixture;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_fixture.fixture TO adminfixture;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_fixture.fixture TO admerpfixture;
 
 
 --
@@ -45676,7 +44912,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_fixture.fixture TO adminfixture;
 --
 
 GRANT SELECT ON TABLE mne_shipment.deliverynote TO erpshipment;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_shipment.deliverynote TO adminshipment;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_shipment.deliverynote TO admerpshipment;
 
 
 --
@@ -45684,15 +44920,15 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_shipment.deliverynote TO adminshi
 --
 
 GRANT SELECT ON TABLE mne_shipment.invoice TO erpshipment;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_shipment.invoice TO adminshipment;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_shipment.invoice TO admerpshipment;
 
 
 --
 -- Name: TABLE offerproductpart; Type: ACL; Schema: mne_warehouse; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.offerproductpart TO adminwarehouse;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.offerproductpart TO admincrm;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.offerproductpart TO admerpwarehouse;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.offerproductpart TO admerpcrm;
 GRANT SELECT ON TABLE mne_warehouse.offerproductpart TO erpwarehouse;
 GRANT SELECT ON TABLE mne_warehouse.offerproductpart TO erpcrm;
 
@@ -45701,8 +44937,8 @@ GRANT SELECT ON TABLE mne_warehouse.offerproductpart TO erpcrm;
 -- Name: TABLE orderproductpart; Type: ACL; Schema: mne_warehouse; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.orderproductpart TO adminwarehouse;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.orderproductpart TO admincrm;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.orderproductpart TO admerpwarehouse;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.orderproductpart TO admerpcrm;
 GRANT SELECT ON TABLE mne_warehouse.orderproductpart TO erpwarehouse;
 GRANT SELECT ON TABLE mne_warehouse.orderproductpart TO erpcrm;
 
@@ -45711,7 +44947,7 @@ GRANT SELECT ON TABLE mne_warehouse.orderproductpart TO erpcrm;
 -- Name: TABLE purchase; Type: ACL; Schema: mne_warehouse; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.purchase TO adminwarehouse;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.purchase TO admerpwarehouse;
 GRANT SELECT ON TABLE mne_warehouse.purchase TO erpwarehouse;
 GRANT SELECT ON TABLE mne_warehouse.purchase TO erpfixture;
 
@@ -45720,25 +44956,24 @@ GRANT SELECT ON TABLE mne_warehouse.purchase TO erpfixture;
 -- Name: TABLE personownerpublic; Type: ACL; Schema: mne_crm; Owner: admindb
 --
 
-GRANT SELECT ON TABLE mne_crm.personownerpublic TO adminpersonnal;
+GRANT SELECT ON TABLE mne_crm.personownerpublic TO admerppersonnal;
 
 
 --
 -- Name: TABLE personpicture; Type: ACL; Schema: mne_crm; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.personpicture TO admincrm;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.personpicture TO admerpcrm;
 GRANT SELECT ON TABLE mne_crm.personpicture TO erpcrm;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.personpicture TO adminpersonnal;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.personpicture TO admerppersonnal;
 GRANT SELECT ON TABLE mne_crm.personpicture TO PUBLIC;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.personpicture TO adminsystem;
 
 
 --
 -- Name: TABLE product; Type: ACL; Schema: mne_crm; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.product TO admincrm;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.product TO admerpcrm;
 GRANT SELECT ON TABLE mne_crm.product TO erpcrm;
 GRANT SELECT ON TABLE mne_crm.product TO erpshipment;
 
@@ -45747,7 +44982,7 @@ GRANT SELECT ON TABLE mne_crm.product TO erpshipment;
 -- Name: TABLE productdefault; Type: ACL; Schema: mne_crm; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.productdefault TO admincrm;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.productdefault TO admerpcrm;
 GRANT SELECT ON TABLE mne_crm.productdefault TO erpcrm;
 GRANT SELECT ON TABLE mne_crm.productdefault TO erpshipment;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.productdefault TO erpdb;
@@ -45757,7 +44992,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.productdefault TO erpdb;
 -- Name: TABLE productprice; Type: ACL; Schema: mne_crm; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.productprice TO admincrm;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.productprice TO admerpcrm;
 GRANT SELECT ON TABLE mne_crm.productprice TO erpcrm;
 GRANT SELECT ON TABLE mne_crm.productprice TO erpshipment;
 
@@ -45766,7 +45001,7 @@ GRANT SELECT ON TABLE mne_crm.productprice TO erpshipment;
 -- Name: TABLE productvendor; Type: ACL; Schema: mne_crm; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.productvendor TO admincrm;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_crm.productvendor TO admerpcrm;
 GRANT SELECT ON TABLE mne_crm.productvendor TO erpcrm;
 GRANT SELECT ON TABLE mne_crm.productvendor TO erpshipment;
 
@@ -45775,17 +45010,17 @@ GRANT SELECT ON TABLE mne_crm.productvendor TO erpshipment;
 -- Name: TABLE fixturecost; Type: ACL; Schema: mne_fixture; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE ON TABLE mne_fixture.fixturecost TO adminfixture;
+GRANT SELECT,INSERT,DELETE ON TABLE mne_fixture.fixturecost TO admerpfixture;
 GRANT SELECT ON TABLE mne_fixture.fixturecost TO erpfixture;
 GRANT SELECT ON TABLE mne_fixture.fixturecost TO erpcrm;
-GRANT SELECT ON TABLE mne_fixture.fixturecost TO admincrm;
+GRANT SELECT ON TABLE mne_fixture.fixturecost TO admerpcrm;
 
 
 --
 -- Name: TABLE fixturetree; Type: ACL; Schema: mne_fixture; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_fixture.fixturetree TO adminfixture;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_fixture.fixturetree TO admerpfixture;
 GRANT SELECT ON TABLE mne_fixture.fixturetree TO erpfixture;
 
 
@@ -45793,7 +45028,7 @@ GRANT SELECT ON TABLE mne_fixture.fixturetree TO erpfixture;
 -- Name: TABLE fixturetype; Type: ACL; Schema: mne_fixture; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_fixture.fixturetype TO adminfixture;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_fixture.fixturetype TO admerpfixture;
 GRANT SELECT ON TABLE mne_fixture.fixturetype TO erpfixture;
 GRANT SELECT ON TABLE mne_fixture.fixturetype TO erpcrm;
 
@@ -45802,9 +45037,9 @@ GRANT SELECT ON TABLE mne_fixture.fixturetype TO erpcrm;
 -- Name: TABLE fixturetypecost; Type: ACL; Schema: mne_fixture; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_fixture.fixturetypecost TO adminfixture;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_fixture.fixturetypecost TO admerpfixture;
 GRANT SELECT ON TABLE mne_fixture.fixturetypecost TO erpfixture;
-GRANT SELECT ON TABLE mne_fixture.fixturetypecost TO admincrm;
+GRANT SELECT ON TABLE mne_fixture.fixturetypecost TO admerpcrm;
 GRANT SELECT ON TABLE mne_fixture.fixturetypecost TO erpcrm;
 
 
@@ -45812,7 +45047,7 @@ GRANT SELECT ON TABLE mne_fixture.fixturetypecost TO erpcrm;
 -- Name: TABLE fixturetypetree; Type: ACL; Schema: mne_fixture; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_fixture.fixturetypetree TO adminfixture;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_fixture.fixturetypetree TO admerpfixture;
 GRANT SELECT ON TABLE mne_fixture.fixturetypetree TO erpfixture;
 GRANT SELECT ON TABLE mne_fixture.fixturetypetree TO erpcrm;
 
@@ -45821,7 +45056,7 @@ GRANT SELECT ON TABLE mne_fixture.fixturetypetree TO erpcrm;
 -- Name: TABLE fee; Type: ACL; Schema: mne_hoai; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_hoai.fee TO admincrm;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_hoai.fee TO admerpcrm;
 GRANT SELECT ON TABLE mne_hoai.fee TO erpcrm;
 
 
@@ -45829,7 +45064,7 @@ GRANT SELECT ON TABLE mne_hoai.fee TO erpcrm;
 -- Name: TABLE feeextra; Type: ACL; Schema: mne_hoai; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_hoai.feeextra TO admincrm;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_hoai.feeextra TO admerpcrm;
 GRANT SELECT ON TABLE mne_hoai.feeextra TO erpcrm;
 
 
@@ -45837,7 +45072,7 @@ GRANT SELECT ON TABLE mne_hoai.feeextra TO erpcrm;
 -- Name: TABLE feename; Type: ACL; Schema: mne_hoai; Owner: admindb
 --
 
-GRANT SELECT ON TABLE mne_hoai.feename TO admincrm;
+GRANT SELECT ON TABLE mne_hoai.feename TO admerpcrm;
 GRANT SELECT ON TABLE mne_hoai.feename TO erpcrm;
 
 
@@ -45846,14 +45081,14 @@ GRANT SELECT ON TABLE mne_hoai.feename TO erpcrm;
 --
 
 GRANT SELECT ON TABLE mne_hoai.offer TO erpcrm;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_hoai.offer TO admincrm;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_hoai.offer TO admerpcrm;
 
 
 --
 -- Name: TABLE "order"; Type: ACL; Schema: mne_hoai; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_hoai."order" TO admincrm;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_hoai."order" TO admerpcrm;
 GRANT SELECT ON TABLE mne_hoai."order" TO erpcrm;
 
 
@@ -45861,7 +45096,7 @@ GRANT SELECT ON TABLE mne_hoai."order" TO erpcrm;
 -- Name: TABLE workphase; Type: ACL; Schema: mne_hoai; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_hoai.workphase TO admincrm;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_hoai.workphase TO admerpcrm;
 GRANT SELECT ON TABLE mne_hoai.workphase TO erpcrm;
 
 
@@ -45870,15 +45105,15 @@ GRANT SELECT ON TABLE mne_hoai.workphase TO erpcrm;
 --
 
 GRANT SELECT ON TABLE mne_mail.imapfolder TO erpmail;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_mail.imapfolder TO adminmail;
-GRANT SELECT ON TABLE mne_mail.imapfolder TO mneerpmailscan;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_mail.imapfolder TO admerpmail;
+GRANT SELECT ON TABLE mne_mail.imapfolder TO mne_mailscan;
 
 
 --
 -- Name: TABLE imapmailbox_secret; Type: ACL; Schema: mne_mail; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_mail.imapmailbox_secret TO mneerpmailscan;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_mail.imapmailbox_secret TO mne_mailscan;
 
 
 --
@@ -45886,7 +45121,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_mail.imapmailbox_secret TO mneerp
 --
 
 GRANT SELECT ON TABLE mne_mail.imapmailbox TO erpmail;
-GRANT SELECT ON TABLE mne_mail.imapmailbox TO adminmail;
+GRANT SELECT ON TABLE mne_mail.imapmailbox TO admerpmail;
 
 
 --
@@ -45894,28 +45129,28 @@ GRANT SELECT ON TABLE mne_mail.imapmailbox TO adminmail;
 --
 
 GRANT SELECT ON TABLE mne_mail.imapuid TO erpmail;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_mail.imapuid TO adminmail;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_mail.imapuid TO mneerpmailscan;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_mail.imapuid TO admerpmail;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_mail.imapuid TO mne_mailscan;
 
 
 --
 -- Name: TABLE offerproducttime; Type: ACL; Schema: mne_personnal; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_personnal.offerproducttime TO adminpersonnal;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_personnal.offerproducttime TO admerppersonnal;
 GRANT SELECT ON TABLE mne_personnal.offerproducttime TO erppersonnal;
 GRANT SELECT ON TABLE mne_personnal.offerproducttime TO erpcrm;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_personnal.offerproducttime TO admincrm;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_personnal.offerproducttime TO admerpcrm;
 
 
 --
 -- Name: TABLE orderproducttime; Type: ACL; Schema: mne_personnal; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_personnal.orderproducttime TO adminpersonnal;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_personnal.orderproducttime TO admerppersonnal;
 GRANT SELECT ON TABLE mne_personnal.orderproducttime TO erppersonnal;
 GRANT SELECT ON TABLE mne_personnal.orderproducttime TO erpcrm;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_personnal.orderproducttime TO admincrm;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_personnal.orderproducttime TO admerpcrm;
 GRANT SELECT ON TABLE mne_personnal.orderproducttime TO erpshipment;
 
 
@@ -45923,8 +45158,8 @@ GRANT SELECT ON TABLE mne_personnal.orderproducttime TO erpshipment;
 -- Name: TABLE personowndata; Type: ACL; Schema: mne_personnal; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_personnal.personowndata TO adminpersonnal;
-GRANT SELECT ON TABLE mne_personnal.personowndata TO admincrm;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_personnal.personowndata TO admerppersonnal;
+GRANT SELECT ON TABLE mne_personnal.personowndata TO admerpcrm;
 GRANT SELECT ON TABLE mne_personnal.personowndata TO erpcrm;
 GRANT SELECT ON TABLE mne_personnal.personowndata TO erppersonnal;
 
@@ -45940,7 +45175,7 @@ GRANT SELECT ON TABLE mne_personnal.personowndatapublic TO PUBLIC;
 -- Name: TABLE personskill; Type: ACL; Schema: mne_personnal; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_personnal.personskill TO adminpersonnal;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_personnal.personskill TO admerppersonnal;
 GRANT SELECT ON TABLE mne_personnal.personskill TO erppersonnal;
 
 
@@ -45948,27 +45183,27 @@ GRANT SELECT ON TABLE mne_personnal.personskill TO erppersonnal;
 -- Name: TABLE producttime; Type: ACL; Schema: mne_personnal; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_personnal.producttime TO adminpersonnal;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_personnal.producttime TO admerppersonnal;
 GRANT SELECT ON TABLE mne_personnal.producttime TO erppersonnal;
 GRANT SELECT ON TABLE mne_personnal.producttime TO erpcrm;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_personnal.producttime TO admincrm;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_personnal.producttime TO admerpcrm;
 
 
 --
 -- Name: TABLE producttimeopt; Type: ACL; Schema: mne_personnal; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_personnal.producttimeopt TO adminpersonnal;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_personnal.producttimeopt TO admerppersonnal;
 GRANT SELECT ON TABLE mne_personnal.producttimeopt TO erppersonnal;
 GRANT SELECT ON TABLE mne_personnal.producttimeopt TO erpcrm;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_personnal.producttimeopt TO admincrm;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_personnal.producttimeopt TO admerpcrm;
 
 
 --
 -- Name: TABLE skill; Type: ACL; Schema: mne_personnal; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_personnal.skill TO adminpersonnal;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_personnal.skill TO admerppersonnal;
 GRANT SELECT ON TABLE mne_personnal.skill TO erppersonnal;
 GRANT SELECT ON TABLE mne_personnal.skill TO erpcrm;
 GRANT SELECT ON TABLE mne_personnal.skill TO erpshipment;
@@ -45978,9 +45213,9 @@ GRANT SELECT ON TABLE mne_personnal.skill TO erpshipment;
 -- Name: TABLE "time"; Type: ACL; Schema: mne_personnal; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_personnal."time" TO adminpersonnal;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_personnal."time" TO admerppersonnal;
 GRANT SELECT ON TABLE mne_personnal."time" TO erppersonnal;
-GRANT SELECT ON TABLE mne_personnal."time" TO admincrm;
+GRANT SELECT ON TABLE mne_personnal."time" TO admerpcrm;
 GRANT SELECT ON TABLE mne_personnal."time" TO erpshipment;
 
 
@@ -45988,7 +45223,7 @@ GRANT SELECT ON TABLE mne_personnal."time" TO erpshipment;
 -- Name: TABLE timemanagement; Type: ACL; Schema: mne_personnal; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_personnal.timemanagement TO adminpersonnal;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_personnal.timemanagement TO admerppersonnal;
 GRANT SELECT ON TABLE mne_personnal.timemanagement TO erppersonnal;
 
 
@@ -45996,7 +45231,7 @@ GRANT SELECT ON TABLE mne_personnal.timemanagement TO erppersonnal;
 -- Name: TABLE timemanagement_param; Type: ACL; Schema: mne_personnal; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_personnal.timemanagement_param TO adminpersonnal;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_personnal.timemanagement_param TO admerppersonnal;
 GRANT SELECT ON TABLE mne_personnal.timemanagement_param TO erppersonnal;
 
 
@@ -46004,25 +45239,25 @@ GRANT SELECT ON TABLE mne_personnal.timemanagement_param TO erppersonnal;
 -- Name: TABLE timemax; Type: ACL; Schema: mne_personnal; Owner: admindb
 --
 
-GRANT SELECT ON TABLE mne_personnal.timemax TO adminpersonnaltime;
+GRANT SELECT ON TABLE mne_personnal.timemax TO admerppersonnaltime;
 GRANT SELECT ON TABLE mne_personnal.timemax TO erppersonnal;
-GRANT SELECT ON TABLE mne_personnal.timemax TO adminpersonnal;
+GRANT SELECT ON TABLE mne_personnal.timemax TO admerppersonnal;
 
 
 --
 -- Name: TABLE filedata; Type: ACL; Schema: mne_repository; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_repository.filedata TO adminrepository;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_repository.filedata TO admerprepository;
 GRANT SELECT ON TABLE mne_repository.filedata TO erprepository;
-GRANT SELECT,UPDATE ON TABLE mne_repository.filedata TO mneerprepository;
+GRANT SELECT,UPDATE ON TABLE mne_repository.filedata TO mne_repository;
 
 
 --
 -- Name: TABLE fileinterests; Type: ACL; Schema: mne_repository; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_repository.fileinterests TO adminrepository;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_repository.fileinterests TO admerprepository;
 GRANT SELECT,UPDATE ON TABLE mne_repository.fileinterests TO erprepository;
 
 
@@ -46030,7 +45265,7 @@ GRANT SELECT,UPDATE ON TABLE mne_repository.fileinterests TO erprepository;
 -- Name: TABLE filedata_interests; Type: ACL; Schema: mne_repository; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_repository.filedata_interests TO adminrepository;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_repository.filedata_interests TO admerprepository;
 GRANT SELECT ON TABLE mne_repository.filedata_interests TO erprepository;
 
 
@@ -46038,7 +45273,7 @@ GRANT SELECT ON TABLE mne_repository.filedata_interests TO erprepository;
 -- Name: TABLE filedata_maxdate; Type: ACL; Schema: mne_repository; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_repository.filedata_maxdate TO adminrepository;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_repository.filedata_maxdate TO admerprepository;
 GRANT SELECT ON TABLE mne_repository.filedata_maxdate TO erprepository;
 
 
@@ -46047,23 +45282,23 @@ GRANT SELECT ON TABLE mne_repository.filedata_maxdate TO erprepository;
 --
 
 GRANT SELECT ON TABLE mne_repository.filedata_rank TO erprepository;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_repository.filedata_rank TO adminrepository;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_repository.filedata_rank TO admerprepository;
 
 
 --
 -- Name: TABLE mail; Type: ACL; Schema: mne_repository; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_repository.mail TO mneerprepository;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_repository.mail TO mne_repository;
 GRANT SELECT ON TABLE mne_repository.mail TO erprepository;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_repository.mail TO adminrepository;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_repository.mail TO admerprepository;
 
 
 --
 -- Name: TABLE person_repository; Type: ACL; Schema: mne_repository; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_repository.person_repository TO adminrepository;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_repository.person_repository TO admerprepository;
 GRANT SELECT ON TABLE mne_repository.person_repository TO erprepository;
 
 
@@ -46071,7 +45306,7 @@ GRANT SELECT ON TABLE mne_repository.person_repository TO erprepository;
 -- Name: TABLE repository; Type: ACL; Schema: mne_repository; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_repository.repository TO adminrepository;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_repository.repository TO admerprepository;
 GRANT SELECT ON TABLE mne_repository.repository TO erprepository;
 
 
@@ -46079,7 +45314,7 @@ GRANT SELECT ON TABLE mne_repository.repository TO erprepository;
 -- Name: TABLE revisionnumber; Type: ACL; Schema: mne_repository; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_repository.revisionnumber TO adminrepository;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_repository.revisionnumber TO admerprepository;
 GRANT SELECT ON TABLE mne_repository.revisionnumber TO erprepository;
 
 
@@ -46087,7 +45322,6 @@ GRANT SELECT ON TABLE mne_repository.revisionnumber TO erprepository;
 -- Name: TABLE addressbookchanges; Type: ACL; Schema: mne_sabredav; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_sabredav.addressbookchanges TO adminshare;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_sabredav.addressbookchanges TO erpdav;
 
 
@@ -46095,7 +45329,6 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_sabredav.addressbookchanges TO er
 -- Name: TABLE addressbooks; Type: ACL; Schema: mne_sabredav; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_sabredav.addressbooks TO adminshare;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_sabredav.addressbooks TO erpdav;
 
 
@@ -46103,7 +45336,6 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_sabredav.addressbooks TO erpdav;
 -- Name: TABLE calendarchanges; Type: ACL; Schema: mne_sabredav; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_sabredav.calendarchanges TO adminshare;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_sabredav.calendarchanges TO erpdav;
 
 
@@ -46111,7 +45343,6 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_sabredav.calendarchanges TO erpda
 -- Name: TABLE calendarinstances; Type: ACL; Schema: mne_sabredav; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_sabredav.calendarinstances TO adminshare;
 GRANT SELECT ON TABLE mne_sabredav.calendarinstances TO PUBLIC;
 GRANT SELECT ON TABLE mne_sabredav.calendarinstances TO erpdav;
 
@@ -46120,7 +45351,6 @@ GRANT SELECT ON TABLE mne_sabredav.calendarinstances TO erpdav;
 -- Name: TABLE calendarobjects; Type: ACL; Schema: mne_sabredav; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_sabredav.calendarobjects TO adminshare;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_sabredav.calendarobjects TO erpdav;
 
 
@@ -46128,7 +45358,6 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_sabredav.calendarobjects TO erpda
 -- Name: TABLE calendars; Type: ACL; Schema: mne_sabredav; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_sabredav.calendars TO adminshare;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_sabredav.calendars TO erpdav;
 
 
@@ -46136,7 +45365,6 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_sabredav.calendars TO erpdav;
 -- Name: TABLE cards; Type: ACL; Schema: mne_sabredav; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_sabredav.cards TO adminshare;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_sabredav.cards TO erpdav;
 
 
@@ -46144,7 +45372,6 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_sabredav.cards TO erpdav;
 -- Name: TABLE groupmembers; Type: ACL; Schema: mne_sabredav; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_sabredav.groupmembers TO adminshare;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_sabredav.groupmembers TO erpdav;
 
 
@@ -46152,7 +45379,6 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_sabredav.groupmembers TO erpdav;
 -- Name: TABLE principals; Type: ACL; Schema: mne_sabredav; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_sabredav.principals TO adminshare;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_sabredav.principals TO erpdav;
 
 
@@ -46168,7 +45394,7 @@ GRANT SELECT ON TABLE mne_sabredav.uri2personid TO erpdav;
 --
 
 GRANT SELECT ON TABLE mne_shipment.deliverynoteproduct TO erpshipment;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_shipment.deliverynoteproduct TO adminshipment;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_shipment.deliverynoteproduct TO admerpshipment;
 GRANT SELECT ON TABLE mne_shipment.deliverynoteproduct TO erpcrm;
 
 
@@ -46176,7 +45402,7 @@ GRANT SELECT ON TABLE mne_shipment.deliverynoteproduct TO erpcrm;
 -- Name: TABLE invoiceaccount; Type: ACL; Schema: mne_shipment; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_shipment.invoiceaccount TO adminshipment;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_shipment.invoiceaccount TO admerpshipment;
 GRANT SELECT ON TABLE mne_shipment.invoiceaccount TO erpshipment;
 
 
@@ -46185,14 +45411,14 @@ GRANT SELECT ON TABLE mne_shipment.invoiceaccount TO erpshipment;
 --
 
 GRANT SELECT ON TABLE mne_shipment.invoicecond TO erpshipment;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_shipment.invoicecond TO adminshipment;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_shipment.invoicecond TO admerpshipment;
 
 
 --
 -- Name: TABLE invoicemanagement; Type: ACL; Schema: mne_shipment; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,TRUNCATE,UPDATE ON TABLE mne_shipment.invoicemanagement TO adminshipment;
+GRANT SELECT,INSERT,DELETE,TRUNCATE,UPDATE ON TABLE mne_shipment.invoicemanagement TO admerpshipment;
 GRANT SELECT ON TABLE mne_shipment.invoicemanagement TO erpshipment;
 
 
@@ -46201,14 +45427,14 @@ GRANT SELECT ON TABLE mne_shipment.invoicemanagement TO erpshipment;
 --
 
 GRANT SELECT ON TABLE mne_shipment.invoicepaid TO erpshipment;
-GRANT SELECT,INSERT,DELETE ON TABLE mne_shipment.invoicepaid TO adminshipment;
+GRANT SELECT,INSERT,DELETE ON TABLE mne_shipment.invoicepaid TO admerpshipment;
 
 
 --
 -- Name: TABLE invoicepaidsum; Type: ACL; Schema: mne_shipment; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_shipment.invoicepaidsum TO adminshipment;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_shipment.invoicepaidsum TO admerpshipment;
 GRANT SELECT ON TABLE mne_shipment.invoicepaidsum TO erpshipment;
 
 
@@ -46216,7 +45442,7 @@ GRANT SELECT ON TABLE mne_shipment.invoicepaidsum TO erpshipment;
 -- Name: TABLE invoiceref; Type: ACL; Schema: mne_shipment; Owner: admindb
 --
 
-GRANT SELECT ON TABLE mne_shipment.invoiceref TO adminshipment;
+GRANT SELECT ON TABLE mne_shipment.invoiceref TO admerpshipment;
 GRANT SELECT ON TABLE mne_shipment.invoiceref TO erpshipment;
 
 
@@ -46224,7 +45450,7 @@ GRANT SELECT ON TABLE mne_shipment.invoiceref TO erpshipment;
 -- Name: TABLE invoicerefcount; Type: ACL; Schema: mne_shipment; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_shipment.invoicerefcount TO adminshipment;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_shipment.invoicerefcount TO admerpshipment;
 GRANT SELECT ON TABLE mne_shipment.invoicerefcount TO erpshipment;
 
 
@@ -46232,7 +45458,7 @@ GRANT SELECT ON TABLE mne_shipment.invoicerefcount TO erpshipment;
 -- Name: TABLE invoicerefprice; Type: ACL; Schema: mne_shipment; Owner: admindb
 --
 
-GRANT SELECT ON TABLE mne_shipment.invoicerefprice TO adminshipment;
+GRANT SELECT ON TABLE mne_shipment.invoicerefprice TO admerpshipment;
 GRANT SELECT ON TABLE mne_shipment.invoicerefprice TO erpshipment;
 
 
@@ -46241,17 +45467,17 @@ GRANT SELECT ON TABLE mne_shipment.invoicerefprice TO erpshipment;
 --
 
 GRANT SELECT ON TABLE mne_shipment.invoicetime TO erpshipment;
-GRANT SELECT ON TABLE mne_shipment.invoicetime TO adminshipment;
+GRANT SELECT ON TABLE mne_shipment.invoicetime TO admerpshipment;
 
 
 --
 -- Name: TABLE part; Type: ACL; Schema: mne_warehouse; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.part TO adminwarehouse;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.part TO admerpwarehouse;
 GRANT SELECT ON TABLE mne_warehouse.part TO erpwarehouse;
 GRANT SELECT ON TABLE mne_warehouse.part TO erpcrm;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.part TO admincrm;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.part TO admerpcrm;
 GRANT SELECT ON TABLE mne_warehouse.part TO erpfixture;
 
 
@@ -46259,7 +45485,7 @@ GRANT SELECT ON TABLE mne_warehouse.part TO erpfixture;
 -- Name: TABLE partstoragelocation; Type: ACL; Schema: mne_warehouse; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.partstoragelocation TO adminwarehouse;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.partstoragelocation TO admerpwarehouse;
 GRANT SELECT ON TABLE mne_warehouse.partstoragelocation TO erpwarehouse;
 GRANT SELECT ON TABLE mne_warehouse.partstoragelocation TO erpfixture;
 
@@ -46268,7 +45494,7 @@ GRANT SELECT ON TABLE mne_warehouse.partstoragelocation TO erpfixture;
 -- Name: TABLE part_sum; Type: ACL; Schema: mne_warehouse; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.part_sum TO adminwarehouse;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.part_sum TO admerpwarehouse;
 GRANT SELECT ON TABLE mne_warehouse.part_sum TO erpwarehouse;
 
 
@@ -46277,7 +45503,7 @@ GRANT SELECT ON TABLE mne_warehouse.part_sum TO erpwarehouse;
 --
 
 GRANT SELECT ON TABLE mne_warehouse.partcost TO erpwarehouse;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.partcost TO adminwarehouse;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.partcost TO admerpwarehouse;
 GRANT SELECT ON TABLE mne_warehouse.partcost TO erpcrm;
 GRANT SELECT ON TABLE mne_warehouse.partcost TO erpfixture;
 
@@ -46286,7 +45512,7 @@ GRANT SELECT ON TABLE mne_warehouse.partcost TO erpfixture;
 -- Name: TABLE partingoing; Type: ACL; Schema: mne_warehouse; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.partingoing TO adminwarehouse;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.partingoing TO admerpwarehouse;
 GRANT SELECT ON TABLE mne_warehouse.partingoing TO erpwarehouse;
 GRANT SELECT ON TABLE mne_warehouse.partingoing TO erpfixture;
 
@@ -46295,7 +45521,7 @@ GRANT SELECT ON TABLE mne_warehouse.partingoing TO erpfixture;
 -- Name: TABLE partingoing_sum; Type: ACL; Schema: mne_warehouse; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.partingoing_sum TO adminwarehouse;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.partingoing_sum TO admerpwarehouse;
 GRANT SELECT ON TABLE mne_warehouse.partingoing_sum TO erpwarehouse;
 
 
@@ -46304,7 +45530,7 @@ GRANT SELECT ON TABLE mne_warehouse.partingoing_sum TO erpwarehouse;
 --
 
 GRANT SELECT ON TABLE mne_warehouse.partoutgoing TO erpwarehouse;
-GRANT SELECT,INSERT,UPDATE ON TABLE mne_warehouse.partoutgoing TO adminwarehouse;
+GRANT SELECT,INSERT,UPDATE ON TABLE mne_warehouse.partoutgoing TO admerpwarehouse;
 GRANT SELECT ON TABLE mne_warehouse.partoutgoing TO erpfixture;
 
 
@@ -46312,7 +45538,7 @@ GRANT SELECT ON TABLE mne_warehouse.partoutgoing TO erpfixture;
 -- Name: TABLE relocation; Type: ACL; Schema: mne_warehouse; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.relocation TO adminwarehouse;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.relocation TO admerpwarehouse;
 GRANT SELECT ON TABLE mne_warehouse.relocation TO erpwarehouse;
 
 
@@ -46320,7 +45546,7 @@ GRANT SELECT ON TABLE mne_warehouse.relocation TO erpwarehouse;
 -- Name: TABLE partoutgoing_sum; Type: ACL; Schema: mne_warehouse; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.partoutgoing_sum TO adminwarehouse;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.partoutgoing_sum TO admerpwarehouse;
 GRANT SELECT ON TABLE mne_warehouse.partoutgoing_sum TO erpwarehouse;
 
 
@@ -46328,9 +45554,9 @@ GRANT SELECT ON TABLE mne_warehouse.partoutgoing_sum TO erpwarehouse;
 -- Name: TABLE parttree; Type: ACL; Schema: mne_warehouse; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.parttree TO adminwarehouse;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.parttree TO admerpwarehouse;
 GRANT SELECT ON TABLE mne_warehouse.parttree TO erpwarehouse;
-GRANT SELECT ON TABLE mne_warehouse.parttree TO admincrm;
+GRANT SELECT ON TABLE mne_warehouse.parttree TO admerpcrm;
 GRANT SELECT ON TABLE mne_warehouse.parttree TO erpfixture;
 
 
@@ -46338,7 +45564,7 @@ GRANT SELECT ON TABLE mne_warehouse.parttree TO erpfixture;
 -- Name: TABLE purchasedelivery; Type: ACL; Schema: mne_warehouse; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.purchasedelivery TO adminwarehouse;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.purchasedelivery TO admerpwarehouse;
 GRANT SELECT ON TABLE mne_warehouse.purchasedelivery TO erpwarehouse;
 GRANT SELECT ON TABLE mne_warehouse.purchasedelivery TO erpfixture;
 
@@ -46347,7 +45573,7 @@ GRANT SELECT ON TABLE mne_warehouse.purchasedelivery TO erpfixture;
 -- Name: TABLE partoutgoing_tree; Type: ACL; Schema: mne_warehouse; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.partoutgoing_tree TO adminwarehouse;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.partoutgoing_tree TO admerpwarehouse;
 GRANT SELECT ON TABLE mne_warehouse.partoutgoing_tree TO erpwarehouse;
 
 
@@ -46355,7 +45581,7 @@ GRANT SELECT ON TABLE mne_warehouse.partoutgoing_tree TO erpwarehouse;
 -- Name: TABLE partstoragelocationmasterdata; Type: ACL; Schema: mne_warehouse; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.partstoragelocationmasterdata TO adminwarehouse;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.partstoragelocationmasterdata TO admerpwarehouse;
 GRANT SELECT ON TABLE mne_warehouse.partstoragelocationmasterdata TO erpwarehouse;
 GRANT SELECT ON TABLE mne_warehouse.partstoragelocationmasterdata TO erpfixture;
 
@@ -46365,14 +45591,14 @@ GRANT SELECT ON TABLE mne_warehouse.partstoragelocationmasterdata TO erpfixture;
 --
 
 GRANT SELECT ON TABLE mne_warehouse.partstorageloction_sum TO erpwarehouse;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.partstorageloction_sum TO adminwarehouse;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.partstorageloction_sum TO admerpwarehouse;
 
 
 --
 -- Name: TABLE partstoragemasterdata; Type: ACL; Schema: mne_warehouse; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.partstoragemasterdata TO adminwarehouse;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.partstoragemasterdata TO admerpwarehouse;
 GRANT SELECT ON TABLE mne_warehouse.partstoragemasterdata TO erpwarehouse;
 GRANT SELECT ON TABLE mne_warehouse.partstoragemasterdata TO erpfixture;
 
@@ -46381,7 +45607,7 @@ GRANT SELECT ON TABLE mne_warehouse.partstoragemasterdata TO erpfixture;
 -- Name: TABLE parttree_r; Type: ACL; Schema: mne_warehouse; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.parttree_r TO adminwarehouse;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.parttree_r TO admerpwarehouse;
 GRANT SELECT ON TABLE mne_warehouse.parttree_r TO erpwarehouse;
 
 
@@ -46389,7 +45615,7 @@ GRANT SELECT ON TABLE mne_warehouse.parttree_r TO erpwarehouse;
 -- Name: TABLE partvendor; Type: ACL; Schema: mne_warehouse; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.partvendor TO adminwarehouse;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.partvendor TO admerpwarehouse;
 GRANT SELECT ON TABLE mne_warehouse.partvendor TO erpwarehouse;
 GRANT SELECT ON TABLE mne_warehouse.partvendor TO erpfixture;
 
@@ -46398,17 +45624,17 @@ GRANT SELECT ON TABLE mne_warehouse.partvendor TO erpfixture;
 -- Name: TABLE productpart; Type: ACL; Schema: mne_warehouse; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.productpart TO adminwarehouse;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.productpart TO admerpwarehouse;
 GRANT SELECT ON TABLE mne_warehouse.productpart TO erpwarehouse;
 GRANT SELECT ON TABLE mne_warehouse.productpart TO erpcrm;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.productpart TO admincrm;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.productpart TO admerpcrm;
 
 
 --
 -- Name: TABLE purchase_partsum; Type: ACL; Schema: mne_warehouse; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.purchase_partsum TO adminwarehouse;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.purchase_partsum TO admerpwarehouse;
 GRANT SELECT ON TABLE mne_warehouse.purchase_partsum TO erpwarehouse;
 
 
@@ -46424,7 +45650,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.purchaseaccount TO erpd
 --
 
 GRANT SELECT ON TABLE mne_warehouse.purchasedelivery_sum TO erpwarehouse;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.purchasedelivery_sum TO adminwarehouse;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.purchasedelivery_sum TO admerpwarehouse;
 
 
 --
@@ -46432,14 +45658,14 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.purchasedelivery_sum TO
 --
 
 GRANT SELECT ON TABLE mne_warehouse.purchaseinvoice TO erpwarehouse;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.purchaseinvoice TO adminwarehouse;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.purchaseinvoice TO admerpwarehouse;
 
 
 --
 -- Name: TABLE purchaseinvoicedelivery; Type: ACL; Schema: mne_warehouse; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.purchaseinvoicedelivery TO adminwarehouse;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.purchaseinvoicedelivery TO admerpwarehouse;
 GRANT SELECT ON TABLE mne_warehouse.purchaseinvoicedelivery TO erpwarehouse;
 
 
@@ -46447,7 +45673,7 @@ GRANT SELECT ON TABLE mne_warehouse.purchaseinvoicedelivery TO erpwarehouse;
 -- Name: TABLE purchaseinvoicepay; Type: ACL; Schema: mne_warehouse; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.purchaseinvoicepay TO adminwarehouse;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.purchaseinvoicepay TO admerpwarehouse;
 GRANT SELECT ON TABLE mne_warehouse.purchaseinvoicepay TO erpwarehouse;
 
 
@@ -46456,7 +45682,7 @@ GRANT SELECT ON TABLE mne_warehouse.purchaseinvoicepay TO erpwarehouse;
 --
 
 GRANT SELECT ON TABLE mne_warehouse.relocation_partnewstoragelocationsum TO erpwarehouse;
-GRANT SELECT,INSERT,REFERENCES,DELETE,UPDATE ON TABLE mne_warehouse.relocation_partnewstoragelocationsum TO adminwarehouse;
+GRANT SELECT,INSERT,REFERENCES,DELETE,UPDATE ON TABLE mne_warehouse.relocation_partnewstoragelocationsum TO admerpwarehouse;
 
 
 --
@@ -46464,7 +45690,7 @@ GRANT SELECT,INSERT,REFERENCES,DELETE,UPDATE ON TABLE mne_warehouse.relocation_p
 --
 
 GRANT SELECT ON TABLE mne_warehouse.relocation_partstoragelocationsum TO erpwarehouse;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.relocation_partstoragelocationsum TO adminwarehouse;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.relocation_partstoragelocationsum TO admerpwarehouse;
 
 
 --
@@ -46472,14 +45698,14 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.relocation_partstoragel
 --
 
 GRANT SELECT ON TABLE mne_warehouse.relocation_sum TO erpwarehouse;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.relocation_sum TO adminwarehouse;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.relocation_sum TO admerpwarehouse;
 
 
 --
 -- Name: TABLE storage; Type: ACL; Schema: mne_warehouse; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.storage TO adminwarehouse;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.storage TO admerpwarehouse;
 GRANT SELECT ON TABLE mne_warehouse.storage TO erpwarehouse;
 
 
@@ -46487,7 +45713,7 @@ GRANT SELECT ON TABLE mne_warehouse.storage TO erpwarehouse;
 -- Name: TABLE storagelocation; Type: ACL; Schema: mne_warehouse; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.storagelocation TO adminwarehouse;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.storagelocation TO admerpwarehouse;
 GRANT SELECT ON TABLE mne_warehouse.storagelocation TO erpwarehouse;
 
 
@@ -46495,7 +45721,7 @@ GRANT SELECT ON TABLE mne_warehouse.storagelocation TO erpwarehouse;
 -- Name: TABLE storagelocationtyp; Type: ACL; Schema: mne_warehouse; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.storagelocationtyp TO adminwarehouse;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.storagelocationtyp TO admerpwarehouse;
 GRANT SELECT ON TABLE mne_warehouse.storagelocationtyp TO erpwarehouse;
 
 
@@ -46504,14 +45730,14 @@ GRANT SELECT ON TABLE mne_warehouse.storagelocationtyp TO erpwarehouse;
 --
 
 GRANT SELECT ON TABLE mne_warehouse.storageopt TO erpwarehouse;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.storageopt TO adminwarehouse;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.storageopt TO admerpwarehouse;
 
 
 --
 -- Name: TABLE storageoptpart; Type: ACL; Schema: mne_warehouse; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.storageoptpart TO adminwarehouse;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.storageoptpart TO admerpwarehouse;
 GRANT SELECT ON TABLE mne_warehouse.storageoptpart TO erpwarehouse;
 
 
@@ -46519,8 +45745,8 @@ GRANT SELECT ON TABLE mne_warehouse.storageoptpart TO erpwarehouse;
 -- Name: TABLE storagepersonnal; Type: ACL; Schema: mne_warehouse; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.storagepersonnal TO adminwarehouse;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.storagepersonnal TO adminpersonnal;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.storagepersonnal TO admerpwarehouse;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.storagepersonnal TO admerppersonnal;
 GRANT SELECT ON TABLE mne_warehouse.storagepersonnal TO erppersonnal;
 GRANT SELECT ON TABLE mne_warehouse.storagepersonnal TO erpwarehouse;
 
@@ -46529,7 +45755,7 @@ GRANT SELECT ON TABLE mne_warehouse.storagepersonnal TO erpwarehouse;
 -- Name: TABLE storagetyp; Type: ACL; Schema: mne_warehouse; Owner: admindb
 --
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.storagetyp TO adminwarehouse;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE mne_warehouse.storagetyp TO admerpwarehouse;
 GRANT SELECT ON TABLE mne_warehouse.storagetyp TO erpwarehouse;
 
 

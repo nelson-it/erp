@@ -22,7 +22,7 @@ class MneErpPersonnalTimeDayselect extends MneDbView
   {
     var ivalues = 
     {
-      css           : '/styles/weblet/personnal/time/day.css',
+      css           : 'personnal/time/day.css',
       schema        : 'mne_personnal',
       query         : 'timeday',
 

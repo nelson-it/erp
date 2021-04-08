@@ -82,7 +82,7 @@ rm -f empty.sql
 psql --username=$origuser --host=$orighost $checkdb < empty.sql > /dev/null
 rm empty.sql
  
-version=`cat ../../../installer/erp/dist/version`
+version=`cat ../../../installer/mneerp/dist/version`
 echo "-- Database Version: $version" > $output
 pg_dump --username=$origuser --host=$orighost $checkdb | sed -e "/CREATE EXTENSION.*plpgsql/d" -e "/COMMENT ON EXTENSION plpgsql/d" >> $output
 

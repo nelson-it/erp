@@ -22,7 +22,7 @@ class MneErpPersonnalMonthreport extends MneFixTable
   {
     var ivalues = 
     {
-        css      : '/styles/weblet/personnal/time/day.css',
+        css      : 'personnal/time/day.css',
         schema   : 'mne_personnal',
         query    : 'persontime_dayall',
         cols     : 'sortcol,needtime,vday,vmonth,vyear,loginname,dayname,vfullday,duration,wtime',

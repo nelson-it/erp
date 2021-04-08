@@ -13,7 +13,7 @@ rdcols="SELECT  DISTINCT\
 
 rdconcheck="SELECT DISTINCT\
             t0."conname" AS name,\
-            t0."consrc" AS check,\
+            pg_get_constraintdef(t0.oid) AS check,\
             t3."nspname" AS cschema\
             FROM\
             ((((pg_catalog.pg_constraint t0 LEFT JOIN pg_catalog.pg_class t1 ON ( t0.conrelid = t1.oid ) ) LEFT JOIN pg_catalog.pg_namespace t2 ON ( t1.relnamespace = t2.oid ) )) LEFT JOIN pg_catalog.pg_namespace t3 ON ( t0.connamespace = t3.oid ))\
@@ -264,7 +264,7 @@ do
             for con in $constr
             do
                 get_con $con
-                echo ALTER TABLE $s.$t ADD CONSTRAINT $tcon CHECK "(" $tsource ");";
+                echo "ALTER TABLE $s.$t ADD CONSTRAINT $tcon $tsource ;";
             done
         fi
         

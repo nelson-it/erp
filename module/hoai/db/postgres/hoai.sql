@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 12.5 (Ubuntu 12.5-0ubuntu0.20.04.1)
--- Dumped by pg_dump version 12.5 (Ubuntu 12.5-0ubuntu0.20.04.1)
+-- Dumped from database version 12.6 (Ubuntu 12.6-0ubuntu0.20.04.1)
+-- Dumped by pg_dump version 12.6 (Ubuntu 12.6-0ubuntu0.20.04.1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -210,8 +210,8 @@ ALTER TABLE mne_crm.product ENABLE TRIGGER ALL;
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 12.5 (Ubuntu 12.5-0ubuntu0.20.04.1)
--- Dumped by pg_dump version 12.5 (Ubuntu 12.5-0ubuntu0.20.04.1)
+-- Dumped from database version 12.6 (Ubuntu 12.6-0ubuntu0.20.04.1)
+-- Dumped by pg_dump version 12.6 (Ubuntu 12.6-0ubuntu0.20.04.1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -449,8 +449,8 @@ ALTER TABLE mne_crm.producttree ENABLE TRIGGER ALL;
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 12.5 (Ubuntu 12.5-0ubuntu0.20.04.1)
--- Dumped by pg_dump version 12.5 (Ubuntu 12.5-0ubuntu0.20.04.1)
+-- Dumped from database version 12.6 (Ubuntu 12.6-0ubuntu0.20.04.1)
+-- Dumped by pg_dump version 12.6 (Ubuntu 12.6-0ubuntu0.20.04.1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -656,8 +656,8 @@ ALTER TABLE mne_crm.productprice ENABLE TRIGGER ALL;
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 12.5 (Ubuntu 12.5-0ubuntu0.20.04.1)
--- Dumped by pg_dump version 12.5 (Ubuntu 12.5-0ubuntu0.20.04.1)
+-- Dumped from database version 12.6 (Ubuntu 12.6-0ubuntu0.20.04.1)
+-- Dumped by pg_dump version 12.6 (Ubuntu 12.6-0ubuntu0.20.04.1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -690,8 +690,8 @@ ALTER TABLE mne_warehouse.productpart ENABLE TRIGGER ALL;
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 12.5 (Ubuntu 12.5-0ubuntu0.20.04.1)
--- Dumped by pg_dump version 12.5 (Ubuntu 12.5-0ubuntu0.20.04.1)
+-- Dumped from database version 12.6 (Ubuntu 12.6-0ubuntu0.20.04.1)
+-- Dumped by pg_dump version 12.6 (Ubuntu 12.6-0ubuntu0.20.04.1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -729,8 +729,8 @@ ALTER TABLE mne_personnal.skill ENABLE TRIGGER ALL;
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 12.5 (Ubuntu 12.5-0ubuntu0.20.04.1)
--- Dumped by pg_dump version 12.5 (Ubuntu 12.5-0ubuntu0.20.04.1)
+-- Dumped from database version 12.6 (Ubuntu 12.6-0ubuntu0.20.04.1)
+-- Dumped by pg_dump version 12.6 (Ubuntu 12.6-0ubuntu0.20.04.1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -1809,8 +1809,8 @@ ALTER TABLE mne_personnal.producttime ENABLE TRIGGER ALL;
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 12.5 (Ubuntu 12.5-0ubuntu0.20.04.1)
--- Dumped by pg_dump version 12.5 (Ubuntu 12.5-0ubuntu0.20.04.1)
+-- Dumped from database version 12.6 (Ubuntu 12.6-0ubuntu0.20.04.1)
+-- Dumped by pg_dump version 12.6 (Ubuntu 12.6-0ubuntu0.20.04.1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -2057,8 +2057,8 @@ ALTER TABLE mne_personnal.producttimeopt ENABLE TRIGGER ALL;
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 12.5 (Ubuntu 12.5-0ubuntu0.20.04.1)
--- Dumped by pg_dump version 12.5 (Ubuntu 12.5-0ubuntu0.20.04.1)
+-- Dumped from database version 12.6 (Ubuntu 12.6-0ubuntu0.20.04.1)
+-- Dumped by pg_dump version 12.6 (Ubuntu 12.6-0ubuntu0.20.04.1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;

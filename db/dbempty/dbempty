@@ -19,7 +19,7 @@ while [ $# -gt 0 ]; do
   esac
 done
 
-version=`cat ../../../installer/erp/dist/version`
+version=`cat ../../../installer/mneerp/dist/version`
 echo "Database Version $version" 1>&2
 
 rdschemas="SELECT schemata.schema_name FROM information_schema.schemata where schema_name like 'mne_%' AND NOT schema_name='mne_application' AND NOT schema_name='mne_catalog'"
@@ -54,7 +54,7 @@ do
       usertables) ;;
       yearday) ;;
       tableconstraintmessages) ;;
-      tablecolnames) echo "ALTER TABLE mne_application.tablecolnames SET WITH OIDS; DELETE FROM mne_application.tablecolnames WHERE tab != '' AND oid in ( SELECT t0.oid FROM mne_application.tablecolnames t0 LEFT JOIN information_schema.columns t1 ON ( t0.\"schema\" = t1.table_schema AND t0.tab = t1.table_name AND t0.colname = t1.column_name ) WHERE t1.table_schema IS NULL );";;
+      tablecolnames) echo "DELETE from mne_application.tablecolnames tt0 WHERE EXISTS ( SELECT t0."schema", t0.tab, t0.colname FROM mne_application.tablecolnames t0 LEFT JOIN information_schema.columns t1 ON ( t0."schema" = t1.table_schema AND t0.tab = t1.table_name AND t0.colname = t1.column_name ) WHERE t1.table_schema IS NULL AND t0.tab != '' AND t0."schema" = tt0."schema" AND t0.tab = tt0.tab AND t0.colname = tt0.colname );";;
       year) ;;
       customerfunctions) ;;
       update)    echo "delete from mne_application.$t; INSERT INTO mne_application.$t ( updateid, version, updatehost ) VALUES ( '0', '"$version"', 'update.nelson-it.ch' );" ;;

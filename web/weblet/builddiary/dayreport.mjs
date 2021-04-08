@@ -22,7 +22,7 @@ class MneErpBuilddiaryDayreport extends MneErpPersonnalDayreport
   {
     var ivalues = 
     {
-        css : '/styles/weblet/builddiary/day.css',
+        css : 'builddiary/day.css',
         tableweblet  : 'builddiary/dayreporttable',
 
         schema      : 'mne_builddiary',
