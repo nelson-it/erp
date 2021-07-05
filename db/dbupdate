@@ -65,7 +65,7 @@ if [ ! "$forceupdate" = "1" ] && [ "$checkversion" = "$origversion" ]; then
     exit 0;
 fi
 
-( cd dbcheck; ./dbcheck -shost $checkhost -dhost $orighost -sdb $origdb -ddb $checkdb )
+( cd dbcheck; ./dbcheck -shost $orighost -dhost $checkhost -sdb $origdb -ddb $checkdb )
 ( cd dbcheck; export PGPASSWORD=$checkpass; psql -U admindb -h $checkhost -e $checkdb < modify.sql > modify.log 2>&1; )
 
 if [ "$NOSECOND" = "" ]; then
@@ -79,7 +79,7 @@ if [ "$NOSECOND" = "" ]; then
     fi
 
     if [ "$error_found" = "0" ]; then
-        ( cd dbcheck; ./dbcheck -shost $checkhost -dhost $orighost -sdb $origdb -ddb $checkdb )
+        ( cd dbcheck; ./dbcheck -shost $orighost -dhost $checkhost -sdb $origdb -ddb $checkdb )
         ( cd dbcheck; export PGPASSWORD=$checkpass; psql -U admindb -h $checkhost -e $checkdb < modify.sql > modify.log 2>&1; )
     fi
 fi
@@ -111,7 +111,7 @@ if [ "$error_found" != "1" ]; then
     fi
 fi
 
-( cd dbcontent; ./dbcontent -shost $checkhost -dhost $orighost -sdb $origdb -ddb $checkdb )
+( cd dbcontent; ./dbcontent -shost $orighost -dhost $checkhost -sdb $origdb -ddb $checkdb )
 ( cd dbcontent; export PGPASSWORD=$checkpass; psql -U admindb -h $checkhost -e $checkdb < content.sql > content.log 2>&1 )
 if [ -d dbadd ]; then
   ( cd dbadd;
