@@ -26,9 +26,10 @@ class MneCrmProuctPrice extends MneDbView
         query     : 'productprice',
 
         showids   : [ 'productpriceid'],
+        showalias : [ 'productid' ],
         
         okfunction : 'productprice_ok',
-        okcols     : ['productid', 'unitcost', 'unitprice', 'unit', 'vat', 'currencyid'],
+        okcols     : ['productpriceid', 'unitcost', 'unitprice', 'unit', 'vat', 'currencyid'],
         oktyps     : { unitcost : 'double', unitprice : 'double', vat : 'double'},
         
         delfunction : 'productprice_del',
@@ -41,7 +42,7 @@ class MneCrmProuctPrice extends MneDbView
       delconfirmids : [ 'unitprice'],
       
       defvalues : { unitcost : 0, currencyid : MneConfig.uowncurrencyid, currency : MneConfig.uowncurrency },
-      defalias  : { productid : 'productid' },
+      defalias  : { productpriceid : 'productid' },
       hinput : false
     };
 

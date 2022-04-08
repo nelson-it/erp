@@ -1,0 +1,30 @@
+#!/bin/bash
+
+develophost=puck
+
+origdb=erpdb
+orighost=$develophost
+origuser=admindb
+origport=5432
+
+checkdb=emptydb
+checkhost=$develophost
+checkuser=admindb
+checkport=5432
+output=erp.sql
+
+hoaioutput=../module/hoai/db/postgres/hoai.sql
+hoaiproductoutput=../module/hoai/db/postgres/hoai_product.sql
+
+. ../../dbsync/dbempty/dbempty
+
+version=`cat ../../installer/mneerp/dist/version`
+
+rm -f empty.sql
+. ./empty/mk_empty > empty.sql
+psql --username=$origuser --host=$orighost $checkdb < empty.sql > /dev/null
+rm empty.sql
+
+echo "-- Database Version: $version" > $output
+pg_dump --username=$origuser --host=$orighost $checkdb | sed -e "/CREATE EXTENSION.*plpgsql/d" -e "/COMMENT ON EXTENSION plpgsql/d" >> $output
+

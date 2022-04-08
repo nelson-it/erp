@@ -31,7 +31,7 @@ class MneErpWarehouseProductPartlist extends MneTableWeblet
 
       modfunction : 'productpart_update',
           modcols : [ 'productpartid', 'count', 'partcost' ],
-          modtyps : { count : 'long', partcost : 'double' },
+          modtyps : { count : 'double', partcost : 'double' },
 
           adddetail : true,
        detailweblet : 'partmanagementedit',

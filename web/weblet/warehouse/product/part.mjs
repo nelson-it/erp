@@ -31,7 +31,7 @@ class MneErpWarehouseProductPart extends MneDbView
 
       okfunction  : 'productpart_ok',
       okcols  : ['productpartid','productid','count','partgroup','partdescription','partcost','partid','fixturetypeid','unit'],
-      oktyps  : { count : 'long', partcost : 'double' },
+      oktyps  : { count : 'double', partcost : 'double' },
 
       delfunction   : 'productpart_del',
       delcols       : [ 'productpartid' ],

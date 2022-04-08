@@ -22,7 +22,7 @@ class MneCrmCompanyContactTable extends MneDbTableView
   {
     super.reset();
     
-    this.setbuttonpar('detailscreen', 'value', MneText.getText('#mne_lang#Mitarbeiter hinzufügen/bearbeiten'));
+    this.setbuttonpar('detailscreen', 'value', MneText.getText('#mne_lang#Mitarbeitenden hinzufügen/bearbeiten'));
     this.obj.mkbuttons.push ( { id : 'assoz', value : MneText.getText('#mne_lang#assoziierten Kontakt hinzufügen'), behind : 'ok', space : 'before'});
   }
   
