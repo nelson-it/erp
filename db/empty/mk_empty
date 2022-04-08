@@ -1,0 +1,149 @@
+echo "Database Version $version" 1>&2
+
+rdschemas="SELECT schemata.schema_name FROM information_schema.schemata where schema_name like 'mne_%' AND NOT schema_name='mne_application' AND NOT schema_name='mne_catalog'"
+rdtables="SELECT tables.table_name FROM information_schema.tables WHERE tables.table_schema = 'par1' AND table_type = 'BASE TABLE'"
+
+echo "--Tabellen überprüfen"
+
+schemas=`get_checkdata "$rdschemas"`
+schemas="$schemas"
+
+tables=`get_checkdata "$rdtables" public`
+for t in $table
+do
+    echo 'DROP TABLE public.'$t' CASCADE;'
+done
+
+tables=`get_checkdata "$rdtables" mne_catalog`
+
+for t in $tables
+do
+    case $t in
+       id_count) ;;
+       *) echo 'TRUNCATE TABLE ' mne_catalog.$t ' CASCADE;'; ;;
+    esac;
+done
+
+tables=`get_checkdata "$rdtables" mne_application`
+
+for t in $tables
+do
+    case $t in
+      usertables) ;;
+      yearday) ;;
+      tableconstraintmessages) ;;
+      tablecolnames) echo "DELETE from mne_application.tablecolnames tt0 WHERE EXISTS ( SELECT t0."schema", t0.tab, t0.colname FROM mne_application.tablecolnames t0 LEFT JOIN information_schema.columns t1 ON ( t0."schema" = t1.table_schema AND t0.tab = t1.table_name AND t0.colname = t1.column_name ) WHERE t1.table_schema IS NULL AND t0.tab != '' AND t0."schema" = tt0."schema" AND t0.tab = tt0.tab AND t0.colname = tt0.colname );";;
+      year) ;;
+      customerfunctions) ;;
+      update)    echo "delete from mne_application.$t; INSERT INTO mne_application.$t ( updateid, version, updatehost ) VALUES ( '0', '"$version"', 'update.nelson-it.ch' );" ;;
+      userpref ) echo "delete from mne_application.$t where username != 'admindb'; update mne_application.$t set startweblet = 'user_settings';"; ;;
+      folder )   echo 'TRUNCATE TABLE ' mne_application.$t ' CASCADE;'; ;;
+      server )   echo 'TRUNCATE TABLE ' mne_application.$t ' CASCADE;'; ;;
+
+    esac;
+
+    case $t in
+      update) ;;
+           *) echo "update mne_application.$t set createuser='admindb', modifyuser='admindb';" ;;
+    esac;
+done
+
+productselect="select t0.productid  from mne_crm.product t0 left join mne_hoai.workphase t1 on ( t0.productid = t1.productid) left join mne_hoai.feeextra t2 on ( t2.productid = t0.productid ) WHERE t1.productid is null and t2.productid is null";
+for s in $schemas
+do
+found=0
+            
+tables=`get_checkdata "$rdtables" $s`
+  for t in $tables
+  do
+    case $s.$t in
+                     
+      mne_base.currency) echo "update $s.$t set createuser='admindb', modifyuser='admindb';" ;;
+                    
+      mne_crm.addresstyp) echo "update $s.$t set createuser='admindb', modifyuser='admindb';" ;;
+      mne_crm.companydatacategorie) echo "update $s.$t set createuser='admindb', modifyuser='admindb';" ;;
+      mne_crm.productdefault) echo "update $s.$t set createuser='admindb', modifyuser='admindb';" ;;
+      mne_crm.productprice) ;;
+      mne_crm.producttree) ;;
+      mne_crm.product) echo "delete from mne_personnal.producttime where productid in ( $productselect );";
+                       echo "delete from mne_personnal.producttimeopt where productid in ( $productselect );";
+                       echo "delete from mne_warehouse.productpart where productid in ( $productselect );";
+                       echo "delete from mne_crm.productprice where productid in ( $productselect );";
+                       echo "delete from mne_crm.producttree where productid in ( $productselect );";
+                       echo "delete from mne_crm.product where productid in ( $productselect );"
+                       echo "delete from mne_crm.producttree where treeid in ( select t0.treeid from mne_crm.producttree t0 LEFT JOIN mne_crm.product t1 ON ( t0.productid = t1.productid ) LEFT JOIN mne_crm.producttree t2 ON ( t0.treeid = t2.parentid ) where t1.productid IS NULL AND t2.treeid is NULL);"
+                       echo "delete from mne_crm.producttree where treeid in ( select t0.treeid from mne_crm.producttree t0 LEFT JOIN mne_crm.product t1 ON ( t0.productid = t1.productid ) LEFT JOIN mne_crm.producttree t2 ON ( t0.treeid = t2.parentid ) where t1.productid IS NULL AND t2.treeid is NULL);"
+                       echo "delete from mne_crm.producttree where treeid in ( select t0.treeid from mne_crm.producttree t0 LEFT JOIN mne_crm.product t1 ON ( t0.productid = t1.productid ) LEFT JOIN mne_crm.producttree t2 ON ( t0.treeid = t2.parentid ) where t1.productid IS NULL AND t2.treeid is NULL);"
+                       echo "delete from mne_crm.producttree where treeid in ( select t0.treeid from mne_crm.producttree t0 LEFT JOIN mne_crm.product t1 ON ( t0.productid = t1.productid ) LEFT JOIN mne_crm.producttree t2 ON ( t0.treeid = t2.parentid ) where t1.productid IS NULL AND t2.treeid is NULL);"
+                       echo "delete from mne_crm.producttree where treeid in ( select t0.treeid from mne_crm.producttree t0 LEFT JOIN mne_crm.product t1 ON ( t0.productid = t1.productid ) LEFT JOIN mne_crm.producttree t2 ON ( t0.treeid = t2.parentid ) where t1.productid IS NULL AND t2.treeid is NULL);"
+                       echo "delete from mne_crm.producttree where treeid in ( select t0.treeid from mne_crm.producttree t0 LEFT JOIN mne_crm.product t1 ON ( t0.productid = t1.productid ) LEFT JOIN mne_crm.producttree t2 ON ( t0.treeid = t2.parentid ) where t1.productid IS NULL AND t2.treeid is NULL);"
+      ;;
+
+      mne_hoai.fee) echo "update $s.$t set createuser='admindb', modifyuser='admindb';" ;;
+      mne_hoai.feeextra) echo "update $s.$t set createuser='admindb', modifyuser='admindb';" ;;
+      mne_hoai.feename) echo "update $s.$t set createuser='admindb', modifyuser='admindb';" ;;
+      mne_hoai.workphase) echo "update $s.$t set createuser='admindb', modifyuser='admindb';" ;;
+
+      mne_shipment.invoicecond) echo "delete from mne_shipment.invoicecond WHERE invoicecondid not in ( 'textstd', 'condstd', 'divstd');";;
+
+      mne_warehouse.storagelocationtyp) echo "update $s.$t set createuser='admindb', modifyuser='admindb';" ;;
+      mne_warehouse.storagetyp) echo "update $s.$t set createuser='admindb', modifyuser='admindb';" ;;
+      mne_warehouse.productpart );;
+
+      mne_personnal.skill )  ;;
+      mne_personnal.timemanagement_param );;
+      mne_personnal.producttime );;
+      mne_personnal.producttimeopt );;
+
+      *) echo 'TRUNCATE TABLE ' $s.$t ' CASCADE;'; ;;
+    esac;
+                    
+  done
+done
+        
+echo "delete from mne_personnal.skill WHERE skillid in ( select t0.skillid from mne_personnal.skill t0 left join mne_personnal.producttime t1 on ( t1.skillid = t0.skillid) left join mne_personnal.producttimeopt t2 on ( t2.skillid = t0.skillid)  where ( t1.skillid is null and t2.skillid is null and t0.skillid != 'special' )); update mne_personnal.skill set unitcost = 0.0;"
+
+ystart=`date +%Y`
+let yend=ystart
+let ystart=ystart-1;
+let yend=yend+1;
+
+echo "update mne_application.customerfunctions set funcschema = '', func = '';"
+
+echo "update mne_application.year set yearmax = "$yend", yearmin = "$ystart";"
+echo 'delete from mne_application.yearday;'
+echo 'insert into mne_application.yearday select * from mne_catalog.yearday();'
+
+# Menu für HOAI
+# ==============
+echo "delete from mne_application.menu where menuid in ( '4e4b69e40000', '50bcb5e30000');";
+        
+# Menu für Builddiary
+# ================
+echo "delete from mne_application.menu where ugroup = 'erpbuilddiary';";
+        
+# Menu für Systemfunktionen
+# ==============================================
+echo "delete from mne_application.menu where ugroup like '%system' and menuname in ( 'dbadmin', 'erp');";
+        
+# HOAI sichern
+# ==============================================
+rm -f $hoaiproductoutput 
+pg_dump --username=$origuser --host=$orighost --format plain --data-only --disable-triggers --column-inserts --table=mne_crm.product $checkdb  > $hoaiproductoutput
+pg_dump --username=$origuser --host=$orighost --format plain --data-only --disable-triggers --column-inserts --table=mne_crm.producttree $checkdb >> $hoaiproductoutput
+pg_dump --username=$origuser --host=$orighost --format plain --data-only --disable-triggers --column-inserts --table=mne_crm.productprice $checkdb >> $hoaiproductoutput
+pg_dump --username=$origuser --host=$orighost --format plain --data-only --disable-triggers --column-inserts --table=mne_warehouse.productpart $checkdb >> $hoaiproductoutput
+pg_dump --username=$origuser --host=$orighost --format plain --data-only --disable-triggers --column-inserts --table=mne_personnal.skill $checkdb >> $hoaiproductoutput
+pg_dump --username=$origuser --host=$orighost --format plain --data-only --disable-triggers --column-inserts --table=mne_personnal.producttime $checkdb >> $hoaiproductoutput
+pg_dump --username=$origuser --host=$orighost --format plain --data-only --disable-triggers --column-inserts --table=mne_personnal.producttimeopt $checkdb >> $hoaiproductoutput
+
+pg_dump --username=$origuser --host=$orighost --format plain --data-only --disable-triggers --column-inserts --schema=mne_hoai $checkdb >> $hoaioutput
+
+echo "TRUNCATE TABLE mne_personnal.producttime CASCADE;" | psql --username=$origuser --host=$orighost $checkdb > /dev/null
+echo "TRUNCATE TABLE mne_personnal.producttimeopt CASCADE;" | psql --username=$origuser --host=$orighost $checkdb > /dev/null
+echo "TRUNCATE TABLE mne_warehouse.productpart CASCADE;" | psql --username=$origuser --host=$orighost $checkdb > /dev/null
+echo "TRUNCATE TABLE mne_crm.productprice CASCADE;" | psql --username=$origuser --host=$orighost $checkdb > /dev/null
+echo "TRUNCATE TABLE mne_crm.producttree CASCADE;" | psql --username=$origuser --host=$orighost $checkdb > /dev/null
+echo "TRUNCATE TABLE mne_crm.product CASCADE;" | psql --username=$origuser --host=$orighost $checkdb > /dev/null
+echo "delete from mne_personnal.personskill where skillid != 'special'" | psql --username=$origuser --host=$orighost $checkdb > /dev/null
+

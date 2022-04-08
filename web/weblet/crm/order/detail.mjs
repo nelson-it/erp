@@ -47,6 +47,8 @@ class MneErpOrderDetail extends MneDbView
       links  : {},
       report : 'mne_orderdetail',
       
+      regexp : { refname : 'notempty' },
+      
       hinput : false
     };
 
