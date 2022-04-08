@@ -16,7 +16,7 @@ output=erp.sql
 hoaioutput=../module/hoai/db/postgres/hoai.sql
 hoaiproductoutput=../module/hoai/db/postgres/hoai_product.sql
 
-. ../../dbsync/dbempty/dbempty
+. ../../dbsync/dbempty
 
 version=`cat ../../installer/mneerp/dist/version`
 
