@@ -1,0 +1,55 @@
+#!/bin/bash
+
+. ../dbcfg
+
+origdb=erpdb
+orighost=localhost
+origuser=admindb
+allschemas=0
+
+echo -n "Password for admindb: "
+stty -echo < /dev/tty
+read origpass
+stty echo < /dev/tty
+echo
+
+checkpass=$origpass
+
+while [ $# -gt 0 ] ; do
+  case $1 in
+    -sdb)   origdb=$2; shift 2;;
+    -shost) orighost=$2; shift 2;;
+    -spass) origpass=$2; shift 2;;
+    -ddb)   checkdb=$2; shift 2;;
+    -dhost) checkhost=$2; shift 2;;
+    -dpass) checkpass=$2; shift 2;;
+    -all )  allschemas=1; shift 1;;
+     *)     shift 1 ;;
+  esac
+done
+
+export PGPASSWORD=$checkpass
+psql --username=admindb --host=$checkhost $checkdb << EOF 
+    DROP DATABASE erpdborig;
+    CREATE DATABASE erpdborig
+       WITH OWNER = admindb
+       TEMPLATE = template0
+       ENCODING = 'UTF8'
+       TABLESPACE = pg_default
+       LC_COLLATE = 'C'
+       LC_CTYPE = 'C'
+       CONNECTION LIMIT = -1;
+EOF
+
+export PGPASSWORD=$origpass
+psql --username=admindb --host=$orighost erpdborig << EOF
+       CREATE PROCEDURAL LANGUAGE plpgsql;
+       ALTER PROCEDURAL LANGUAGE plpgsql OWNER TO postgres;
+EOF
+
+psql --username=admindb --host=$orighost erpdborig < erp.sql
+
+for s in $cus_schemas
+do
+  pg_dump --username=admindb --host=$sourcehost --format=c --schema $s --schema-only $checkdb | pg_restore --host=$sourcehost --username=admindb --dbname="erpdborig"
+done
