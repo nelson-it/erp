@@ -1,4 +1,4 @@
-#!/bin/bash 
+#!/bin/bash
 
 origdb=erpdborig
 orighost=localhost
@@ -11,11 +11,6 @@ checkhost=localhost
 checkport=5432
 checkuser=admindb
 #checkpass='geheim'
-
-if [ "$(id -u)" = "0" ]; then
-    orighost=127.0.156.1
-    checkhost=127.0.156.1
-fi
 
 cus_schemas="$cus_schemas
 mne_hoai
