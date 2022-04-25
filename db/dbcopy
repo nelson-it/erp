@@ -1,0 +1,15 @@
+#!/bin/bash
+
+develophost=puck
+
+origdb=erpdb
+orighost=$develophost
+origuser=admindb
+origport=5432
+
+checkdb=erpdb
+checkhost=localhost
+checkuser=admindb
+checkport=5432
+
+. ../../dbsync/dbcopy
