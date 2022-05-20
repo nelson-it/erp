@@ -3,12 +3,12 @@
 develophost=puck
 
 origdb=erpdb
-orighost=$develophost
+orighost=localhost
 origuser=admindb
 origport=5432
 
-checkdb=emptydb
-checkhost=$develophost
+checkdb=eerpdb
+checkhost=localhost
 checkuser=admindb
 checkport=5432
 output=erp.sql
