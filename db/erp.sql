@@ -18162,15 +18162,15 @@ COPY mne_application.htmlcomposetabnames (createdate, createuser, modifydate, mo
 --
 
 COPY mne_application.htmlcomposetabselect (createdate, createuser, modifydate, modifyuser, id, element, schema, query, tab, wop, wcol, wval, scols, showcols, cols, weblet, showids, custom, selval, htmlcomposetabselectid, htmlcomposeid, type, showalias) FROM stdin;
-1306307276	admindb	1604669168	admindb	quartal	enddate,month								date,#-2		selectday		f	\N	575ea30c8071	575e9c45800f	weblet	
 1250511818	admindb	1605275742	admindb	detail	birthday								date		selectday		f	\N	575ea30c8042	575e9c458020	weblet	
+1281607319	admindb	1601278418	admindb	hoai	law	mne_hoai		feename				feenameid	law,feenameid	law,feenameid			f	\N	575ea30c801e	575e9c458017	table	
+1306307276	admindb	1604669168	admindb	quartal	enddate,month								date,#-2		selectday		f	\N	575ea30c8071	575e9c45800f	weblet	
 1237298688	admindb	1649142554	admindb	detail	refname,refid,contactname,contactid								refname,refid,#,#		refnameselect		f	\N	575ea30c8088	575e9c458017	weblet	
 1600765370	admindb	1649142758	admindb	refnameselectcompany	city,postcode,country,cityid	mne_crm	city					name,postcode	name,postcode,country,cityid	name,postcode,country			f	\N	5f69bdba0000	575e9c458017	table	
 1600773611	admindb	1649142772	admindb	refnameselectperson	city,postcode,country,cityid	mne_crm	city					name,postcode	name,postcode,country,cityid	name,postcode,country			f	\N	5f69ddeb0000	575e9c458017	table	
 1603887197	admindb	1603888309	admindb	top	vfullday								cdate		selectday		f	\N	5f99605d0000	575e9c45800f	weblet	
 1386585561	admindb	1386586067	admindb	hoai	year	mne_hoai	fee					!year	year	year			f	\N	575ea30c811c	575e9c458017	table	
 1605257284	admindb	1605257284	admindb	bdiarypresentlist	starttime,timeid	mne_builddiary	time_order					starttime	starttime,timeid	ordernumber,starttime		orderid	f	\N	5fae48440000	575e9c45800f	table	[ () => { return this.obj.inputs.orderid.getValue() } ]
-1281607319	admindb	1601278418	admindb	hoai	law	mne_hoai		feename				feenameid	law,feenameid	law,feenameid			f	\N	575ea30c801e	575e9c458017	table	
 1608208175	admindb	1608208175	admindb	detail_deliverynotenumberselectdetail	storageid	mne_warehouse	storage_name		=,o=,o=	storageclass,storageclass,storageclass	inout,ingoing,nostorage	description	storageid	description			f	\N	5fdb4f2f0000	575e9c45801e	table	
 1608208290	admindb	1608208290	admindb	detail_deliverynotenumberselectdetail	storagelocation,storagelocationid	mne_warehouse	storagelocation_empty					storagelocationname	storagelocationname,storagelocationid	storagelocationname		storageid	f	\N	5fdb4fa20000	575e9c45801e	table	[ () => { return self.obj.inputs.storageid.getValue() } ]
 1301477906	admindb	1603956549	admindb	detail	!productnumber,productname	mne_personnal	orderproducttime		=,=	ready,open	false,true	nproductnumber	productnumber,productname,nproductnumber	productnumber,productname		orderid	f	\N	575ea30c8066	575e9c45800f	frame	[  () => { return this.obj.outputs.orderid.getValue() } ]
@@ -18897,6 +18897,16 @@ COPY mne_application.menu (createdate, createuser, modifydate, modifyuser, menup
 --
 
 COPY mne_application.querycolnames (createdate, createuser, modifydate, modifyuser, text_de, text_en, colid, schema, query) FROM stdin;
+1605174508	admindb	1605174508	admindb	\N	\N	orderid	mne_builddiary	present
+1601538783	admindb	1601538783	admindb	\N	\N	refid	mne_crm	reference
+1609766841	admindb	1609766841	admindb	\N	\N	typ	mne_crm	producttree
+1608287743	admindb	1608287743	admindb	\N	\N	treeid	mne_fixture	fixture
+1603718113	admindb	1603718113	admindb	\N	\N	sortcol	mne_personnal	timeday
+1358260498	admindb	1358260498	admindb	\N	\N	prefix	mne_crm	account
+1356191052	admindb	1356191052	admindb	\N	\N	sorting	mne_crm	offerforecast
+1393567628	admindb	1393567628	admindb	\N	\N	sorcol	mne_mail	address
+1534140126	admindb	1534140126	admindb	\N	\N	tosign	mne_crm	person_letter
+1534144736	admindb	1534144736	admindb	\N	\N	ownerid	mne_crm	person_invoice
 1385429086	admindb	1385429086	admindb	\N	\N	count	mne_crm	orderproductcost
 1291366311	admindb	1291366311	admindb	\N	\N	count	mne_crm	offercost
 1647251509	admindb	1647251509	admindb	\N	\N	productid	mne_crm	product
@@ -19320,7 +19330,6 @@ COPY mne_application.querycolnames (createdate, createuser, modifydate, modifyus
 1601380214	admindb	1601380214	admindb	\N	\N	priceisnull	mne_crm	orderproduct_list
 1601380214	admindb	1601380214	admindb	\N	\N	-orderproducttype	mne_crm	orderproduct_list
 1601380214	admindb	1601380214	admindb	\N	\N	-pcurrency	mne_crm	orderproduct_list
-1605174508	admindb	1605174508	admindb	\N	\N	orderid	mne_builddiary	present
 1603966398	admindb	1603966398	admindb	\N	\N	sortcol	mne_personnal	orderproducttime_person
 1603966398	admindb	1603966398	admindb	\N	\N	personid	mne_personnal	orderproducttime_person
 1603966398	admindb	1603966398	admindb	\N	\N	orderid	mne_personnal	orderproducttime_person
@@ -19627,6 +19636,7 @@ COPY mne_application.querycolnames (createdate, createuser, modifydate, modifyus
 1601458426	admindb	1601458426	admindb	\N	\N	rowtyp	mne_personnal	orderproducttime_list
 1601458426	admindb	1601458426	admindb	\N	\N	orderid	mne_personnal	orderproducttime_list
 1601458426	admindb	1601458426	admindb	\N	\N	orderproductid	mne_personnal	orderproducttime_list
+1608287743	admindb	1608287743	admindb	Besitzer	owner	fullname	mne_fixture	fixture
 1601458426	admindb	1601458426	admindb	\N	\N	orderproducttype	mne_personnal	orderproducttime_list
 1601458426	admindb	1601458426	admindb	\N	\N	position	mne_personnal	orderproducttime_list
 1601458426	admindb	1601458426	admindb	Art	type	orderproducttypetext	mne_personnal	orderproducttime_list
@@ -19791,7 +19801,6 @@ COPY mne_application.querycolnames (createdate, createuser, modifydate, modifyus
 1603345954	admindb	1603345954	admindb	\N	\N	textid	mne_shipment	invoice_detail
 1598603028	admindb	1598603028	admindb	\N	\N	shortrev	mne_repository	filedata_interests
 1598603028	admindb	1598603028	admindb	\N	\N	rank	mne_repository	filedata_interests
-1601538783	admindb	1601538783	admindb	\N	\N	refid	mne_crm	reference
 1601538783	admindb	1601538783	admindb	Name	name	refname	mne_crm	reference
 1601538783	admindb	1601538783	admindb	Referenzart	type	reftyp	mne_crm	reference
 1598603028	admindb	1598603028	admindb	\N	\N	nrank	mne_repository	filedata_interests
@@ -20057,7 +20066,6 @@ COPY mne_application.querycolnames (createdate, createuser, modifydate, modifyus
 1609766841	admindb	1609766841	admindb	\N	\N	treepath	mne_crm	producttree
 1609766841	admindb	1609766841	admindb	\N	\N	fullpath	mne_crm	producttree
 1609766841	admindb	1609766841	admindb	\N	\N	productid	mne_crm	producttree
-1609766841	admindb	1609766841	admindb	\N	\N	typ	mne_crm	producttree
 1609766841	admindb	1609766841	admindb	\N	\N	typnoleaf	mne_crm	producttree
 1609766841	admindb	1609766841	admindb	\N	\N	action	mne_crm	producttree
 1609766841	admindb	1609766841	admindb	\N	\N	productnumber	mne_crm	producttree
@@ -20097,9 +20105,7 @@ COPY mne_application.querycolnames (createdate, createuser, modifydate, modifyus
 1608287743	admindb	1608287743	admindb	\N	\N	modifyuser	mne_fixture	fixture
 1608287743	admindb	1608287743	admindb	\N	\N	firstname	mne_fixture	fixture
 1608287743	admindb	1608287743	admindb	\N	\N	lastname	mne_fixture	fixture
-1608287743	admindb	1608287743	admindb	Besitzer	owner	fullname	mne_fixture	fixture
 1608287743	admindb	1608287743	admindb	\N	\N	treeparentid	mne_fixture	fixture
-1608287743	admindb	1608287743	admindb	\N	\N	treeid	mne_fixture	fixture
 1608287743	admindb	1608287743	admindb	\N	\N	treename	mne_fixture	fixture
 1608287743	admindb	1608287743	admindb	Kategorie	categorie	treeparentname	mne_fixture	fixture
 1608287743	admindb	1608287743	admindb	Kategorie	categorie	treepath	mne_fixture	fixture
@@ -20250,7 +20256,6 @@ COPY mne_application.querycolnames (createdate, createuser, modifydate, modifyus
 1607510788	admindb	1607510788	admindb	Startdatum	start date	startday	mne_personnal	orderproducttimemanagement
 1607510788	admindb	1607510788	admindb	Startzeit	start time	starttime	mne_personnal	orderproducttimemanagement
 1607510788	admindb	1607510788	admindb	\N	\N	note	mne_personnal	orderproducttimemanagement
-1603718113	admindb	1603718113	admindb	\N	\N	sortcol	mne_personnal	timeday
 1603718113	admindb	1603718113	admindb	\N	\N	vyear	mne_personnal	timeday
 1603718113	admindb	1603718113	admindb	\N	\N	vmonth	mne_personnal	timeday
 1603718113	admindb	1603718113	admindb	\N	\N	vday	mne_personnal	timeday
@@ -20531,7 +20536,6 @@ COPY mne_application.querycolnames (createdate, createuser, modifydate, modifyus
 1608188280	admindb	1608188280	admindb	\N	\N	ordernumber	mne_warehouse	purchasedelivery_invoice
 1608188280	admindb	1608188280	admindb	\N	\N	orderdate	mne_warehouse	purchasedelivery_invoice
 1608188280	admindb	1608188280	admindb	\N	\N	crmorder	mne_warehouse	purchasedelivery_invoice
-1358260498	admindb	1358260498	admindb	\N	\N	prefix	mne_crm	account
 1608188280	admindb	1608188280	admindb	\N	\N	crmordernumber	mne_warehouse	purchasedelivery_invoice
 1347950513	admindb	1347950513	admindb	\N	\N	productpartid	mne_warehouse	productpart
 1608188280	admindb	1608188280	admindb	mit Rechnung	with invoice	haveinvoice	mne_warehouse	purchasedelivery_invoice
@@ -20649,7 +20653,6 @@ COPY mne_application.querycolnames (createdate, createuser, modifydate, modifyus
 1347951938	admindb	1347951938	admindb	\N	\N	fixturetypeid	mne_warehouse	productpart_list
 1347951938	admindb	1347951938	admindb	\N	\N	fixturetype	mne_warehouse	productpart_list
 1347951938	admindb	1347951938	admindb	\N	\N	description	mne_warehouse	productpart_list
-1356191052	admindb	1356191052	admindb	\N	\N	sorting	mne_crm	offerforecast
 1356191052	admindb	1356191052	admindb	\N	\N	offerid	mne_crm	offerforecast
 1356191052	admindb	1356191052	admindb	\N	\N	description	mne_crm	offerforecast
 1356191052	admindb	1356191052	admindb	\N	\N	offernumber	mne_crm	offerforecast
@@ -20802,7 +20805,6 @@ COPY mne_application.querycolnames (createdate, createuser, modifydate, modifyus
 1351243433	admindb	1351243433	admindb	N	n	pricechange	mne_crm	offerproduct_list
 1351243433	admindb	1351243433	admindb	\N	\N	pcurrency	mne_crm	offerproduct_list
 1351243433	admindb	1351243433	admindb	\N	\N	ocurrency	mne_crm	offerproduct_list
-1393567628	admindb	1393567628	admindb	\N	\N	sorcol	mne_mail	address
 1393567628	admindb	1393567628	admindb	\N	\N	refid	mne_mail	address
 1393567628	admindb	1393567628	admindb	\N	\N	email	mne_mail	address
 1545403743	admindb	1545403743	admindb	\N	\N	ordernumber	mne_personnal	time
@@ -20958,7 +20960,6 @@ COPY mne_application.querycolnames (createdate, createuser, modifydate, modifyus
 1534140126	admindb	1534140126	admindb	\N	\N	refid	mne_crm	person_letter
 1534140126	admindb	1534140126	admindb	Referenzname	referenz name	refname	mne_crm	person_letter
 1534140126	admindb	1534140126	admindb	männlich	male	sex	mne_crm	person_letter
-1534140126	admindb	1534140126	admindb	\N	\N	tosign	mne_crm	person_letter
 1385429086	admindb	1385429086	admindb	Projekt DB	project DB	sumactmargincomp	mne_crm	orderproductcost
 1385429086	admindb	1385429086	admindb	\N	\N	result	mne_crm	orderproductcost
 1264759887	admindb	1264759887	admindb	\N	\N	modifydate	mne_warehouse	storage_personnal
@@ -21593,6 +21594,7 @@ COPY mne_application.querycolnames (createdate, createuser, modifydate, modifyus
 1382373501	admindb	1382373501	admindb	Lagerteil	part	partname	mne_warehouse	orderproductpart
 1338553773	admindb	1338553773	admindb	Netto	amount net	sumnet	mne_crm	orderproduct_sum
 1338553773	admindb	1338553773	admindb	Brutto	amount gross	sumgross	mne_crm	orderproduct_sum
+1534144680	admindb	1534144680	admindb	\N	\N	addressid	mne_crm	person_buissiness
 1338553773	admindb	1338553773	admindb	MWST	amount acutal vat	sumabsvat	mne_crm	orderproduct_sum
 1338553773	admindb	1338553773	admindb	Währung	currency	currency	mne_crm	orderproduct_sum
 1338553773	admindb	1338553773	admindb	\N	\N	companyid	mne_crm	orderproduct_sum
@@ -21745,7 +21747,6 @@ COPY mne_application.querycolnames (createdate, createuser, modifydate, modifyus
 1534144680	admindb	1534144680	admindb	Referenzname	referenz name	refname	mne_crm	person_buissiness
 1534144680	admindb	1534144680	admindb	männlich	male	sex	mne_crm	person_buissiness
 1534144680	admindb	1534144680	admindb	\N	\N	tosign	mne_crm	person_buissiness
-1534144680	admindb	1534144680	admindb	\N	\N	addressid	mne_crm	person_buissiness
 1534144680	admindb	1534144680	admindb	\N	\N	cityid	mne_crm	person_buissiness
 1534144680	admindb	1534144680	admindb	\N	\N	letterlastname	mne_crm	person_buissiness
 1544537726	admindb	1544537726	admindb	\N	\N	partid	mne_warehouse	partstoragemasterdata
@@ -21972,7 +21973,6 @@ COPY mne_application.querycolnames (createdate, createuser, modifydate, modifyus
 1534144736	admindb	1534144736	admindb	\N	\N	cityid	mne_crm	person_invoice
 1534144736	admindb	1534144736	admindb	\N	\N	letterlastname	mne_crm	person_invoice
 1534144736	admindb	1534144736	admindb	\N	\N	owner	mne_crm	person_invoice
-1534144736	admindb	1534144736	admindb	\N	\N	ownerid	mne_crm	person_invoice
 1534144736	admindb	1534144736	admindb	\N	\N	subject	mne_crm	person_invoice
 1534144736	admindb	1534144736	admindb	\N	\N	lettername	mne_crm	person_invoice
 1534144736	admindb	1534144736	admindb	\N	\N	letterid	mne_crm	person_invoice
@@ -22120,10 +22120,12 @@ COPY mne_application.querycolnames (createdate, createuser, modifydate, modifyus
 1449582738	admindb	1449582738	admindb	Login	login	loginname	mne_personnal	ordertime_quarter
 1449582738	admindb	1449582738	admindb	Name	name	fullname	mne_personnal	ordertime_quarter
 1449582738	admindb	1449582738	admindb	Dauer	duration	duration	mne_personnal	ordertime_quarter
+1472214992	admindb	1472214992	admindb	\N	\N	orderid	mne_personnal	timeorder_single
 1449582738	admindb	1449582738	admindb	Dauer	duration	dduration	mne_personnal	ordertime_quarter
 1449582738	admindb	1449582738	admindb	\N	\N	-start	mne_personnal	ordertime_quarter
 1479483372	admindb	1479483372	admindb	\N	\N	sorting	mne_warehouse	orderproductpart_list
 1479483372	admindb	1479483372	admindb	\N	\N	rowtyp	mne_warehouse	orderproductpart_list
+1515764924	admindb	1515764924	admindb	\N	\N	depend	mne_application	weblet_detail
 1479483372	admindb	1479483372	admindb	\N	\N	position	mne_warehouse	orderproductpart_list
 1479483372	admindb	1479483372	admindb	\N	\N	orderid	mne_warehouse	orderproductpart_list
 1479483372	admindb	1479483372	admindb	\N	\N	orderproductid	mne_warehouse	orderproductpart_list
@@ -22195,7 +22197,6 @@ COPY mne_application.querycolnames (createdate, createuser, modifydate, modifyus
 1479483372	admindb	1479483372	admindb	Betreuer	\N	pownerid	mne_warehouse	orderproductpart_list
 1479483372	admindb	1479483372	admindb	Betreuer	\N	powner	mne_warehouse	orderproductpart_list
 1479483372	admindb	1479483372	admindb	Betreuerfirma	\N	pownercompany	mne_warehouse	orderproductpart_list
-1472214992	admindb	1472214992	admindb	\N	\N	orderid	mne_personnal	timeorder_single
 1472214992	admindb	1472214992	admindb	\N	\N	ordernumber	mne_personnal	timeorder_single
 1472214992	admindb	1472214992	admindb	\N	\N	orderdescription	mne_personnal	timeorder_single
 1472214992	admindb	1472214992	admindb	Kunde	customer	refname	mne_personnal	timeorder_single
@@ -22279,7 +22280,6 @@ COPY mne_application.querycolnames (createdate, createuser, modifydate, modifyus
 1515764924	admindb	1515764924	admindb	\N	\N	htmlcomposeid	mne_application	weblet_detail
 1515764924	admindb	1515764924	admindb	\N	\N	name	mne_application	weblet_detail
 1515764924	admindb	1515764924	admindb	\N	\N	id	mne_application	weblet_detail
-1515764924	admindb	1515764924	admindb	\N	\N	depend	mne_application	weblet_detail
 1515764924	admindb	1515764924	admindb	\N	\N	position	mne_application	weblet_detail
 1515764924	admindb	1515764924	admindb	\N	\N	subposition	mne_application	weblet_detail
 1515764924	admindb	1515764924	admindb	\N	\N	path	mne_application	weblet_detail
@@ -22470,6 +22470,14 @@ COPY mne_application.querycolnames (createdate, createuser, modifydate, modifyus
 --
 
 COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuser, tabnum, colnum, queryid, fieldtyp, lang, colid, field, format, groupby, cannull, musthaving) FROM stdin;
+1601458426	admindb	1601458426	admindb	5	25	506574930000	1	0	open	open		t	f	f
+1604300501	admindb	1604300501	admindb	0	1	4dc932260000	4	0	vyear	vyear		t	f	f
+1593692423	admindb	1593692423	admindb	-1	2	4b1cfad30000	2	0	parentid	''		f	f	f
+1544598938	admindb	1544598938	admindb	2	16	4ed4a7c50000	2	0	part	part		t	f	f
+1608287743	admindb	1608287743	admindb	12	24	4ce4ee6a0000	2	0	typeparentid	parentid		f	t	f
+1600076712	admindb	1600076712	admindb	1	6	505ad0e70000	2	0	name	name		f	f	f
+1347869187	admindb	1347869187	admindb	0	2	5056d0e30000	2	1	text	text		f	f	f
+1479483507	admindb	1479483507	admindb	0	9	5065c79d0000	2	0	offerproducttype	offerproducttype		t	f	f
 1534144736	admindb	1534144736	admindb	135	13	49b6d07f0000	2	0	email	email		f	f	f
 1593692423	admindb	1593692423	admindb	-1	6	4b1cfad30000	2	0	pos	''		f	f	f
 1479483531	admindb	1479483531	admindb	-1	23	5065c9a30000	2	0	part	null		f	f	f
@@ -22747,7 +22755,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1601458426	admindb	1601458426	admindb	-1	22	506574930000	2	0	skillid	null		f	f	f
 1601458426	admindb	1601458426	admindb	-1	23	506574930000	2	0	skilltext	null		f	f	f
 1601458426	admindb	1601458426	admindb	-1	24	506574930000	1	0	ready	CAST( null AS BOOLEAN)		f	f	f
-1601458426	admindb	1601458426	admindb	5	25	506574930000	1	0	open	open		t	f	f
 1601458426	admindb	1601458426	admindb	-1	26	506574930000	2	0	refname	CASE WHEN #10.companyid IS NULL THEN #14.firstname || ' ' || #14.lastname ELSE #10.name END		t	f	f
 1601458426	admindb	1601458426	admindb	-1	27	506574930000	6	0	timecostsumset	SUM( ( #3.setduration / 3600.0 ) * #16.unitcost * #0.count )	%.2f	f	f	f
 1601458426	admindb	1601458426	admindb	18	28	506574930000	2	0	timecurrency	currency		t	f	f
@@ -22824,7 +22831,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1601276304	admindb	1601276304	admindb	0	15	5065a4600000	2	0	productnumber	productnumber		t	f	f
 1604299995	admindb	1604299995	admindb	2	11	4dc8eb0f0000	2	0	personid	personid		t	t	f
 1604300501	admindb	1604300501	admindb	-1	0	4dc932260000	2	0	sortcol	2		f	f	f
-1604300501	admindb	1604300501	admindb	0	1	4dc932260000	4	0	vyear	vyear		t	f	f
 1604300501	admindb	1604300501	admindb	0	2	4dc932260000	4	0	vmonth	vmonth		t	f	f
 1604300501	admindb	1604300501	admindb	-1	3	4dc932260000	4	0	vday	CAST ( NULL AS INTEGER)		f	f	f
 1604300501	admindb	1604300501	admindb	-1	4	4dc932260000	1007	0	vfullday	NULL		f	f	f
@@ -22994,6 +23000,7 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1534140496	admindb	1534140496	admindb	-1	8	mne_crmbase_letter_ref_1	2	0	country	CASE WHEN #23.personid IS NOT NULL THEN CASE WHEN #35.addressid IS NOT NULL THEN CASE WHEN (select countrycarcode from mne_settings) <> #39.countrycarcode THEN #39.name_#mne_langid# ELSE '' END ELSE CASE WHEN (select countrycarcode from mne_settings) <> #109.countrycarcode THEN #109.name_#mne_langid# ELSE '' END END ELSE CASE WHEN (select countrycarcode from mne_settings) <> #120.countrycarcode THEN #120.name_#mne_langid# ELSE '' END END		f	f	f
 1534140496	admindb	1534140496	admindb	-1	9	mne_crmbase_letter_ref_1	2	0	continent	CASE WHEN #23.personid IS NOT NULL THEN CASE WHEN #35.addressid IS NOT NULL THEN CASE WHEN (select countrycarcode from mne_settings) <> #39.countrycarcode THEN #39.continent_#mne_langid# ELSE '' END ELSE CASE WHEN (select countrycarcode from mne_settings) <> #109.countrycarcode THEN #109.continent_#mne_langid# ELSE '' END END ELSE CASE WHEN (select countrycarcode from mne_settings) <> #120.countrycarcode THEN #120.continent_#mne_langid# ELSE '' END END		f	f	f
 1534140496	admindb	1534140496	admindb	-1	10	mne_crmbase_letter_ref_1	2	0	countrycarcode	CASE WHEN #23.personid IS NOT NULL THEN CASE WHEN #35.addressid IS NOT NULL THEN CASE WHEN (select countrycarcode from mne_settings) <> #39.countrycarcode THEN #39.countrycarcode ELSE '' END ELSE CASE WHEN (select countrycarcode from mne_settings) <> #109.countrycarcode THEN #109.countrycarcode ELSE '' END END ELSE CASE WHEN (select countrycarcode from mne_settings) <> #120.countrycarcode THEN #120.countrycarcode ELSE '' END END		f	f	f
+1603345954	admindb	1603345954	admindb	361	9	mne_finance_invoice_detail_1	4	0	paytime	paytime		f	t	f
 1534140496	admindb	1534140496	admindb	-1	11	mne_crmbase_letter_ref_1	2	0	tosign	CASE WHEN #23.personid IS NOT NULL THEN #23.sign ELSE '' END 		f	f	f
 1534140496	admindb	1534140496	admindb	-1	12	mne_crmbase_letter_ref_1	2	0	fromsign	(select sign from mne_crm.person p, mne_crm.personowndata d where p.personid = d.personid and d.loginname = session_user )		f	f	f
 1534140496	admindb	1534140496	admindb	-1	13	mne_crmbase_letter_ref_1	2	0	lettersalutation	CASE WHEN #23.personid IS NOT NULL THEN ((CASE WHEN #23.sex = 1 THEN '#mne_lang#Sehr geehrter Herr#' ELSE '#mne_lang#Sehr geehrte Frau#' END )  || ' ' || #23.lastname) ELSE '' END		f	f	f
@@ -23032,6 +23039,7 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1545403743	admindb	1545403743	admindb	0	4	4a4b280f0000	2	0	comment	comment		f	t	f
 1545403743	admindb	1545403743	admindb	-1	5	4a4b280f0000	1001	0	date	mne_catalog.epoch_day(#0.start)		f	f	f
 1545403743	admindb	1545403743	admindb	-1	6	4a4b280f0000	1003	0	clocktime	mne_catalog.epoch_time(#0.start)		f	f	f
+1608125748	admindb	1608125748	admindb	70	22	4b84e2b50000	2	0	parttype	parttype		f	f	f
 1545403743	admindb	1545403743	admindb	-1	7	4a4b280f0000	1003	0	clocktimeend	mne_catalog.epoch_time(#0.start + #0.duration)		f	f	f
 1545403743	admindb	1545403743	admindb	-1	8	4a4b280f0000	2	0	month	mne_catalog.epoch_format(#0.start, 'MM')		f	f	f
 1545403743	admindb	1545403743	admindb	-1	9	4a4b280f0000	2	0	year	mne_catalog.epoch_format(#0.start, 'yyyy')		f	f	f
@@ -23099,7 +23107,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1608125748	admindb	1608125748	admindb	9	19	4b84e2b50000	2	0	orderdescription	description		f	f	f
 1608125748	admindb	1608125748	admindb	70	20	4b84e2b50000	2	0	partid	partid		f	f	f
 1608125748	admindb	1608125748	admindb	70	21	4b84e2b50000	2	0	part	part		f	f	f
-1608125748	admindb	1608125748	admindb	70	22	4b84e2b50000	2	0	parttype	parttype		f	f	f
 1608125748	admindb	1608125748	admindb	-1	23	4b84e2b50000	2	0	partname	#70.part || ' ' || #70.parttype		f	f	f
 1608125748	admindb	1608125748	admindb	66	24	4b84e2b50000	1001	0	deliverydate	deliverydate		f	f	f
 1608125748	admindb	1608125748	admindb	31	25	4b84e2b50000	2	0	storage	description		f	f	f
@@ -23187,7 +23194,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1603345954	admindb	1603345954	admindb	142	6	mne_finance_invoice_detail_1	2	0	ordernumber	ordernumber		f	f	f
 1603345954	admindb	1603345954	admindb	260	7	mne_finance_invoice_detail_1	2	0	refid	companyid		f	f	f
 1603345954	admindb	1603345954	admindb	142	8	mne_finance_invoice_detail_1	4	0	withvat	withvat		f	f	f
-1603345954	admindb	1603345954	admindb	361	9	mne_finance_invoice_detail_1	4	0	paytime	paytime		f	t	f
 1608125748	admindb	1608125748	admindb	-1	35	4b84e2b50000	2	0	fullname	#44.firstname || ' ' || #44.lastname		f	f	f
 1608125748	admindb	1608125748	admindb	-1	36	4b84e2b50000	1	0	swaped	#0.relocationid IS NULL		f	f	f
 1608125748	admindb	1608125748	admindb	-1	37	4b84e2b50000	1	0	fetched	#24.storagelocationid IS NULL		f	f	f
@@ -23228,6 +23234,12 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1600179117	admindb	1600179117	admindb	-1	18	mne_crmbase_offer_detail_1	2	0	city	CASE WHEN NOT #110.personid IS NULL THEN CASE WHEN NOT #117.addressid IS NULL THEN #119.name ELSE #189.name END ELSE CASE WHEN NOT #16.addressid IS NULL THEN #18.name  WHEN NOT #80.addressid IS NULL THEN #82.name ELSE #95.name END END		f	f	f
 1600179117	admindb	1600179117	admindb	-1	19	mne_crmbase_offer_detail_1	2	0	postcode	CASE WHEN NOT #110.personid IS NULL THEN CASE WHEN NOT #117.addressid IS NULL THEN #119.postcode ELSE #189.postcode END ELSE CASE WHEN NOT #16.addressid IS NULL THEN #18.postcode  WHEN NOT #80.addressid IS NULL THEN #82.postcode ELSE #95.postcode END END		f	f	f
 1600179117	admindb	1600179117	admindb	-1	20	mne_crmbase_offer_detail_1	2	0	country	CASE WHEN NOT #110.personid IS NULL THEN CASE WHEN NOT #117.addressid IS NULL THEN CASE WHEN (select countrycarcode from mne_settings) <> #121.countrycarcode THEN #121.name_#mne_langid# ELSE '' END ELSE CASE WHEN (select countrycarcode from mne_settings) <> #191.countrycarcode THEN #191.name_#mne_langid# ELSE '' END END ELSE CASE WHEN NOT #16.addressid IS NULL THEN CASE WHEN (select countrycarcode from mne_settings) <> #86.countrycarcode THEN #86.name_#mne_langid# ELSE '' END WHEN NOT #80.addressid IS NULL THEN CASE WHEN (select countrycarcode from mne_settings) <> #91.countrycarcode THEN #91.name_#mne_langid# ELSE '' END ELSE CASE WHEN (select countrycarcode from mne_settings) <> #109.countrycarcode THEN #109.name_#mne_langid# ELSE '' END END END		f	f	f
+1600179117	admindb	1600179117	admindb	366	44	mne_crmbase_offer_detail_1	2	0	uownpostbox	postbox		f	f	f
+1600179117	admindb	1600179117	admindb	366	45	mne_crmbase_offer_detail_1	2	0	uownstreet	street		f	f	f
+1600179117	admindb	1600179117	admindb	381	46	mne_crmbase_offer_detail_1	2	0	uowncity	name		f	f	f
+1600179117	admindb	1600179117	admindb	385	49	mne_crmbase_offer_detail_1	2	0	uowncountrycarcode	countrycarcode		f	f	f
+1600179117	admindb	1600179117	admindb	385	50	mne_crmbase_offer_detail_1	2	0	uowncountryname_de	name_de		f	f	f
+1600179117	admindb	1600179117	admindb	385	51	mne_crmbase_offer_detail_1	2	0	uowncountryname_en	name_en		f	f	f
 1600179117	admindb	1600179117	admindb	-1	21	mne_crmbase_offer_detail_1	2	0	countrycarcode	CASE WHEN NOT #110.personid IS NULL THEN CASE WHEN NOT #117.addressid IS NULL THEN CASE WHEN (select countrycarcode from mne_settings) <> #121.countrycarcode THEN #121.countrycarcode ELSE '' END ELSE CASE WHEN (select countrycarcode from mne_settings) <> #191.countrycarcode THEN #191.countrycarcode ELSE '' END END ELSE CASE WHEN NOT #16.addressid IS NULL THEN CASE WHEN (select countrycarcode from mne_settings) <> #86.countrycarcode THEN #86.countrycarcode ELSE '' END WHEN NOT #80.addressid IS NULL THEN CASE WHEN (select countrycarcode from mne_settings) <> #91.countrycarcode THEN #91.countrycarcode ELSE '' END ELSE CASE WHEN (select countrycarcode from mne_settings) <> #109.countrycarcode THEN #109.countrycarcode ELSE '' END END END		f	f	f
 1600179117	admindb	1600179117	admindb	381	47	mne_crmbase_offer_detail_1	2	0	uownpostcode	postcode		f	f	f
 1600179117	admindb	1600179117	admindb	385	48	mne_crmbase_offer_detail_1	2	0	uownphoneprefix	phoneprefix		f	f	f
@@ -23274,12 +23286,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1600179117	admindb	1600179117	admindb	313	41	mne_crmbase_offer_detail_1	2	0	uownbank	bank		f	f	f
 1600179117	admindb	1600179117	admindb	313	42	mne_crmbase_offer_detail_1	2	0	uownblz	blz		f	f	f
 1600179117	admindb	1600179117	admindb	364	43	mne_crmbase_offer_detail_1	2	0	uowncompany	name		f	f	f
-1600179117	admindb	1600179117	admindb	366	44	mne_crmbase_offer_detail_1	2	0	uownpostbox	postbox		f	f	f
-1600179117	admindb	1600179117	admindb	366	45	mne_crmbase_offer_detail_1	2	0	uownstreet	street		f	f	f
-1600179117	admindb	1600179117	admindb	381	46	mne_crmbase_offer_detail_1	2	0	uowncity	name		f	f	f
-1600179117	admindb	1600179117	admindb	385	49	mne_crmbase_offer_detail_1	2	0	uowncountrycarcode	countrycarcode		f	f	f
-1600179117	admindb	1600179117	admindb	385	50	mne_crmbase_offer_detail_1	2	0	uowncountryname_de	name_de		f	f	f
-1600179117	admindb	1600179117	admindb	385	51	mne_crmbase_offer_detail_1	2	0	uowncountryname_en	name_en		f	f	f
 1600179117	admindb	1600179117	admindb	-1	52	mne_crmbase_offer_detail_1	2	0	uowntelefon	CASE WHEN substring(#371.telefon from 1 for 1 ) = '0' THEN substring(#371.telefon from 2 ) ELSE #371.telefon END		f	f	f
 1600179117	admindb	1600179117	admindb	371	53	mne_crmbase_offer_detail_1	1011	0	uownhttp	http		f	f	f
 1600179117	admindb	1600179117	admindb	371	54	mne_crmbase_offer_detail_1	2	0	uownfax	fax		f	f	f
@@ -23336,7 +23342,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1599140602	admindb	1599140602	admindb	-1	13	5f50be7f0000	1	0	canlogin	#6.usename is not null		f	f	f
 1593692423	admindb	1593692423	admindb	-1	0	4b1cfad30000	2	0	menuname	CASE WHEN NOT #2.companyid IS NULL THEN '#mne_lang#Firma' WHEN NOT #3.personid IS NULL THEN '#mne_lang#Person' ELSE '#mne_lang#Vorlage' END		f	f	f
 1593692423	admindb	1593692423	admindb	-1	1	4b1cfad30000	2	0	refid	'0'		f	f	f
-1593692423	admindb	1593692423	admindb	-1	2	4b1cfad30000	2	0	parentid	''		f	f	f
 1593692423	admindb	1593692423	admindb	-1	3	4b1cfad30000	2	0	menuid	CASE WHEN NOT #2.companyid IS NULL THEN '#mne_lang#Firma' WHEN NOT #3.personid IS NULL THEN '#mne_lang#Person' ELSE '#mne_lang#Vorlage' END		f	f	f
 1593692423	admindb	1593692423	admindb	-1	4	4b1cfad30000	2	0	item	CASE WHEN NOT #2.companyid IS NULL THEN '#mne_lang#Firma' WHEN NOT #3.personid IS NULL THEN '#mne_lang#Person' ELSE '#mne_lang#Vorlage' END		f	f	f
 1593692423	admindb	1593692423	admindb	-1	5	4b1cfad30000	2	0	parentname	''		f	f	f
@@ -23480,6 +23485,8 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1603345954	admindb	1603345954	admindb	914	54	mne_finance_invoice_detail_1	2	0	uownstreet	street		f	f	f
 1603345954	admindb	1603345954	admindb	0	55	mne_finance_invoice_detail_1	2	0	contactid	contactid		f	t	f
 1603345954	admindb	1603345954	admindb	0	56	mne_finance_invoice_detail_1	2	0	modifyuser	modifyuser		f	f	f
+1603345954	admindb	1603345954	admindb	929	69	mne_finance_invoice_detail_1	2	0	uownpostcode	postcode		f	f	f
+1597321185	admindb	1597321185	admindb	0	12	4b42ebc10000	4	0	modifydate	modifydate		f	f	f
 1603345954	admindb	1603345954	admindb	-1	57	mne_finance_invoice_detail_1	1	0	secondreminder	( #707.invoiced AND NOT #707.paid ) AND ( #707.reminder2 IS NULL ) AND ((((( #707.invoicetime + ( #361.paytime + 14 )* 86400 )  - (CAST(FLOOR(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP)) AS INTEGER)))) / 86400 + 1) < 0)  AND NOT #707.paid		f	f	f
 1603345954	admindb	1603345954	admindb	-1	58	mne_finance_invoice_detail_1	2	0	country	NULLIF( CASE WHEN #738.personid  IS NOT NULL THEN CASE WHEN #783.addressid IS NOT NULL THEN #886.name_#mne_langid# ELSE #888.name_#mne_langid# END WHEN #737.companyid IS NOT NULL THEN #890.name_#mne_langid# WHEN #420.personid IS NOT NULL THEN CASE WHEN #768.addressid IS NOT NULL THEN #892.name_#mne_langid# ELSE #492.name_#mne_langid# END ELSE #694.name_#mne_langid# END, ( SELECT tt0.name_#mne_langid# FROM mne_crm.country tt0, mne_settings tt1 WHERE tt0.countrycarcode = tt1.countrycarcode ))		f	f	f
 1608188280	admindb	1608188280	admindb	0	1	4ed76db80000	2	0	purchaseid	purchaseid		f	f	f
@@ -23537,7 +23544,7 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1603345954	admindb	1603345954	admindb	707	66	mne_finance_invoice_detail_1	4	0	lumpsum	lumpsum		f	f	f
 1603345954	admindb	1603345954	admindb	-1	67	mne_finance_invoice_detail_1	2	0	name	CASE WHEN #420.personid IS NOT NULL THEN #420.firstname || ' ' || #420.lastname ELSE #284.firstname || ' ' || #284.lastname END		f	f	f
 1603345954	admindb	1603345954	admindb	0	68	mne_finance_invoice_detail_1	1000	0	createdate	createdate		f	f	f
-1603345954	admindb	1603345954	admindb	929	69	mne_finance_invoice_detail_1	2	0	uownpostcode	postcode		f	f	f
+1605278963	admindb	1605278963	admindb	30	9	57befec30000	1003	0	wtime	wtime		f	f	f
 1603345954	admindb	1603345954	admindb	-1	70	mne_finance_invoice_detail_1	2	0	street	CASE WHEN #738.personid  IS NOT NULL THEN CASE WHEN #783.addressid IS NOT NULL THEN #783.street ELSE #803.street END WHEN #737.companyid IS NOT NULL THEN #842.street WHEN #420.personid  IS NOT NULL THEN CASE WHEN #768.addressid IS NOT NULL THEN #768.street ELSE #488.street END ELSE #690.street END		f	f	f
 1603345954	admindb	1603345954	admindb	-1	71	mne_finance_invoice_detail_1	1	0	thirdreminder	( #707.invoiced AND NOT #707.paid ) AND ( #707.reminder3 IS NULL ) AND ((((( #707.invoicetime + ( #361.paytime + 28 )* 86400 )  - (CAST(FLOOR(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP)) AS INTEGER)))) / 86400 + 1) < 0)  AND NOT #707.paid		f	f	f
 1603345954	admindb	1603345954	admindb	707	72	mne_finance_invoice_detail_1	1	0	invoiced	invoiced		f	f	f
@@ -23664,7 +23671,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1597321185	admindb	1597321185	admindb	2	8	4b42ebc10000	2	0	company	name		f	f	f
 1597321185	admindb	1597321185	admindb	-1	9	4b42ebc10000	1	0	companyown	true		f	f	f
 1597321185	admindb	1597321185	admindb	0	10	4b42ebc10000	4	0	createdate	createdate		f	f	f
-1597321185	admindb	1597321185	admindb	0	12	4b42ebc10000	4	0	modifydate	modifydate		f	f	f
 1597321185	admindb	1597321185	admindb	0	13	4b42ebc10000	2	0	modifyuser	modifyuser		f	f	f
 1597667547	admindb	1597667547	admindb	0	0	491b522b0000	2	0	cityid	cityid		f	f	f
 1597667547	admindb	1597667547	admindb	0	1	491b522b0000	2	0	countryid	countryid		f	t	f
@@ -23796,6 +23802,7 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1603455140	admindb	1603455140	admindb	-1	0	4a408b900000	2	0	typ	' ' || '#mne_lang#Rechnung'		f	f	f
 1603455140	admindb	1603455140	admindb	0	1	4a408b900000	1001	0	invoiceauto	invoiceauto		f	t	f
 1603455140	admindb	1603455140	admindb	-1	2	4a408b900000	2	0	ntyp	0		f	f	f
+1607510788	admindb	1607510788	admindb	11	23	4a8fe3910000	1000	0	start	start		f	f	f
 1603455140	admindb	1603455140	admindb	1	3	4a408b900000	2	0	invoiceid	invoiceid		f	f	f
 1603455140	admindb	1603455140	admindb	0	4	4a408b900000	1001	0	date	invoiceauto		f	t	f
 1603455140	admindb	1603455140	admindb	1	5	4a408b900000	4	0	invoicenum	num		f	f	f
@@ -24220,7 +24227,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1544598938	admindb	1544598938	admindb	-1	13	4ed4a7c50000	2	0	modifyuser	null		f	f	f
 1544598938	admindb	1544598938	admindb	1	14	4ed4a7c50000	4	0	orderdate	orderdate		t	t	f
 1544598938	admindb	1544598938	admindb	1	15	4ed4a7c50000	2	0	ordernumber	ordernumber		t	t	f
-1544598938	admindb	1544598938	admindb	2	16	4ed4a7c50000	2	0	part	part		t	f	f
 1544598938	admindb	1544598938	admindb	2	17	4ed4a7c50000	2	0	parttype	parttype		t	f	f
 1544598938	admindb	1544598938	admindb	-1	18	4ed4a7c50000	2	0	partname	#2.part || ' ' || #2.parttype		t	f	f
 1544598938	admindb	1544598938	admindb	-1	19	4ed4a7c50000	2	0	vendor	COALESCE(#6.name,'#mne_lang#Kein Lieferant')		t	f	f
@@ -24393,7 +24399,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1605278963	admindb	1605278963	admindb	-1	6	57befec30000	2	0	fullname	#1.firstname || ' ' || #1.lastname		f	f	f
 1605278963	admindb	1605278963	admindb	-1	7	57befec30000	4	0	canlogin	CASE WHEN #8.rolcanlogin THEN 1 ELSE 0 END		f	f	f
 1605278963	admindb	1605278963	admindb	30	8	57befec30000	6	0	unitcost	unitcost	%.2f	f	f	f
-1605278963	admindb	1605278963	admindb	30	9	57befec30000	1003	0	wtime	wtime		f	f	f
 1605278963	admindb	1605278963	admindb	15	10	57befec30000	2	0	currency	currency		f	f	f
 1605278963	admindb	1605278963	admindb	8	11	57befec30000	2	0	username	rolname		f	t	f
 1605278963	admindb	1605278963	admindb	-1	12	57befec30000	2	0	adminpassword	''		f	f	f
@@ -24587,7 +24592,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1598603028	admindb	1598603028	admindb	4	13	54607d0b0000	4	0	modifydate	modifydate		f	f	f
 1598603028	admindb	1598603028	admindb	4	14	54607d0b0000	2	0	modifyuser	modifyuser		f	f	f
 1607510788	admindb	1607510788	admindb	-1	22	4a8fe3910000	1020	0	color	COALESCE(NULLIF(#58.color,''),mne_catalog.color(0))		f	f	f
-1607510788	admindb	1607510788	admindb	11	23	4a8fe3910000	1000	0	start	start		f	f	f
 1607510788	admindb	1607510788	admindb	-1	24	4a8fe3910000	1000	0	end	mne_personnal.slotend(#11.start, #11.duration, #61.slotstart, #61.slotsize, #61.slotcount)		f	f	f
 1607510788	admindb	1607510788	admindb	11	25	4a8fe3910000	1003	0	duration	duration		f	f	f
 1607510788	admindb	1607510788	admindb	-1	26	4a8fe3910000	1003	0	timeneeded	CAST(( #3.setduration * #0.count) - COALESCE(#11.duration, 0) AS INTEGER)		f	f	f
@@ -24939,11 +24943,19 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1647331369	admindb	1647331369	admindb	-1	16	mne_crmbase_order_detail_1	2	0	contactname	CASE WHEN #147.personid IS NULL THEN #47.firstname || ' ' || #47.lastname ELSE '' END		f	f	f
 1647331369	admindb	1647331369	admindb	-1	17	mne_crmbase_order_detail_1	2	0	company	CASE WHEN #147.personid IS NULL THEN #33.name ELSE #147.firstname || ' ' || #147.lastname END		f	f	f
 1647331369	admindb	1647331369	admindb	-1	18	mne_crmbase_order_detail_1	2	0	postbox	CASE WHEN NOT #147.personid IS NULL THEN CASE WHEN NOT #154.addressid IS NULL THEN #154.postbox ELSE #224.postbox END ELSE CASE WHEN NOT #78.addressid IS NULL THEN #78.postbox WHEN NOT #104.addressid IS NULL THEN #104.postbox ELSE #129.postbox END END		f	f	f
+1605600809	admindb	1605600809	admindb	0	0	4e0c922a0000	2	0	skillid	skillid		f	f	f
+1347950513	admindb	1347950513	admindb	0	0	4b4f2f900000	2	0	productpartid	productpartid		f	f	f
 1647331369	admindb	1647331369	admindb	-1	19	mne_crmbase_order_detail_1	2	0	street	CASE WHEN NOT #147.personid IS NULL THEN CASE WHEN NOT #154.addressid IS NULL THEN #154.street ELSE #224.street END ELSE CASE WHEN NOT #78.addressid IS NULL THEN #78.street WHEN NOT #104.addressid IS NULL THEN #104.street ELSE #129.street END END		f	f	f
 1647331369	admindb	1647331369	admindb	-1	20	mne_crmbase_order_detail_1	2	0	city	CASE WHEN NOT #147.personid IS NULL THEN CASE WHEN NOT #154.addressid IS NULL THEN #156.name ELSE #226.name END ELSE CASE WHEN NOT #78.addressid IS NULL THEN #131.name  WHEN NOT #104.addressid IS NULL THEN #136.name ELSE #141.name END END		f	f	f
 1647331369	admindb	1647331369	admindb	-1	21	mne_crmbase_order_detail_1	2	0	postcode	CASE WHEN NOT #147.personid IS NULL THEN CASE WHEN NOT #154.addressid IS NULL THEN #156.postcode ELSE #226.postcode END ELSE CASE WHEN NOT #78.addressid IS NULL THEN #131.postcode  WHEN NOT #104.addressid IS NULL THEN #136.postcode ELSE #141.postcode END END		f	f	f
 1647331369	admindb	1647331369	admindb	-1	22	mne_crmbase_order_detail_1	2	0	country	CASE WHEN NOT #147.personid IS NULL THEN CASE WHEN NOT #154.addressid IS NULL THEN CASE WHEN (select countrycarcode from mne_settings) <> #158.countrycarcode THEN #158.name_#mne_langid# ELSE '' END ELSE CASE WHEN (select countrycarcode from mne_settings) <> #228.countrycarcode THEN #228.name_#mne_langid# ELSE '' END END ELSE CASE WHEN NOT #78.addressid IS NULL THEN CASE WHEN (select countrycarcode from mne_settings) <> #133.countrycarcode THEN #133.name_#mne_langid# ELSE '' END WHEN NOT #104.addressid IS NULL THEN CASE WHEN (select countrycarcode from mne_settings) <> #138.countrycarcode THEN #138.name_#mne_langid# ELSE '' END ELSE CASE WHEN (select countrycarcode from mne_settings) <> #143.countrycarcode THEN #143.name_#mne_langid# ELSE '' END END END		f	f	f
 1647331369	admindb	1647331369	admindb	-1	23	mne_crmbase_order_detail_1	2	0	continent	CASE WHEN NOT #147.personid IS NULL THEN CASE WHEN NOT #154.addressid IS NULL THEN CASE WHEN (select countrycarcode from mne_settings) <> #158.countrycarcode THEN #158.continent_#mne_langid# ELSE '' END ELSE CASE WHEN (select countrycarcode from mne_settings) <> #228.countrycarcode THEN #228.continent_#mne_langid# ELSE '' END END ELSE CASE WHEN NOT #78.addressid IS NULL THEN CASE WHEN (select countrycarcode from mne_settings) <> #133.countrycarcode THEN #133.continent_#mne_langid# ELSE '' END WHEN NOT #104.addressid IS NULL THEN CASE WHEN (select countrycarcode from mne_settings) <> #138.countrycarcode THEN #138.continent_#mne_langid# ELSE '' END ELSE CASE WHEN (select countrycarcode from mne_settings) <> #143.countrycarcode THEN #143.continent_#mne_langid# ELSE '' END END END		f	f	f
+1605600809	admindb	1605600809	admindb	0	5	4e0c922a0000	6	0	unitcost	unitcost	%.2f	f	f	f
+1605600809	admindb	1605600809	admindb	1	6	4e0c922a0000	2	0	currency	currency		f	f	f
+1605600809	admindb	1605600809	admindb	0	7	4e0c922a0000	1000	0	createdate	createdate		f	f	f
+1605600809	admindb	1605600809	admindb	0	8	4e0c922a0000	2	0	createuser	createuser		f	f	f
+1605600809	admindb	1605600809	admindb	0	9	4e0c922a0000	1000	0	modifydate	modifydate		f	f	f
+1605600809	admindb	1605600809	admindb	0	10	4e0c922a0000	2	0	modifyuser	modifyuser		f	f	f
 1647331369	admindb	1647331369	admindb	-1	24	mne_crmbase_order_detail_1	2	0	contrycarcode	CASE WHEN NOT #147.personid IS NULL THEN CASE WHEN NOT #154.addressid IS NULL THEN CASE WHEN (select countrycarcode from mne_settings) <> #158.countrycarcode THEN #158.countrycarcode ELSE '' END ELSE CASE WHEN (select countrycarcode from mne_settings) <> #228.countrycarcode THEN #228.countrycarcode ELSE '' END END ELSE CASE WHEN NOT #78.addressid IS NULL THEN CASE WHEN (select countrycarcode from mne_settings) <> #133.countrycarcode THEN #133.countrycarcode ELSE '' END WHEN NOT #104.addressid IS NULL THEN CASE WHEN (select countrycarcode from mne_settings) <> #138.countrycarcode THEN #138.countrycarcode ELSE '' END ELSE CASE WHEN (select countrycarcode from mne_settings) <> #143.countrycarcode THEN #143.countrycarcode ELSE '' END END END		f	f	f
 1647331369	admindb	1647331369	admindb	0	25	mne_crmbase_order_detail_1	1000	0	createdate	createdate		f	f	f
 1647331369	admindb	1647331369	admindb	0	26	mne_crmbase_order_detail_1	2	0	createuser	createuser		f	f	f
@@ -24981,8 +24993,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1386585811	admindb	1386585811	admindb	10	1	4c5264930000	2	0	year	year		f	f	f
 1544598911	admindb	1544598911	admindb	0	5	4cd3af8b0000	4	0	count	count		f	f	f
 1382375860	admindb	1382375860	admindb	15	32	50659ba10000	1	0	open	open		t	f	f
-1605600809	admindb	1605600809	admindb	0	0	4e0c922a0000	2	0	skillid	skillid		f	f	f
-1347950513	admindb	1347950513	admindb	0	0	4b4f2f900000	2	0	productpartid	productpartid		f	f	f
 1347950513	admindb	1347950513	admindb	0	1	4b4f2f900000	2	0	productid	productid		f	f	f
 1347950513	admindb	1347950513	admindb	0	2	4b4f2f900000	2	0	partgroup	partgroup		f	f	f
 1347950513	admindb	1347950513	admindb	0	3	4b4f2f900000	2	0	partdescription	partdescription		f	f	f
@@ -25008,12 +25018,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1605600809	admindb	1605600809	admindb	0	2	4e0c922a0000	2	0	text_de	text_de		f	f	f
 1605600809	admindb	1605600809	admindb	0	3	4e0c922a0000	2	0	text_en	text_en		f	f	f
 1605600809	admindb	1605600809	admindb	0	4	4e0c922a0000	2	1	text	text		f	f	f
-1605600809	admindb	1605600809	admindb	0	5	4e0c922a0000	6	0	unitcost	unitcost	%.2f	f	f	f
-1605600809	admindb	1605600809	admindb	1	6	4e0c922a0000	2	0	currency	currency		f	f	f
-1605600809	admindb	1605600809	admindb	0	7	4e0c922a0000	1000	0	createdate	createdate		f	f	f
-1605600809	admindb	1605600809	admindb	0	8	4e0c922a0000	2	0	createuser	createuser		f	f	f
-1605600809	admindb	1605600809	admindb	0	9	4e0c922a0000	1000	0	modifydate	modifydate		f	f	f
-1605600809	admindb	1605600809	admindb	0	10	4e0c922a0000	2	0	modifyuser	modifyuser		f	f	f
 1605600809	admindb	1605600809	admindb	-1	11	4e0c922a0000	2	0	skillname	#0.sorting|| ' ' || #0.text_#mne_langid#		f	f	f
 1607941971	admindb	1607941971	admindb	-1	0	4af286640000	2	0	menuname	'main'		f	f	f
 1607941971	admindb	1607941971	admindb	-1	1	4af286640000	2	0	parentid	CASE WHEN #0.parentid is null THEN '' ELSE #0.parentid END		f	f	f
@@ -25076,6 +25080,8 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1608221689	admindb	1608221689	admindb	0	3	4ce4edc30000	2	0	item	treename		f	f	f
 1608221689	admindb	1608221689	admindb	0	4	4ce4edc30000	2	0	pos	treename		f	f	f
 1608221689	admindb	1608221689	admindb	-1	5	4ce4edc30000	2	0	typ	CASE WHEN NULLIF(#0.fixtureid,'') IS NULL THEN '' ELSE 'leaf' END		f	f	f
+1607950930	admindb	1607950930	admindb	-1	10	4def76ee0000	1	0	havevendor	mne_warehouse.parttree_havevendor(t0.treeid)		f	f	f
+1607950930	admindb	1607950930	admindb	3	11	4def76ee0000	2	0	part	part		f	f	f
 1608221689	admindb	1608221689	admindb	-1	6	4ce4edc30000	2	0	action	CASE WHEN NULLIF(#0.fixtureid,'') IS NULL\nTHEN '{ "action": "submenu", "parameter" : [ "", "", { "menuid" : "' || #0.treeid || '" } ] } '\nELSE\n'{ "action" : "show",\n"parameter" : [ "", "", { "parentid" : "' || COALESCE(#0.parentid,'') || '", "menuid" : "' || #0.treeid || '", "fixtureid" : "' || #0.fixtureid || '"} ] }'\nEND		f	f	f
 1608221689	admindb	1608221689	admindb	-1	7	4ce4edc30000	2	0	treepath	mne_catalog.path('mne_fixture.fixturetree',#0.treeid)		f	f	f
 1608221689	admindb	1608221689	admindb	-1	8	4ce4edc30000	2	0	fullpath	mne_catalog.path('mne_fixture.fixturetree',#0.treeid)\n|| ( CASE WHEN #0.parentid is null THEN '' ELSE '➔' END )\n|| #0.treename\n\n\n		f	f	f
@@ -25137,8 +25143,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1607950930	admindb	1607950930	admindb	0	7	4def76ee0000	2	0	partid	partid		f	t	f
 1607950930	admindb	1607950930	admindb	-1	8	4def76ee0000	2	0	typ	CASE WHEN NULLIF(#0.partid,'') IS NULL THEN '' ELSE 'leaf' END		f	f	f
 1607950930	admindb	1607950930	admindb	-1	9	4def76ee0000	2	0	action	CASE WHEN NULLIF(#0.partid,'') IS NULL\nTHEN '{ "action": "submenu", "parameter" : [ "", "", { "menuid" : "' || #0.treeid || '" } ] } '\nELSE\n'{ "action" : "show",\n"parameter" : [ "", "", { "parentid" : "' || COALESCE(#0.parentid,'') || '", "menuid" : "' || #0.treeid || '", "partid" : "' || #0.partid || '"} ] }'\nEND		f	f	f
-1607950930	admindb	1607950930	admindb	-1	10	4def76ee0000	1	0	havevendor	mne_warehouse.parttree_havevendor(t0.treeid)		f	f	f
-1607950930	admindb	1607950930	admindb	3	11	4def76ee0000	2	0	part	part		f	f	f
 1607950930	admindb	1607950930	admindb	3	12	4def76ee0000	2	0	parttype	parttype		f	f	f
 1607950930	admindb	1607950930	admindb	-1	13	4def76ee0000	2	0	partname	#3.part || ' ' || #3.parttype		f	f	f
 1608221689	admindb	1608221689	admindb	6	13	4ce4edc30000	2	0	ownerid	ownerid		f	t	f
@@ -25391,6 +25395,7 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1603198358	admindb	1603198358	admindb	0	20	mne_finance_delivery_detail_1	2	0	modifyuser	modifyuser		f	f	f
 1603198358	admindb	1603198358	admindb	39	21	mne_finance_delivery_detail_1	2	0	company	name		f	f	f
 1603198358	admindb	1603198358	admindb	-1	22	mne_finance_delivery_detail_1	2	0	contactname	CASE WHEN #348.personid IS NOT NULL THEN #348.firstname || ' ' || #348.lastname ELSE #344.firstname || ' ' || #344.lastname END		f	f	f
+1351145892	admindb	1351145892	admindb	-1	17	mne_crmbase_orderproduct_list_2	6	0	cvat	cast(null as double precision)		f	f	f
 1603198358	admindb	1603198358	admindb	-1	23	mne_finance_delivery_detail_1	2	0	postbox	CASE WHEN #348.personid IS NOT NULL THEN CASE WHEN #373.addressid IS NOT NULL THEN #373.postbox ELSE #501.postbox END ELSE CASE WHEN #544.addressid IS NOT NULL THEN #544.postbox WHEN #672.addressid IS NOT NULL THEN #672.postbox ELSE #703.postbox END END		f	f	f
 1603198358	admindb	1603198358	admindb	-1	24	mne_finance_delivery_detail_1	2	0	street	CASE WHEN #348.personid IS NOT NULL THEN CASE WHEN #373.addressid IS NOT NULL THEN #373.street ELSE #501.street END ELSE CASE WHEN #544.addressid IS NOT NULL THEN #544.street WHEN #672.addressid IS NOT NULL THEN #672.street ELSE #703.street END END		f	f	f
 1608276929	admindb	1608276929	admindb	2	4	5fdc573f0000	2	0	unit	unit		f	f	f
@@ -25452,7 +25457,7 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1351145892	admindb	1351145892	admindb	-1	14	mne_crmbase_orderproduct_list_2	6	0	cactcount	cast(null as integer)		f	f	f
 1351145892	admindb	1351145892	admindb	-1	15	mne_crmbase_orderproduct_list_2	2	0	productunit	null		f	f	f
 1351145892	admindb	1351145892	admindb	-1	16	mne_crmbase_orderproduct_list_2	6	0	resultvat	cast(null as double precision)	%.1f	f	f	f
-1351145892	admindb	1351145892	admindb	-1	17	mne_crmbase_orderproduct_list_2	6	0	cvat	cast(null as double precision)		f	f	f
+1382394995	admindb	1382449250	admindb	-1	3	5265620b0000	2	0	lastname	'#mne_lang#keiner#'		f	f	f
 1351145892	admindb	1351145892	admindb	-1	18	mne_crmbase_orderproduct_list_2	6	0	net	cast(null as double precision)		f	f	f
 1351145892	admindb	1351145892	admindb	1	19	mne_crmbase_orderproduct_list_2	4	0	withvat	withvat		t	f	f
 1351145892	admindb	1351145892	admindb	1	20	mne_crmbase_orderproduct_list_2	1	0	closed	closed		t	f	f
@@ -25485,6 +25490,8 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1351145892	admindb	1351145892	admindb	-1	28	mne_crmbase_orderproduct_list_2	6	0	sumproductcost	cast(null as double precision)	%.2f	f	f	f
 1351145892	admindb	1351145892	admindb	-1	29	mne_crmbase_orderproduct_list_2	6	0	sumnetcalc	sum(#0.count *  #0.productpricecalc )	%.2f	f	f	t
 1351145892	admindb	1351145892	admindb	-1	30	mne_crmbase_orderproduct_list_2	6	0	sumnetact	sum(#0.actcount *  #0.productpricecalc )	%.2f	f	f	t
+1603198358	admindb	1603198358	admindb	794	42	mne_finance_delivery_detail_1	2	0	uownpostcode	postcode		f	f	f
+1603198358	admindb	1603198358	admindb	794	43	mne_finance_delivery_detail_1	2	0	uowncity	name		f	f	f
 1603198358	admindb	1603198358	admindb	-1	26	mne_finance_delivery_detail_1	2	0	postcode	CASE WHEN #348.personid IS NOT NULL THEN CASE WHEN #373.addressid IS NOT NULL THEN #713.postcode ELSE #718.postcode END ELSE CASE WHEN #544.addressid IS NOT NULL THEN #708.postcode WHEN #672.addressid IS NOT NULL THEN #723.postcode ELSE #728.postcode END END		f	f	f
 1351145892	admindb	1351145892	admindb	-1	31	mne_crmbase_orderproduct_list_2	6	0	sumnetdelta	sum(( #0.count - #0.actcount) *  #0.productpricecalc )	%.2f	f	f	t
 1380109905	admindb	1380109905	admindb	0	2	mne_finance_deliverynotes_all_1	2	0	orderid	orderid		f	f	f
@@ -25511,7 +25518,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1382394995	admindb	1382394995	admindb	-1	9	5265620b0000	1	0	active	true		f	f	f
 1382394995	admindb	1382449220	admindb	-1	2	5265620b0000	2	0	firstname	'#mne_lang#keiner#'		f	f	f
 1382394995	admindb	1382449243	admindb	-1	6	5265620b0000	2	0	name	'#mne_lang#keiner#'		f	f	f
-1382394995	admindb	1382449250	admindb	-1	3	5265620b0000	2	0	lastname	'#mne_lang#keiner#'		f	f	f
 1603198358	admindb	1603198358	admindb	-1	27	mne_finance_delivery_detail_1	2	0	country	CASE WHEN #348.personid IS NOT NULL THEN CASE WHEN #373.addressid IS NOT NULL THEN CASE WHEN (select countrycarcode from mne_settings) <> #715.countrycarcode THEN #715.name_#mne_langid# ELSE '' END ELSE CASE WHEN (select countrycarcode from mne_settings) <> #720.countrycarcode THEN #720.name_#mne_langid# ELSE '' END END ELSE CASE WHEN #544.addressid IS NOT NULL THEN CASE WHEN (select countrycarcode from mne_settings) <> #710.countrycarcode THEN #710.name_#mne_langid# ELSE '' END WHEN #672.addressid IS NOT NULL THEN CASE WHEN (select countrycarcode from mne_settings) <> #725.countrycarcode THEN #725.name_#mne_langid# ELSE '' END ELSE CASE WHEN (select countrycarcode from mne_settings) <> #730.countrycarcode THEN #730.name_#mne_langid# ELSE '' END END END		f	f	f
 1385429086	admindb	1385429086	admindb	-1	13	4b54b34d0000	6	0	sumactcostcalc	#2.productcostcalc * #2.actcount	%.2f	f	f	f
 1601014240	admindb	1601014240	admindb	-1	0	4b4f6cbb0000	2	0	materialid	'1'		f	f	f
@@ -25529,8 +25535,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1603198358	admindb	1603198358	admindb	777	39	mne_finance_delivery_detail_1	2	0	uowncompany	name		f	f	f
 1603198358	admindb	1603198358	admindb	779	40	mne_finance_delivery_detail_1	2	0	uownpostbox	postbox		f	f	f
 1603198358	admindb	1603198358	admindb	779	41	mne_finance_delivery_detail_1	2	0	uownstreet	street		f	f	f
-1603198358	admindb	1603198358	admindb	794	42	mne_finance_delivery_detail_1	2	0	uownpostcode	postcode		f	f	f
-1603198358	admindb	1603198358	admindb	794	43	mne_finance_delivery_detail_1	2	0	uowncity	name		f	f	f
 1380109905	admindb	1380109905	admindb	0	0	mne_finance_deliverynotes_all_1	2	0	deliverynoteid	deliverynoteid		f	f	f
 1380109905	admindb	1380109905	admindb	2	1	mne_finance_deliverynotes_all_1	2	0	refid	refid		f	f	f
 1356191052	admindb	1356191052	admindb	-1	4	4b4c9c230000	4	0	version	1		f	f	f
@@ -25686,6 +25690,7 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1351235968	admindb	1351235968	admindb	1	11	mne_crmbase_offerproduct_sum_1	4	0	withvat	withvat		t	f	f
 1351235968	admindb	1351235968	admindb	-1	12	mne_crmbase_offerproduct_sum_1	6	0	sumnet	sum(#0.count *  #0.productprice )	%.2f	f	f	t
 1351235968	admindb	1351235968	admindb	-1	13	mne_crmbase_offerproduct_sum_1	6	0	sumgross	sum(#0.count * #0.productprice *( 1 + #1.withvat * (COALESCE(#0.productvat, (select vat from mne_crm.productdefault))/100.0) ))	%.2f	f	f	t
+1351243384	admindb	1351243384	admindb	0	16	mne_crmbase_offerproduct_list_1	6	0	productcost	productcost	%.2f	f	f	f
 1351235968	admindb	1351235968	admindb	-1	14	mne_crmbase_offerproduct_sum_1	6	0	sumabsvat	sum(#0.count * #0.productprice *( 1 + #1.withvat * ( COALESCE(#0.productvat, (select vat from mne_crm.productdefault))/100.0) )) - sum(#0.count * #0.productprice)	%.2f	f	f	t
 1351235968	admindb	1351235968	admindb	-1	15	mne_crmbase_offerproduct_sum_1	2	0	currency	COALESCE(#25.currency, #27.currency)		f	f	f
 1351235968	admindb	1351235968	admindb	0	16	mne_crmbase_offerproduct_sum_1	2	0	offerproducttype	offerproducttype		t	f	f
@@ -25720,7 +25725,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1608287743	admindb	1608287743	admindb	-1	21	4ce4ee6a0000	2	0	partname	COALESCE(#19.part || ' ' || #19.parttype, #6.part || ' ' || #6.parttype)		f	f	f
 1608287743	admindb	1608287743	admindb	-1	22	4ce4ee6a0000	2	0	deliverynotenumber	COALESCE(#7.deliverynotenumber,'')		f	f	f
 1608287743	admindb	1608287743	admindb	10	23	4ce4ee6a0000	2	0	partingoingid	partingoingid		f	f	f
-1608287743	admindb	1608287743	admindb	12	24	4ce4ee6a0000	2	0	typeparentid	parentid		f	t	f
 1608287743	admindb	1608287743	admindb	12	25	4ce4ee6a0000	2	0	typetreeid	treeid		f	f	f
 1608287743	admindb	1608287743	admindb	12	26	4ce4ee6a0000	2	0	typetreename	treename		f	f	f
 1356191052	admindb	1356191052	admindb	-1	5	4b4c9c230000	2	0	refname	''		f	f	f
@@ -25747,7 +25751,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1351243384	admindb	1351243384	admindb	-1	13	mne_crmbase_offerproduct_list_1	6	0	productresultvat	COALESCE(#0.productvat, (select vat from mne_crm.productdefault))	%.1f	f	f	f
 1351243384	admindb	1351243384	admindb	0	14	mne_crmbase_offerproduct_list_1	6	0	productvat	productvat		f	t	f
 1351243384	admindb	1351243384	admindb	0	15	mne_crmbase_offerproduct_list_1	6	0	productprice	productprice	%.2f	f	t	f
-1351243384	admindb	1351243384	admindb	0	16	mne_crmbase_offerproduct_list_1	6	0	productcost	productcost	%.2f	f	f	f
 1351243384	admindb	1351243384	admindb	1	17	mne_crmbase_offerproduct_list_1	4	0	withvat	withvat		f	f	f
 1351243384	admindb	1351243384	admindb	-1	18	mne_crmbase_offerproduct_list_1	6	0	sumnet	(#0.productprice * #0.count)	%.2f	f	f	f
 1351243384	admindb	1351243384	admindb	-1	19	mne_crmbase_offerproduct_list_1	6	0	sumgross	(#0.productprice  * #0.count * ( 1 + #1.withvat * (COALESCE(#0.productvat, (select vat from mne_crm.productdefault))/100)))	%.2f	f	f	f
@@ -25970,7 +25973,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1323078225	admindb	1323078225	admindb	9	8	4ed619570000	4	0	orderdate	orderdate		f	t	f
 1323078225	admindb	1323078225	admindb	9	9	4ed619570000	2	0	ordernumber	ordernumber		f	t	f
 1324461797	admindb	1324461797	admindb	-1	11	4bceb0630000	6	0	sumendpricecalc	SUM(#2.productpricecalc * #2.count )	%.2f	f	f	t
-1600076712	admindb	1600076712	admindb	1	6	505ad0e70000	2	0	name	name		f	f	f
 1324461797	admindb	1324461797	admindb	-1	12	4bceb0630000	6	0	sumactpricecalc	SUM(#2.productpricecalc * #2.actcount )	%.2f	f	f	t
 1324461797	admindb	1324461797	admindb	-1	13	4bceb0630000	6	0	sumendmargin	SUM(( #2.productprice - #2.productcost ) * #2.count )	%.2f	f	f	t
 1324461797	admindb	1324461797	admindb	-1	14	4bceb0630000	6	0	sumactmargin	SUM(( #2.productprice - #2.productcost ) * #2.actcount )	%.2f	f	f	t
@@ -26383,6 +26385,8 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1263290412	admindb	1263290412	admindb	0	4	4b4c2fc50000	4	0	createdate	createdate		f	f	f
 1263290412	admindb	1263290412	admindb	0	5	4b4c2fc50000	2	0	createuser	createuser		f	f	f
 1400478534	admindb	1400478534	admindb	0	10	4af408450000	4	0	z	z		f	f	f
+1338553773	admindb	1338553773	admindb	3	18	mne_crmbase_orderproduct_sum_1	2	0	companyid	companyid		t	f	f
+1338553773	admindb	1338553773	admindb	3	19	mne_crmbase_orderproduct_sum_1	2	0	company	name		t	f	f
 1338553773	admindb	1338553773	admindb	-1	15	mne_crmbase_orderproduct_sum_1	2	0	sumgross	sum(#0.count *  #0.productprice *( 1 + #1.withvat * (COALESCE(#0.productvat, (select vat from mne_crm.productdefault))/100.0) ))	%.2f	f	f	t
 1236853383	admindb	1236853383	admindb	0	0	mne_crmbase_companyperson_list_1	2	0	personid	personid		f	f	f
 1324462055	admindb	1324462055	admindb	-1	19	4bceb29e0000	2	0	result	CASE WHEN ( SUM( (#2.productprice * #2.actcount ) - mne_crm.orderproductcostact(#2.orderproductid) )) < 0 THEN 'negativ' ELSE 'positiv' END		f	f	f
@@ -26447,8 +26451,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1521215429	admindb	1521215429	admindb	-1	1	5aabe73c0000	2	0	ownertyp	'#mne_lang#Angebotsmaterial'		f	f	f
 1236853383	admindb	1236853383	admindb	24	2	mne_crmbase_companyperson_list_1	2	0	refid	companyid		f	f	f
 1338553773	admindb	1338553773	admindb	-1	17	mne_crmbase_orderproduct_sum_1	2	0	currency	COALESCE(#2.currency, #9.currency)		f	f	f
-1338553773	admindb	1338553773	admindb	3	18	mne_crmbase_orderproduct_sum_1	2	0	companyid	companyid		t	f	f
-1338553773	admindb	1338553773	admindb	3	19	mne_crmbase_orderproduct_sum_1	2	0	company	name		t	f	f
 1338553773	admindb	1338553773	admindb	7	20	mne_crmbase_orderproduct_sum_1	2	0	personid	personid		t	f	f
 1338553773	admindb	1338553773	admindb	7	21	mne_crmbase_orderproduct_sum_1	2	0	firstname	firstname		t	f	f
 1338553773	admindb	1338553773	admindb	7	22	mne_crmbase_orderproduct_sum_1	2	0	lastname	lastname		t	f	f
@@ -26611,6 +26613,7 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1306857001	admindb	1306857001	admindb	-1	8	4de50adf0000	1000	0	start	MIN(#0.start)		f	f	f
 1306857001	admindb	1306857001	admindb	-1	9	4de50adf0000	1000	0	end	MAX(#0.start)		f	f	f
 1534144660	admindb	1534144660	admindb	135	13	49b6ce440000	2	0	email	email		f	f	f
+1601458390	admindb	1601458390	admindb	0	8	506572480000	2	0	productname	productname		t	f	f
 1292853492	admindb	1292853492	admindb	-1	0	mne_crmbase_order_history_1	2	0	orderid	CASE WHEN #13.orderid IS NOT NULL THEN #13.orderid WHEN #138.orderid IS NOT NULL THEN #138.orderid WHEN #740.orderid IS NOT NULL THEN #740.orderid ELSE #746.orderid END 		f	f	f
 1292853492	admindb	1292853492	admindb	-1	1	mne_crmbase_order_history_1	2	0	tabname	CASE WHEN #0.tabname = 'order' THEN '#mne_lang#Auftrag' WHEN #0.tabname = 'orderproduct' THEN '#mne_lang#Produkt' WHEN #0.tabname = 'orderproducttime' THEN '#mne_lang#Zeitplannung' WHEN #0.tabname = 'orderproductpart' THEN '#mne_lang#Materialplannung' ELSE '' END		f	f	f
 1292853492	admindb	1292853492	admindb	138	2	mne_crmbase_order_history_1	2	0	productname	productname		f	f	f
@@ -26662,7 +26665,7 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1601458390	admindb	1601458390	admindb	-1	5	506572480000	4	0	position	MAX(#0.position) + 1		f	f	f
 1601458390	admindb	1601458390	admindb	17	6	506572480000	2	1	orderproducttypetext	text		t	f	f
 1601458390	admindb	1601458390	admindb	0	7	506572480000	2	0	productoptid	productoptid		t	t	f
-1601458390	admindb	1601458390	admindb	0	8	506572480000	2	0	productname	productname		t	f	f
+1524476722	admindb	1524476722	admindb	0	2	4ddcca360000	4	0	vday	vday		t	f	f
 1601458390	admindb	1601458390	admindb	0	9	506572480000	2	0	productnumber	productnumber		t	f	f
 1601458390	admindb	1601458390	admindb	5	10	506572480000	2	0	ordernumber	ordernumber		t	f	f
 1263819456	admindb	1263819456	admindb	-1	1	4b5459440000	6	0	productcost	mne_crm.productcost(#0.productid)	%.2f	f	f	f
@@ -26730,7 +26733,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1306422520	admindb	1306422520	admindb	0	12	mne_application_querycols_1	4	0	typ	fieldtyp		f	f	f
 1306422520	admindb	1306422520	admindb	0	13	mne_application_querycols_1	2	0	format	format		f	f	f
 1524476722	admindb	1524476722	admindb	0	1	4ddcca360000	4	0	month	vmonth		t	f	f
-1524476722	admindb	1524476722	admindb	0	2	4ddcca360000	4	0	vday	vday		t	f	f
 1524476722	admindb	1524476722	admindb	0	3	4ddcca360000	2	0	date	vfullday		t	f	f
 1305893645	admindb	1305893645	admindb	1	9	48cfa87a0000	2	0	text_en	text_en		f	f	f
 1305893645	admindb	1305893645	admindb	1	10	48cfa87a0000	1	0	custom	custom		f	f	f
@@ -26901,7 +26903,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1524486937	admindb	1524486937	admindb	26	8	4ddcc3480000	2	0	orderproductdescription	description		f	t	f
 1347869187	admindb	1347869187	admindb	0	0	5056d0e30000	2	0	schema	schemaname		f	f	f
 1347869187	admindb	1347869187	admindb	0	1	5056d0e30000	2	0	table	tablename		f	f	f
-1347869187	admindb	1347869187	admindb	0	2	5056d0e30000	2	1	text	text		f	f	f
 1400488426	admindb	1400488426	admindb	9	7	4cc83b060000	2	0	tostoragelocationid	storagelocationid		f	f	f
 1400488426	admindb	1400488426	admindb	31	8	4cc83b060000	2	0	tostorage	description		f	f	f
 1333377612	admindb	1333377612	admindb	12	0	49b93cdb0000	2	0	refid	companyid		f	f	f
@@ -27066,7 +27067,6 @@ COPY mne_application.querycolumns (createdate, createuser, modifydate, modifyuse
 1479483507	admindb	1479483507	admindb	0	6	5065c79d0000	2	0	offerproductid	offerproductid		t	f	f
 1479483507	admindb	1479483507	admindb	-1	7	5065c79d0000	2	0	offerproductpartid	null		f	f	f
 1479483507	admindb	1479483507	admindb	-1	8	5065c79d0000	2	0	rofferproductpartid	'##' || '##' ||'##' ||'##' ||'##' ||'##' ||'##' ||'##'		f	f	f
-1479483507	admindb	1479483507	admindb	0	9	5065c79d0000	2	0	offerproducttype	offerproducttype		t	f	f
 1479483507	admindb	1479483507	admindb	11	10	5065c79d0000	2	1	offerproducttypetext	text		t	f	f
 1479483507	admindb	1479483507	admindb	0	11	5065c79d0000	2	0	productname	productname		t	t	f
 1479483507	admindb	1479483507	admindb	-1	12	5065c79d0000	2	0	sortname	#0.position || ' ' || #0.productname		t	f	f
@@ -27457,6 +27457,9 @@ COPY mne_application.queryname (createdate, createuser, modifydate, modifyuser, 
 --
 
 COPY mne_application.querytables (createdate, createuser, modifydate, modifyuser, tabnum, typ, deep, tabid, queryid, fcols, op, tcols, tschema, ttab, joindefid) FROM stdin;
+1600074098	admindb	1600074098	admindb	0	1	0	0	4a8e42fc0000				mne_personnal	producttime	\N
+1591372373	admindb	1591372373	admindb	0	1	0	0	4ce24d130000				mne_application	menu	\N
+1388140628	admindb	1388140628	admindb	0	1	0	0	4cf4fb040000				mne_fixture	fixturetype	\N
 1347951913	admindb	1347951913	admindb	0	1	0	0	4b4f3e8d0000				mne_warehouse	productpart	\N
 1352985807	admindb	1352985807	admindb	0	1	0	0	4c64cc090000				mne_hoai	feeextra	\N
 1382471072	admindb	1382471072	admindb	0	1	0	0	5065c6fa0000				mne_crm	offerproduct	\N
@@ -27676,6 +27679,7 @@ COPY mne_application.querytables (createdate, createuser, modifydate, modifyuser
 1597752027	admindb	1597752027	admindb	37	1	2	3	mne_crmbase_person_detail_1		#0.companyid = #1.refid AND #1.addresstypid = '000000000001'		mne_crm	address	\N
 1597752027	admindb	1597752027	admindb	106	1	3	4	mne_crmbase_person_detail_1	cityid	=	cityid	mne_crm	city	41b9907b0004
 1597752027	admindb	1597752027	admindb	108	1	4	5	mne_crmbase_person_detail_1	countryid	=	countryid	mne_crm	country	4368c58a0003
+1603703327	admindb	1603703327	admindb	16	1	1	1	4d95f8250000	personid	=	userid	mne_personnal	time	4d95f7830000
 1597752027	admindb	1597752027	admindb	1	1	1	6	mne_crmbase_person_detail_1		#0.personid = #1.refid AND #1.addresstypid = '000000000001'		mne_crm	address	\N
 1597752027	admindb	1597752027	admindb	39	1	2	7	mne_crmbase_person_detail_1	cityid	=	cityid	mne_crm	city	41b9907b0004
 1597752027	admindb	1597752027	admindb	41	1	3	8	mne_crmbase_person_detail_1	countryid	=	countryid	mne_crm	country	4368c58a0003
@@ -27687,7 +27691,6 @@ COPY mne_application.querytables (createdate, createuser, modifydate, modifyuser
 1597752027	admindb	1597752027	admindb	301	1	1	13	mne_crmbase_person_detail_1	personid	=	personid	mne_crm	personowndata	57c550a30000
 1597752027	admindb	1597752027	admindb	323	1	2	14	mne_crmbase_person_detail_1	loginname	=	usename	pg_catalog	pg_user	57befa4f0000
 1597752027	admindb	1597752027	admindb	324	1	3	15	mne_crmbase_person_detail_1	usename	=	role	mne_catalog	dbaccessgroup	5052f3a00000
-1600074098	admindb	1600074098	admindb	0	1	0	0	4a8e42fc0000				mne_personnal	producttime	\N
 1600074098	admindb	1600074098	admindb	1	1	1	1	4a8e42fc0000	productid	=	productid	mne_crm	product	4a8e42b20000
 1600074098	admindb	1600074098	admindb	3	1	1	2	4a8e42fc0000	skillid	=	skillid	mne_personnal	skill	4b43925d0000
 1600074098	admindb	1600074098	admindb	4	1	2	3	4a8e42fc0000		#1.prefix = ''		mne_crm	companyown	\N
@@ -27737,7 +27740,6 @@ COPY mne_application.querytables (createdate, createuser, modifydate, modifyuser
 1603345954	admindb	1603345954	admindb	142	1	2	5	mne_finance_invoice_detail_1	orderid	=	orderid	mne_crm	order	4a3a08b40000
 1603345954	admindb	1603345954	admindb	420	1	3	6	mne_finance_invoice_detail_1	refid	=	personid	mne_crm	person	44c5c6770000
 1603345954	admindb	1603345954	admindb	475	1	4	7	mne_finance_invoice_detail_1	refid	=	companyid	mne_crm	company	4219bca00001
-1591372373	admindb	1591372373	admindb	0	1	0	0	4ce24d130000				mne_application	menu	\N
 1591372373	admindb	1591372373	admindb	1	1	1	1	4ce24d130000	itemname	=	id	mne_application	translate	475563520000
 1591372373	admindb	1591372373	admindb	2	1	1	2	4ce24d130000	ugroup	=	rolname	pg_catalog	pg_roles	4b459ba10000
 1591372373	admindb	1591372373	admindb	4	1	2	3	4ce24d130000		#0.oid = #1.roleid		pg_catalog	pg_auth_members	\N
@@ -27833,6 +27835,8 @@ COPY mne_application.querytables (createdate, createuser, modifydate, modifyuser
 1601276336	admindb	1601276336	admindb	14	1	1	7	5065a74c0000		#0.offerproducttype = #1.value AND #1.name = 'offerproducttype'		mne_application	selectlist	4b4f7ee00000
 1603345954	admindb	1603345954	admindb	737	1	2	30	mne_finance_invoice_detail_1	refid	=	companyid	mne_crm	company	4ca08e6f0000
 1603345954	admindb	1603345954	admindb	813	1	3	31	mne_finance_invoice_detail_1		/* haupt */ #0.companyid = #1.refid AND #1.addresstypid = '000000000001'		mne_crm	address	43b9480d0001
+1603703327	admindb	1603703327	admindb	35	1	1	2	4d95f8250000	personid	=	personid	mne_personnal	personowndatapublic	5242a6700000
+1603703341	admindb	1603703341	admindb	0	1	0	0	4d9979dd0000				mne_crm	person	\N
 1603345954	admindb	1603345954	admindb	842	1	3	32	mne_finance_invoice_detail_1		/* rechnung */ ( #1.refid = #0.companyid AND CAST ( #1.addresstypid AS INTEGER ) = ( SELECT MAX(CAST( addresstypid AS INTEGER )) FROM mne_crm.address a WHERE refid = #1.refid AND CAST(a.addresstypid AS INTEGER ) IN (1,40) ))		mne_crm	address	49b789ff0000
 1603345954	admindb	1603345954	admindb	851	1	4	33	mne_finance_invoice_detail_1	cityid	=	cityid	mne_crm	city	41b9907b0004
 1603345954	admindb	1603345954	admindb	890	1	5	34	mne_finance_invoice_detail_1	countryid	=	countryid	mne_crm	country	4368c58a0003
@@ -27885,9 +27889,6 @@ COPY mne_application.querytables (createdate, createuser, modifydate, modifyuser
 1603358746	admindb	1603358746	admindb	431	1	1	10	mne_finance_invoice_all_1	condid	=	invoicecondid	mne_shipment	invoicecond	4a3b82b00000
 1603358746	admindb	1603358746	admindb	469	1	1	11	mne_finance_invoice_all_1	invoiceid	=	invoiceid	mne_shipment	invoicerefcount	4ca16db40000
 1603703327	admindb	1603703327	admindb	0	1	0	0	4d95f8250000				mne_crm	person	\N
-1603703327	admindb	1603703327	admindb	16	1	1	1	4d95f8250000	personid	=	userid	mne_personnal	time	4d95f7830000
-1603703327	admindb	1603703327	admindb	35	1	1	2	4d95f8250000	personid	=	personid	mne_personnal	personowndatapublic	5242a6700000
-1603703341	admindb	1603703341	admindb	0	1	0	0	4d9979dd0000				mne_crm	person	\N
 1603703341	admindb	1603703341	admindb	16	1	1	1	4d9979dd0000	personid	=	userid	mne_personnal	time	4d95f7830000
 1603703341	admindb	1603703341	admindb	35	1	1	2	4d9979dd0000	personid	=	personid	mne_personnal	personowndatapublic	5242a6700000
 1603446263	admindb	1603446263	admindb	0	1	0	0	4a41dda90000				mne_shipment	invoicecond	\N
@@ -28284,6 +28285,7 @@ COPY mne_application.querytables (createdate, createuser, modifydate, modifyuser
 1382471065	admindb	1382471065	admindb	42	1	4	5	5065c6690000	partid	=	partid	mne_warehouse	partcost	4d01f6960000
 1382471065	admindb	1382471065	admindb	20	1	3	6	5065c6690000	fixturetypeid	=	fixturetypeid	mne_fixture	fixturetype	4cfe49c50000
 1382471065	admindb	1382471065	admindb	21	1	4	7	5065c6690000	fixturetypeid	=	fixturetypeid	mne_fixture	fixturetypecost	4cfde48a0000
+1380109582	admindb	1380109582	admindb	1	1	1	1	4cc1793d0000	userid	=	personid	mne_crm	person	4a4b28350000
 1351145892	admindb	1351145892	admindb	2	1	1	2	mne_crmbase_orderproduct_list_2	productcurrencyid	=	currencyid	mne_base	currency	443a94370000
 1351145892	admindb	1351145892	admindb	4	1	1	3	mne_crmbase_orderproduct_list_2		#1.prefix = ''		mne_crm	companyown	\N
 1382471065	admindb	1382471065	admindb	5	1	1	8	5065c6690000	offerproductid	=	offerproductid	mne_warehouse	offerproductpart	4b4f6a810000
@@ -28399,7 +28401,6 @@ COPY mne_application.querytables (createdate, createuser, modifydate, modifyuser
 1382471096	admindb	1382471096	admindb	3	1	1	1	5065ca950000	productid	=	productid	mne_crm	product	43a17a060002
 1382471096	admindb	1382471096	admindb	9	1	2	2	5065ca950000	productid	=	productid	mne_warehouse	productpart	4b4f2fcf0000
 1382471096	admindb	1382471096	admindb	10	1	3	3	5065ca950000		#1.prefix = ''		mne_crm	companyown	\N
-1380109582	admindb	1380109582	admindb	1	1	1	1	4cc1793d0000	userid	=	personid	mne_crm	person	4a4b28350000
 1380109582	admindb	1380109582	admindb	40	1	2	21	4cc1793d0000	personid	=	personid	mne_personnal	personowndatapublic	5242a6700000
 1380109905	admindb	1380109905	admindb	0	1	0	0	mne_finance_deliverynotes_all_1				mne_shipment	deliverynote	\N
 1380109905	admindb	1380109905	admindb	45	1	1	1	mne_finance_deliverynotes_all_1	ownerid	=	personid	mne_crm	person	\N
@@ -28534,6 +28535,7 @@ COPY mne_application.querytables (createdate, createuser, modifydate, modifyuser
 1224836999	admindb	1224836999	admindb	0	1	0	0	48bbe7280000				mne_application	joindef	\N
 1226406260	admindb	1226406260	admindb	0	1	0	0	491979530000				pg_catalog	pg_roles	\N
 1106061401	admindb	1106061401	admindb	0	1	0	0	mne_crmbase_country_1				mne_crm	country	\N
+1377236436	admindb	1377236436	admindb	3	1	2	2	506055be0000	userid	=	personid	mne_crm	person	4a4b28350000
 1106570498	admindb	1106570498	admindb	1	1	1	1	mne_crmbase_city_detail_1	countryid	=	countryid	mne_crm	country	4368c58a0003
 1127831494	admindb	1127831494	admindb	0	1	0	0	mne_crmbase_address_list_1				mne_crm	address	\N
 1127831494	admindb	1127831494	admindb	1	1	1	1	mne_crmbase_address_list_1	addresstypid	=	addresstypid	mne_crm	addresstyp	41f4fa5c0006
@@ -28647,7 +28649,6 @@ COPY mne_application.querytables (createdate, createuser, modifydate, modifyuser
 1545403743	admindb	1545403743	admindb	3	1	1	3	4a4b280f0000	orderproducttimeid	=	orderproducttimeid	mne_personnal	orderproducttime	4b2b41d80000
 1377236436	admindb	1377236436	admindb	0	1	0	0	506055be0000				mne_shipment	invoicetime	\N
 1377236436	admindb	1377236436	admindb	1	1	1	1	506055be0000	timeid	=	timeid	mne_personnal	time	506055580000
-1377236436	admindb	1377236436	admindb	3	1	2	2	506055be0000	userid	=	personid	mne_crm	person	4a4b28350000
 1377236436	admindb	1377236436	admindb	4	1	2	3	506055be0000	orderproducttimeid	=	orderproducttimeid	mne_personnal	orderproducttime	4b2b41d80000
 1377236436	admindb	1377236436	admindb	6	1	3	4	506055be0000	orderproductid	=	orderproductid	mne_crm	orderproduct	4a8e9b1a0000
 1377236436	admindb	1377236436	admindb	8	1	3	5	506055be0000	skillid	=	skillid	mne_personnal	skill	4b4392280000
@@ -28700,12 +28701,12 @@ COPY mne_application.querytables (createdate, createuser, modifydate, modifyuser
 1386585811	admindb	1386585811	admindb	99	1	2	18	4c5264930000	productid	=	productid	mne_crm	product	4c63a30b0000
 1386585811	admindb	1386585811	admindb	10	1	1	19	4c5264930000	law	=	feenameid	mne_hoai	feename	4c5268b20000
 1377236582	admindb	1377236582	admindb	17	1	1	7	508a81010000		#0.orderproducttype = #1.value AND #1.name = 'orderproducttype'		mne_application	selectlist	4b54c6d10000
-1388140628	admindb	1388140628	admindb	0	1	0	0	4cf4fb040000				mne_fixture	fixturetype	\N
 1388140628	admindb	1388140628	admindb	1	1	1	1	4cf4fb040000	fixturetypeid	=	fixturetypeid	mne_fixture	fixturetypetree	4cf4f5c70000
 1388140628	admindb	1388140628	admindb	3	1	2	2	4cf4fb040000	parentid	=	treeid	mne_fixture	fixturetypetree	4cf4f3d50000
 1388140628	admindb	1388140628	admindb	4	1	1	3	4cf4fb040000	fixturetypeid	=	fixturetypeid	mne_fixture	fixturetypecost	4cfde48a0000
 1410162428	admindb	1410162428	admindb	0	1	0	0	4ca1871f0000				mne_shipment	invoiceref	\N
 1410162428	admindb	1410162428	admindb	1	1	1	1	4ca1871f0000	refid	=	companyid	mne_crm	company	4ca08e6f0000
+1534140496	admindb	1534140496	admindb	109	1	5	5	mne_crmbase_letter_ref_1	countryid	=	countryid	mne_crm	country	4368c58a0003
 1410162428	admindb	1410162428	admindb	5	1	2	2	4ca1871f0000		/* haupt */ #0.companyid = #1.refid AND #1.addresstypid = '000000000001'		mne_crm	address	43b9480d0001
 1410162428	admindb	1410162428	admindb	15	1	3	3	4ca1871f0000	cityid	=	cityid	mne_crm	city	41b9907b0004
 1410162428	admindb	1410162428	admindb	2	1	1	4	4ca1871f0000	refid	=	personid	mne_crm	person	4ca08e850000
@@ -28746,6 +28747,7 @@ COPY mne_application.querytables (createdate, createuser, modifydate, modifyuser
 1410256508	admindb	1410256508	admindb	10	1	2	3	4f756c120000		#0.relnamespace = #1.oid		pg_catalog	pg_namespace	48cf6e440000
 1400488426	admindb	1400488426	admindb	0	1	0	0	4cc83b060000				mne_warehouse	partstoragelocation	\N
 1449571160	admindb	1449571160	admindb	0	1	0	0	4ff3f1700000				mne_application	yearday	\N
+1449571160	admindb	1449571160	admindb	1	1	1	1	4ff3f1700000		true		mne_personnal	personowndatapublic	\N
 1400488426	admindb	1400488426	admindb	9	1	1	1	4cc83b060000		#0.storagelocationid <> #1.storagelocationid AND ( #1.storagelocationtypid = 'universal' OR  #1.storagelocationtypid IS NULL )		mne_warehouse	storagelocation	\N
 1400488426	admindb	1400488426	admindb	12	1	2	2	4cc83b060000	storagelocationid	=	storagelocationid	mne_warehouse	partstorageloction_sum	4b8ec0e60000
 1400488426	admindb	1400488426	admindb	31	1	2	3	4cc83b060000		#0.storageid = #1.storageid		mne_warehouse	storage	\N
@@ -28799,7 +28801,6 @@ COPY mne_application.querytables (createdate, createuser, modifydate, modifyuser
 1534140126	admindb	1534140126	admindb	217	1	2	10	49b68e9c0000	personid	=	personid	mne_personnal	personowndatapublic	5242a6700000
 1534140126	admindb	1534140126	admindb	145	0	1	11	49b68e9c0000	personid	=	refid	mne_base	letter	44c717d60000
 1534140126	admindb	1534140126	admindb	195	1	1	12	49b68e9c0000	personid	=	personid	mne_personnal	personowndatapublic	5242a6700000
-1449571160	admindb	1449571160	admindb	1	1	1	1	4ff3f1700000		true		mne_personnal	personowndatapublic	\N
 1449571160	admindb	1449571160	admindb	4	1	2	2	4ff3f1700000	personid	=	personid	mne_crm	person	4ddcf1280000
 1449571160	admindb	1449571160	admindb	2	1	1	3	4ff3f1700000		#t1.personid = #1.userid AND #0.vfullday = mne_catalog.epoch_format(#1.start, 'DDMMYYYY')		mne_personnal	time	\N
 1449571160	admindb	1449571160	admindb	8	1	2	4	4ff3f1700000	orderproducttimeid	=	orderproducttimeid	mne_personnal	orderproducttime	4b2b41d80000
@@ -28817,7 +28818,6 @@ COPY mne_application.querytables (createdate, createuser, modifydate, modifyuser
 1534140496	admindb	1534140496	admindb	98	1	2	2	mne_crmbase_letter_ref_1	refid	=	companyid	mne_crm	company	4219bca00001
 1534140496	admindb	1534140496	admindb	105	1	3	3	mne_crmbase_letter_ref_1		#0.companyid = #1.refid AND #1.addresstypid = '000000000001'		mne_crm	address	\N
 1534140496	admindb	1534140496	admindb	107	1	4	4	mne_crmbase_letter_ref_1	cityid	=	cityid	mne_crm	city	41b9907b0004
-1534140496	admindb	1534140496	admindb	109	1	5	5	mne_crmbase_letter_ref_1	countryid	=	countryid	mne_crm	country	4368c58a0003
 1534144736	admindb	1534144736	admindb	106	1	3	4	49b6d07f0000	cityid	=	cityid	mne_crm	city	41b9907b0004
 1534140496	admindb	1534140496	admindb	35	1	2	6	mne_crmbase_letter_ref_1		#0.personid = #1.refid AND #1.addresstypid = '000000000001'		mne_crm	address	\N
 1534140496	admindb	1534140496	admindb	37	1	3	7	mne_crmbase_letter_ref_1	cityid	=	cityid	mne_crm	city	41b9907b0004
@@ -28870,6 +28870,8 @@ COPY mne_application.querytables (createdate, createuser, modifydate, modifyuser
 1534144736	admindb	1534144736	admindb	0	1	0	0	49b6d07f0000				mne_crm	person	\N
 1534144736	admindb	1534144736	admindb	135	1	1	1	49b6d07f0000	personid	=	persondataid	mne_crm	persondata	422c08300001
 1534144736	admindb	1534144736	admindb	23	1	1	2	49b6d07f0000	refid	=	companyid	mne_crm	company	4219bca00001
+1512988543	admindb	1512988543	admindb	2	1	1	2	4923eaa30000	cityid	=	cityid	mne_crm	city	41b9907b0004
+1512988543	admindb	1512988543	admindb	4	1	2	3	4923eaa30000	countryid	=	countryid	mne_crm	country	4368c58a0003
 1534144736	admindb	1534144736	admindb	37	1	2	3	49b6d07f0000		 #1.refid = #0.companyid AND CAST ( #1.addresstypid AS INTEGER ) = ( SELECT MAX(CAST( addresstypid AS INTEGER )) FROM mne_crm.address a WHERE refid = #1.refid AND CAST(a.addresstypid AS INTEGER ) IN (1,40) )		mne_crm	address	\N
 1534144736	admindb	1534144736	admindb	108	1	4	5	49b6d07f0000	countryid	=	countryid	mne_crm	country	4368c58a0003
 1472214992	admindb	1472214992	admindb	0	1	0	0	4ff3fba70000				mne_personnal	time	\N
@@ -28925,8 +28927,6 @@ COPY mne_application.querytables (createdate, createuser, modifydate, modifyuser
 1512555690	admindb	1512555690	admindb	1	1	1	1	48e8bb150000	index	=	tableconstraintmessagesid	mne_application	tableconstraintmessages	4dd4df460000
 1512988543	admindb	1512988543	admindb	0	1	0	0	4923eaa30000				mne_crm	address	\N
 1512988543	admindb	1512988543	admindb	1	1	1	1	4923eaa30000	addresstypid	=	addresstypid	mne_crm	addresstyp	41f4fa5c0006
-1512988543	admindb	1512988543	admindb	2	1	1	2	4923eaa30000	cityid	=	cityid	mne_crm	city	41b9907b0004
-1512988543	admindb	1512988543	admindb	4	1	2	3	4923eaa30000	countryid	=	countryid	mne_crm	country	4368c58a0003
 1544428762	admindb	1544428762	admindb	0	1	0	0	49ad9b890000				mne_crm	person	\N
 1544428762	admindb	1544428762	admindb	9	1	1	1	49ad9b890000	refid	=	companyid	mne_crm	company	4219bca00001
 1544428827	admindb	1544428827	admindb	0	1	0	0	54c5f8760000				mne_crm	order	\N
@@ -29268,6 +29268,7 @@ COPY mne_application.reportscache (createdate, createuser, modifydate, modifyuse
 --
 
 COPY mne_application.selectlist (createdate, createuser, modifydate, modifyuser, name, text_de, value, num, text_en, custom) FROM stdin;
+1318314235	admindb	1318314235	admindb	lettertypcompany	standard		0	standard	f
 1586960869	admindb	1586960869	admindb	tabledpytype	Bool	1	1	bool	f
 1318314015	admindb	1318314299	admindb	lettertypperson	standard		0	standard	f
 1586960869	admindb	1586960869	admindb	tabledpytype	Standard	-1	0	default	f
@@ -29328,7 +29329,7 @@ COPY mne_application.selectlist (createdate, createuser, modifydate, modifyuser,
 1352974045	admindb	1352974161	admindb	hoia_extrafee	Standardprodukt	default	-1	standard product	f
 1281675015	admindb	1281675015	admindb	hoia_extrafee	Besondere Leistungen	besonders	2	extra fee	f
 1281675079	admindb	1281675079	admindb	hoia_extrafee	Zusätzliche Leistungen	zusatz	4	more fee	f
-1318314235	admindb	1318314235	admindb	lettertypcompany	standard		0	standard	f
+1478867622	admindb	1478867622	admindb	dns_record	MX	MX	3	MX	f
 1478867553	admindb	1478867553	admindb	dns_record	A	A	0	A	f
 1318313943	admindb	1318314589	admindb	lettertyp	standard		0	standard	f
 1236847320	admindb	1318323053	admindb	lettertypcompany	Lieferung	mne_crm.company_deliver	10	deliver	f
@@ -29444,7 +29445,6 @@ COPY mne_application.selectlist (createdate, createuser, modifydate, modifyuser,
 1471857435	admindb	1471857435	admindb	domaintyp	Primärer Domain Controler	primary	1	primary domain controler	f
 1471857473	admindb	1471930298	admindb	domaintyp	Secondärer Domain Controler	second	2	second domain controler	f
 1478867591	admindb	1478867591	admindb	dns_record	AAAA	AAAA	1	AAAA	f
-1478867622	admindb	1478867622	admindb	dns_record	MX	MX	3	MX	f
 1478867646	admindb	1478867646	admindb	dns_record	CNAME	CNAME	2	CNAME	f
 1516629472	admindb	1516629472	admindb	stylename	Dunkel	dark	2	dark	f
 1144670006	admindb	1516692069	admindb	stylename	Grosse Buchstaben	large	1	big letter	f
@@ -29471,6 +29471,8 @@ COPY mne_application.selectlist (createdate, createuser, modifydate, modifyuser,
 --
 
 COPY mne_application.tablecolnames (createdate, createuser, modifydate, modifyuser, schema, tab, colname, text_en, text_de, dpytype, showhistory, regexp, regexphelp, custom, regexpmod) FROM stdin;
+1605105191	admindb	1605105191	admindb	mne_builddiary	persontime	count	\N	\N	-1	f	\N	\N	f	\N
+1309254709	admindb	1310558758	admindb	mne_crm	file	fileid	\N	\N	-1	t	\N	\N	f	\N
 1115643668	admindb	1115643668	admindb	mne_base	history	schema	\N	\N	-1	t	\N	\N	f	\N
 1391530914	admindb	1413881118	admindb	mne_repository	fileinterests	filename	\N	Dateiname	-1	f	\N	\N	f	\N
 1391416170	admindb	1415345995	admindb	mne_repository	filedata	shortrev	version	Version	-1	f	\N	\N	f	\N
@@ -29537,7 +29539,6 @@ COPY mne_application.tablecolnames (createdate, createuser, modifydate, modifyus
 1600775092	admindb	1600775092	admindb	mne_application	htmlcomposetabselect	showids	\N	\N	-1	f	\N	\N	f	\N
 1603794758	admindb	1603794758	admindb	mne_application	htmlcomposetabselect	showalias	\N	\N	-1	f	\N	\N	f	\N
 1605105191	admindb	1605105191	admindb	mne_builddiary	persontime	bdtimeid	\N	\N	-1	f	\N	\N	f	\N
-1605105191	admindb	1605105191	admindb	mne_builddiary	persontime	count	\N	\N	-1	f	\N	\N	f	\N
 1606145819	admindb	1606145819	admindb	mne_personnal	timemax	start	\N	\N	1000	f	\N	\N	f	\N
 1288778606	admindb	1608127821	admindb	mne_warehouse	purchase	ordernumber	order number	Bestellnummer	-1	t	\N	\N	f	\N
 1110180602	admindb	1597672659	admindb	mne_crm	persondata	telephonoffice	tel. office	Tel. geschäftlich	-1	t	\N	\N	f	\N
@@ -29815,6 +29816,7 @@ COPY mne_application.tablecolnames (createdate, createuser, modifydate, modifyus
 1134648513	admindb	1292851660	admindb	mne_crm	productdefault	defaultid	\N	\N	-1	t	\N	\N	f	\N
 1134648513	admindb	1292851660	admindb	mne_crm	productdefault	vat	\N	MWST.	-1	t	\N	\N	f	\N
 1330690977	admindb	1330690987	admindb	mne_builddiary	time	timeid	\N	\N	-1	t	\N	\N	f	\N
+1347347459	admindb	1347354095	admindb	mne_hoai	offer	l3	\N	\N	-1	f	\N	\N	f	\N
 1245143746	admindb	1292920491	admindb	mne_shipment	invoicemanagement	invoiceauto	\N	\N	1001	f	\N	\N	f	\N
 1322719336	admindb	1322733791	admindb	mne_warehouse	purchaseinvoice	companyid	\N	\N	-1	f	keyvalue	\N	f	\N
 1322814650	admindb	1322830755	admindb	mne_warehouse	purchaseinvoice	paytime	released for payment	freigegeben am	1000	f	\N	\N	f	\N
@@ -29959,6 +29961,7 @@ COPY mne_application.tablecolnames (createdate, createuser, modifydate, modifyus
 1265106324	admindb	1265106324	admindb	mne_warehouse	partstoragelocation	partingoingid	\N	\N	-1	f	\N	\N	f	\N
 1256713215	admindb	1256713215	admindb	mne_personnal	timemanagement_param	timemanagement_paramid	\N	\N	-1	t	\N	\N	f	\N
 1256713310	admindb	1256713360	admindb	mne_personnal	timemanagement_param	slotsize	day interval size	Tagesintervalgrösse	-1	f	num	\N	f	\N
+1347347463	admindb	1347354098	admindb	mne_hoai	offer	l4	\N	\N	-1	f	\N	\N	f	\N
 1256713385	admindb	1256713385	admindb	mne_personnal	timemanagement_param	slotstart	day start	Tagesstart	-1	f	num	\N	f	\N
 1256713407	admindb	1256714668	admindb	mne_personnal	timemanagement_param	slotcount	interval count	Intervalanzahl	-1	f	num	\N	f	\N
 1285647756	admindb	1285647756	admindb	mne_shipment	invoicerefcount	count	\N	\N	-1	f	\N	\N	f	\N
@@ -30111,7 +30114,6 @@ COPY mne_application.tablecolnames (createdate, createuser, modifydate, modifyus
 1288778603	admindb	1292851891	admindb	mne_warehouse	purchase	orderdate	order date	Bestelldatum	1001	t	\N	\N	f	\N
 1309855566	admindb	1309855566	admindb	mne_mail	imapfolder	checkit	check	Überprüfen	-1	f	\N	\N	f	\N
 1309254894	admindb	1310558758	admindb	mne_crm	file	datatype	file type	Dateityp	-1	f	\N	\N	f	\N
-1309254709	admindb	1310558758	admindb	mne_crm	file	fileid	\N	\N	-1	t	\N	\N	f	\N
 1310725243	admindb	1310725243	admindb	mne_crm	file	author	author	Verfasser	-1	f	\N	\N	f	\N
 1310459741	admindb	1310558758	admindb	mne_crm	file	typ	\N	Art	-1	f	\N	\N	f	\N
 1309254838	admindb	1597066212	admindb	mne_crm	file	name	\N	Name	-1	f	notempty	\N	f	\N
@@ -30245,8 +30247,6 @@ COPY mne_application.tablecolnames (createdate, createuser, modifydate, modifyus
 1330961443	admindb	1330961443	admindb	mne_builddiary	present	timeid	\N	\N	-1	f	\N	\N	f	\N
 1330961804	admindb	1330961804	admindb	mne_builddiary	present	role	\N	Funktion	-1	f	\N	\N	f	\N
 1331129283	admindb	1331129283	admindb	mne_builddiary	present	count	\N	Anzahl Mitarbeiter	-1	f	num	\N	f	\N
-1347347459	admindb	1347354095	admindb	mne_hoai	offer	l3	\N	\N	-1	f	\N	\N	f	\N
-1347347463	admindb	1347354098	admindb	mne_hoai	offer	l4	\N	\N	-1	f	\N	\N	f	\N
 1347347469	admindb	1347354102	admindb	mne_hoai	offer	l5	\N	\N	-1	f	\N	\N	f	\N
 1332164068	admindb	1332164092	admindb	mne_builddiary	comment	comment	\N	Bemerkung	-1	f	\N	\N	f	\N
 1347347474	admindb	1347354105	admindb	mne_hoai	offer	l6	\N	\N	-1	f	\N	\N	f	\N
@@ -30408,6 +30408,7 @@ COPY mne_application.tablecolnames (createdate, createuser, modifydate, modifyus
 --
 
 COPY mne_application.tableconstraintmessages (tableconstraintmessagesid, text_de, text_en, custom, createuser, modifyuser, createdate, modifydate) FROM stdin;
+country_third	Das Land existiert schon	the contry exists	f	admindb	admindb	0	0
 htmlcompose_name			f	admindb	admindb	0	0
 public_test2_idx_1588163134234	Nur ein Test		f	admindb	admindb	1588163159	1588163159
 uid_second	Die Uid ist schon erfasst	the uid is registered	f	admindb	admindb	0	0
@@ -30419,6 +30420,7 @@ personowndata_personid_idx	Die Person hat schon Personaldaten	the person has per
 storageoptpart_partid_idx	Das Teil ist schon in der Statistik erfasst	the part have a statistic record	f	admindb	admindb	1608124170	1608124170
 test_testid_idx	Nur ein Test	only on test	f	admindb	admindb	1588938463	1588938463
 fixturetree_parentid_fkey	Elternelement nicht mehr vorhanden oder hat noch Elemente	parent element not avaible or have elements	f	admindb	admindb	1608287463	1608287463
+filedata_second	Die Revision ist schon vorhaden	the revision exists	f	admindb	admindb	0	0
 fixturetree_fixtureid_fkey	Inventar ist nicht vorhanden oder ist noch im Inventarbaum vorhanden	fixture is not avaible or is element in fixture tree	f	admindb	admindb	1608287550	1608287550
 			f	admindb	admindb	1588158053	1588158053
 invoicepaid_second			f	admindb	admindb	0	0
@@ -30460,6 +30462,7 @@ invoicetime_invoiceid_fkey	Die Rechnung muss in der Datenbank erfasst sein bzw. 
 feeextra_check	Das Standardprodukt darf nur global definiert werden		f	admindb	admindb	0	0
 fixture_purchasedeliveryid_fkey	Die Bestellung muss in der Datenbank erfasst sein bzw. die Bestellung ist einem Inventar zugeordnet	the purchase must be avaible in the database resp. the purchase is asigned to an fixture	f	admindb	admindb	0	0
 workphase_third	Bitte unterschiedliche Produktnummer vergeben		f	admindb	admindb	0	0
+oderproduct_second	Das Produkt existiert schon	the product exists	f	admindb	admindb	0	0
 partstoragedata_partid_fkey	Das Teil muss in der Datenbank erfasst sein bzw. es existieren Waren dieser Art im Lager	the part must be availible at the database resp. it exists goods of these in the warehouse	f	admindb	admindb	0	0
 producttree_check	Das Elternelement muss ungleich dem Element sein	the parent must be a other as the child	f	admindb	admindb	0	0
 partstoragedata_storagelocationid_fkey	Der Lagerplatz muss erfasst sein bzw. es liegen Waren auf dem Lagerplatz	the storage location must be availible at the database resp. it exists goods on the storage location	f	admindb	admindb	0	0
@@ -30488,7 +30491,6 @@ fixture_fixturetypeid_fkey	Der Inventartyp muss in der Datenbank erfasst sein bz
 fixture_ownerid_fkey	Der Besitzer muss in der Datenbank erfasst sein bzw. ist in besitzt von Inventar	the owner must be availible at the database resp. have fixture	f	admindb	admindb	0	0
 fixturetypecost_fixturetypeid_fkey	Der Inventartyp muss in der Datenbank erfasst sein bzw. hat noch eine Kosteneintrag	the fixturetype must be availible at the database resp. have a cost entry	f	admindb	admindb	0	0
 feeextra_productid_fkey	Das Produkt muss in der Datenbank erfasst sein bzw. hat noch eine HOAI Eintrag		f	admindb	admindb	0	0
-country_third	Das Land existiert schon	the contry exists	f	admindb	admindb	0	0
 purchaseinvoicedelivery_purchaseinvoiceid_check	Es ist keine Rechnung angegeben	please assign a invoice	f	admindb	admindb	0	0
 queryname_second	Es existiert ein Query mit gleichem Namen und gleicher Union Nummer	it exists a query with the same name and union number	f	admindb	admindb	0	0
 offerprobability_probability_check	Die Wahrscheinlichkeit muss grösser oder gleich 0 und kleiner oder gleich 100 sein	the probability must be equal or greater than 0 and lower or equal 100	f	admindb	admindb	0	0
@@ -30540,7 +30542,6 @@ companyperson_check	Eine assiziierter Kontakt muss von einer Fremdfirma sein	a a
 country_name_de_check	Das Land muss einen deutschen Namen haben	the contry must have a german name	f	admindb	admindb	0	0
 country_name_en_check	Das Land muss einen englischen Namen haben	the country must have a english name	f	admindb	admindb	0	0
 country_countryid_check	Die countryid darf nicht leer sein	the countryid must have a content	f	admindb	admindb	0	0
-oderproduct_second	Das Produkt existiert schon	the product exists	f	admindb	admindb	0	0
 person_lastname_check	Für die Person muss ein Nachname eingeben werden	the person needs a last name	f	admindb	admindb	0	0
 person_sex_check	Das Geschlecht ist entweder weiblich oder mänlich	the sex ist fermale or male	f	admindb	admindb	0	0
 fixturetype_typ_check	Der Inventartyp muss benannt werden	the fixture type needs a name	f	admindb	admindb	0	0
@@ -30585,6 +30586,7 @@ order_second	Die Auftragsnummer existiert schon	this order number exists	f	admin
 fixturetree_treename_check	Das Inventar muss einen Namen haben	the fixture must have a name	f	admindb	admindb	0	0
 invoiceaccount_second	Die Buchung ist schon zugewiesen	the accounting entry is allready asigned	f	admindb	admindb	0	0
 trustfunction__first			f	admindb	admindb	0	0
+present_second	Die Person ist schon im Bautagebuch diese Termins	the person is in the build diary of this date	f	admindb	admindb	0	0
 deliverynoteproduct_orderproductid_fkey	Das Produkt muss zu einem Auftrag gehören bzw. das Produkt wurde ausgeliefert	the product must be a product of a order resp. is delivered	f	admindb	admindb	0	0
 purchase_crmorderid_fkey	Der Auftrag besitzt noch eine Bestellung	the order have an material order	f	admindb	admindb	0	0
 purchaseinvoice_second	Die Belegnummer ist schon vorhanden	the document number exists	f	admindb	admindb	0	0
@@ -30623,11 +30625,9 @@ personowndata_second	Der Loginname ist schon vergeben	the login name is in use	f
 time_userid_fkey	Der Benutzer muss im Personalverzeichnis vorhanden sein bzw. es existieren Zeiteinträge für die Person	the person must be employer resp. the person have time records	f	admindb	admindb	0	0
 present_check	Es muss mindestens eine Person anwesend sein	it must be mininum on person persent	f	admindb	admindb	0	0
 present_count_check	Die Anzahl der Mitarbeiter kann nicht negativ sein	the employee count is not negative	f	admindb	admindb	0	0
-present_second	Die Person ist schon im Bautagebuch diese Termins	the person is in the build diary of this date	f	admindb	admindb	0	0
 orderproductpart_orderproductid_fkey	Es muss ein Produkt aus dem Auftrag ausgewählt werden bzw. wird das Produkt besitzt Einträge in der Materialplanung	the product must be selected  from the order  resp. is using at the material planning	f	admindb	admindb	0	0
 orderproductpart_ownerid_fkey	Bitte eine Mitarbeiter auswählen bzw. der Mitarbeiter ist noch Manager von Auftragsmaterial	please select a employee or the employee is still manager of order material	f	admindb	admindb	0	0
 offerproductpart_ownerid_fkey	Es muss ein Mitarbeiter als Betreuer ausgewählt werden bzw. der Mitarbeiter ist noch Betreuer von Angebotsmaterial	It must be selected an employee as manager of offer material resp. the employee is manager of offer material	f	admindb	admindb	0	0
-filedata_second	Die Revision ist schon vorhaden	the revision exists	f	admindb	admindb	0	0
 fileinterests_personid_fkey	Die Person ist nicht im ERP erfasst bzw. die Person interessiert sich noch für Daten im Aktenschrank	the person must be avaible im ERP resp. the person need data of the repository	f	admindb	admindb	0	0
 filedata_repositoryid_fkey	Der Akteneintrag muss einem Aktenordner zugeordnet werden bzw. die Aktenordern ist während des Löschens nicht leer	the file must be contained in a folder resp. during delete of the folder the folder is not empty	f	admindb	admindb	0	0
 repository_second	Der Name des Aktenordners existiert schon	the name of the file exists	f	admindb	admindb	0	0
@@ -30708,6 +30708,13 @@ COPY mne_application.timestyle (createdate, createuser, language, modifydate, mo
 --
 
 COPY mne_application.translate (createdate, createuser, modifydate, modifyuser, id, text_de, text_en, categorie, accesstime) FROM stdin;
+1124284460	admindb	1152881754	admindb	Briefe		letter	Http	\N
+1106850234	admindb	1107783033	admindb	Menüs		menu		\N
+1351254746	admindb	1382442280	admindb	Berechnen		compute	HttpTranslate	\N
+1098345264	admindb	1098776666	admindb	Berechtigungen		access	Http	\N
+1098283406	admindb	1098776642	admindb	schreiben		write		\N
+1098346225	admindb	1098776677	admindb	alles		all		\N
+1145522270	admindb	1147792360	admindb	Einmalig		single	Http	\N
 1351323647	admindb	1382444798	admindb	Firma 		company	HttpTranslate	\N
 1107782479	admindb	1107782604	admindb	screen		screen		\N
 1100785141	admindb	1101396538	admindb	Addresse		address		\N
@@ -30762,6 +30769,7 @@ COPY mne_application.translate (createdate, createuser, modifydate, modifyuser, 
 1605523599	admindb	1607409453	admindb	Mitglied		member	HttpTranslate	0
 1606820267	admindb	1607409462	admindb	Startzeit		start time	HttpTranslate	0
 1607088272	admindb	1607409470	admindb	Alle Personen		all person	HttpTranslate	0
+1351254746	admindb	1382442289	admindb	Leistungsphasen		working steps	HttpTranslate	\N
 1607705472	admindb	1609750305	admindb	Der Lieferant liefert dieses Teil nicht		the supplier does not deliver this part	DbConnect	0
 1607956753	admindb	1609750347	admindb	Die Kosten werden noch von einem Angebot benötigt		the costs are still required from an offer	DbConnect	0
 1609743588	admindb	1609750347	admindb	Folder		folder	DbHttpUtilsImap	0
@@ -30892,6 +30900,7 @@ COPY mne_application.translate (createdate, createuser, modifydate, modifyuser, 
 1107781963	admindb	1107789659	admindb	Web		web		\N
 1351236365	admindb	1381274156	admindb	Angebot bearbeiten		modify offer	HttpTranslate	\N
 1351236365	admindb	1381274161	admindb	Angebot 		offer	HttpTranslate	\N
+1351254746	admindb	1382442310	admindb	Honorarzone		charge zone	HttpTranslate	\N
 1351236328	admindb	1530178873	admindb	Bitte nur Buchstaben ohne Umlaute, Zahlen, den Unterstrich und den Schrägstrich eingeben		only letter, number, underscore order slash	HttpTranslate	\N
 1098343532	admindb	1098776657	admindb	Neues Schema		new schema	Http	\N
 1351236365	admindb	1381276543	admindb	Wirklich alle manuell veränderten Kosten der Produkte überschreiben?		Really overwrite any manual changes in cost of products?	HttpTranslate	\N
@@ -30964,9 +30973,6 @@ COPY mne_application.translate (createdate, createuser, modifydate, modifyuser, 
 1351254229	admindb	1382442247	admindb	Keine Zeile ausgewählt		no row selected	HttpTranslate	\N
 1351254229	admindb	1382442258	admindb	Kein Feld ausgewählt		no field selected	HttpTranslate	\N
 1351254746	admindb	1382442273	admindb	Leistungsphasen bearbeiten		modify working step	HttpTranslate	\N
-1351254746	admindb	1382442280	admindb	Berechnen		compute	HttpTranslate	\N
-1351254746	admindb	1382442289	admindb	Leistungsphasen		working steps	HttpTranslate	\N
-1351254746	admindb	1382442310	admindb	Honorarzone		charge zone	HttpTranslate	\N
 1351254746	admindb	1382442334	admindb	Erbrachte Leistung		 services rendered	HttpTranslate	\N
 1351254746	admindb	1382442356	admindb	Honoraransatz		honorary approach	HttpTranslate	\N
 1351254746	admindb	1382442378	admindb	Anrechenbare Kosten		 eligible costs	HttpTranslate	\N
@@ -31112,7 +31118,6 @@ COPY mne_application.translate (createdate, createuser, modifydate, modifyuser, 
 1355307329	admindb	1382446822	admindb	Password bearbeiten		modify password	HttpTranslate	\N
 1355307329	admindb	1382446840	admindb	Passworte sind nicht gleich		passwords are different	HttpTranslate	\N
 1355307347	admindb	1382446858	admindb	Benutzereinstellungen hinzufügen		add user settings	HttpTranslate	\N
-1098345264	admindb	1098776666	admindb	Berechtigungen		access	Http	\N
 1355307347	admindb	1382446867	admindb	Bitte Benutzer auswählen		modify user settings	HttpTranslate	\N
 1355307408	admindb	1382446894	admindb	geerbte Adresse		inherited adress	HttpTranslate	\N
 1355307408	admindb	1382446900	admindb	eigene Adresse		own adress	HttpTranslate	\N
@@ -31127,6 +31132,7 @@ COPY mne_application.translate (createdate, createuser, modifydate, modifyuser, 
 1358244342	admindb	1382447060	admindb	Es besteht keine Verbindung zur Datenbank		no connection to the database	Database	\N
 1358522811	admindb	1382447098	admindb	Bitte 6 Hexadezimalziffern eingeben		please enter 6 hex digits	DbHttpAdminTable	\N
 1113204273	admindb	1113205883	admindb	Kontakte		contacts	Http	\N
+1098718132	admindb	1110286945	admindb	Sprache		language		\N
 1358522872	admindb	1382447134	admindb	adezimalziffern eingeben	Hexadezimalziffer eingeben	enter a hex digit	DbHttpAdminTable	\N
 1358522876	admindb	1382447139	admindb	 eingeben		enter	DbHttpAdminTable	\N
 1358763543	admindb	1382447163	admindb	Konto anzeigen		show account	HttpTranslate	\N
@@ -31153,7 +31159,6 @@ COPY mne_application.translate (createdate, createuser, modifydate, modifyuser, 
 1358315997	admindb	1382447941	admindb	Bereinigen		purge	HttpTranslate	\N
 1322640868	admindb	1322642171	admindb	MneAjaxWeblet:getIdparam ist nur im Modifymodus erlaubt		MneAjaxWeblet:getIdparam is only allowed during modify	HttpTranslate	\N
 1322640868	admindb	1322642196	admindb	keine Buttonaktion für 		no button action for	HttpTranslate	\N
-1124284460	admindb	1152881754	admindb	Briefe		letter	Http	\N
 1245403011	admindb	1305880971	admindb	Aktualisieren		refresh	HttpTranslate	\N
 1100785141	admindb	1101396579	admindb	Addressen		addresses		\N
 1131177093	admindb	1131980194	admindb	Produkt Hinzufügen		add product	Http	\N
@@ -31203,6 +31208,7 @@ COPY mne_application.translate (createdate, createuser, modifydate, modifyuser, 
 1132146085	admindb	1132146085	admindb	Referenzen		references		\N
 1102612907	admindb	1106131846	admindb	Ortschaft		city	Http	\N
 1103018793	admindb	1106131898	admindb	englisch		english	Http	\N
+1146834409	admindb	1152522697	admindb	Rechnungen		invoices		\N
 1105971658	admindb	1106131955	admindb	Zum Join von Tabelle %s werden Spalten- und Operatorangaben benötigt		joining the table %s needs columnnames and operators	PgJoin	\N
 1102612907	admindb	1106131970	admindb	Addresse gelöscht		address deleted	Http	\N
 1098102416	admindb	1098103682	admindb	Zeile löschen		delete row	Http	\N
@@ -31266,8 +31272,6 @@ COPY mne_application.translate (createdate, createuser, modifydate, modifyuser, 
 1098281216	admindb	1098776605	admindb	unbekannt		unknown		\N
 1098283406	admindb	1098776616	admindb	alle		all		\N
 1098283406	admindb	1098776631	admindb	lesen		read		\N
-1098283406	admindb	1098776642	admindb	schreiben		write		\N
-1098346225	admindb	1098776677	admindb	alles		all		\N
 1098347052	admindb	1098776718	admindb	Schema <$1> mit gesammten Inhalt wirklich löschen ?		delete schema <$1> with all contents ?	Http	\N
 1098347052	admindb	1098776732	admindb	Schema gelöscht		schema deleted	Http	\N
 1098347851	admindb	1098776760	admindb	kein Schema gewählt		no schema selected	Http	\N
@@ -31281,8 +31285,6 @@ COPY mne_application.translate (createdate, createuser, modifydate, modifyuser, 
 1107875406	admindb	1107958486	admindb	neues Weblet		new weblet	Http	\N
 1107786488	admindb	1107958494	admindb	Maske Hinzufügen		new screen	Http	\N
 1110286355	admindb	1110286934	admindb	Datumsformat		date format		\N
-1098718132	admindb	1110286945	admindb	Sprache		language		\N
-1146834409	admindb	1152522697	admindb	Rechnungen		invoices		\N
 1119606751	admindb	1119876073	admindb	Kein Indexname beim Erzeugen des Indexes vorhanden		no index name during make a index	PgIndex	\N
 1099485640	admindb	1099995774	admindb	weiter		next	Http	\N
 1115990016	admindb	1119876130	admindb	Spalte %s ist in der Tabelle %s beim Modifizieren nicht forhanden		column %s not availble during modify table %s	PgTable	\N
@@ -31347,7 +31349,6 @@ COPY mne_application.translate (createdate, createuser, modifydate, modifyuser, 
 1144930138	admindb	1147792314	admindb	Gesammt		all	Http	\N
 1097767924	admindb	1097768042	admindb	Grösse		size		\N
 1145623792	admindb	1147792354	admindb	Auftragsbestätigung		confirmation	Http	\N
-1145522270	admindb	1147792360	admindb	Einmalig		single	Http	\N
 1147270767	admindb	1147792381	admindb	Lieferschein <$1> wirklich löschen ?		delete delivery not <$1> ?	Http	\N
 1147860594	admindb	1147864283	admindb	ändern		modify		\N
 1147860594	admindb	1147864288	admindb	einfügen		insert		\N
@@ -31361,13 +31362,13 @@ COPY mne_application.translate (createdate, createuser, modifydate, modifyuser, 
 1106573353	admindb	1106754167	admindb	Firma bearbeiten		modify company	Http	\N
 1106573353	admindb	1106754177	admindb	neue Firma		new company	Http	\N
 1106754220	admindb	1106754344	admindb	Firma Löschen		delete company	Http	\N
+1425652584	admindb	1472110463	admindb	Message gefunden		message found		\N
 1106754220	admindb	1106754383	admindb	Kann Element <$1:$2> nicht lesen		can't read element<$1:$2>	Http	\N
 1098103403	admindb	1098103713	admindb	Tabelle gelöscht		table deleted	Http	\N
 1099393527	admindb	1099483765	admindb	Administration		adminstration	Http	\N
 1100158138	admindb	1100158252	admindb	Name <%s> ist unbenannt		name <%s> is unknown	DbHtml	\N
 1106754422	admindb	1106754450	admindb	Kann Element <$1:$2> nicht vorbesetzen		can't preset element <$1:$2>	Http	\N
 1106754220	admindb	1107269039	admindb	Element mit id <$1> ist unbekannt		element with id <$1> is unknown	Http	\N
-1106850234	admindb	1107783033	admindb	Menüs		menu		\N
 1097767982	admindb	1107783046	admindb	Sichten		views		\N
 1098116259	admindb	1107783051	admindb	Joins		joins		\N
 1098116259	admindb	1107783062	admindb	Definitionen		definition		\N
@@ -31790,6 +31791,7 @@ COPY mne_application.translate (createdate, createuser, modifydate, modifyuser, 
 1391588823	admindb	1399367580	admindb	Der Aktenordner muss einen Namen haben		the file must be a name	DbHttpUtilsRepository	\N
 1391588823	admindb	1399367599	admindb	Der Ordner <%s> wurde nicht gefunden		the folder <%s> was not found	HttpFilesystem	\N
 1391590435	admindb	1399367618	admindb	Der Aktenordner <%s> existiert nicht		the file <%s> don't exists	DbHttpUtilsRepository	\N
+1541593886	admindb	1576763236	admindb	Summe ist ungleich 100		sum not equal 100	DbConnect	\N
 1391594218	admindb	1399367637	admindb	Fehler während des Listens eines Ordners		error during listing the folder	DbHttpUtilsRepository	\N
 1391598781	admindb	1399367651	admindb	kann nicht in Ordner <%s> wechseln		can't change to folder <%s>	PROCESS	\N
 1472112427	admindb	1472112427	admindb	Apache		apache	HttpMenu	\N
@@ -31852,6 +31854,7 @@ COPY mne_application.translate (createdate, createuser, modifydate, modifyuser, 
 1409730854	admindb	1576761779	admindb	Bild hinzufügen		add pictures	HttpTranslate	\N
 1409730854	admindb	1576761789	admindb	Bild bearbeiten		modify pictures	HttpTranslate	\N
 1409934120	admindb	1576761932	admindb	Angebot gehört zu einem Auftrag		offer belongs to an order	DbConnect	\N
+1472110031	admindb	1472110416	admindb	wirklich löschen		really delete	HttpTranslate	\N
 1410159318	admindb	1576761949	admindb	Rechnung hat mehr als einen Empfänger - bitte einzeln quitieren		invoice has more than one recipient - please acknowledge individually	DbConnect	\N
 1410162017	admindb	1576761972	admindb	Rechnung wurde nicht verschickt		invoice was not sent	DbConnect	\N
 1410162017	admindb	1576761992	admindb	Rechnung ist schon als bezahlt makiert		invoice is already marked as paid	DbConnect	\N
@@ -31916,9 +31919,6 @@ COPY mne_application.translate (createdate, createuser, modifydate, modifyuser, 
 1453824770	admindb	1576763206	admindb	Webseite 		website	HttpTranslate	\N
 1453999098	admindb	1576763213	admindb	Webseite bearbeiten		modify web site	HttpTranslate	\N
 1541584654	admindb	1576763225	admindb	Die Mailbox <%s> wurde nicht gefunden		mail box <%s> not found	ImapScan	\N
-1541593886	admindb	1576763236	admindb	Summe ist ungleich 100		sum not equal 100	DbConnect	\N
-1472110031	admindb	1472110416	admindb	wirklich löschen		really delete	HttpTranslate	\N
-1425652584	admindb	1472110463	admindb	Message gefunden		message found		\N
 1352797415	admindb	1472111002	admindb	Subweblet bearbeiten		modify subweblet	HttpTranslate	\N
 1472111086	admindb	1472111086	admindb	Sql ausführen		execute sql	HttpMenu	\N
 1544191080	admindb	1576763267	admindb	Kosten werden mit hinterlegten Kosten überschrieben		costs are overwritten with the stored costs	DbConnect	\N
@@ -32109,1101 +32109,1101 @@ COPY mne_application.year (yearmin, yearmax, yearid, createuser, modifyuser, cre
 --
 
 COPY mne_application.yearday (leapyear, vyear, vquarter, vmonth, vday, wday, vfullday, createuser, modifyuser, createdate, modifydate) FROM stdin;
-f	2021	1	1	1	6	01012021	admindb	admindb	1653058466	1653058466
-f	2021	1	1	2	7	02012021	admindb	admindb	1653058466	1653058466
-f	2021	1	1	3	1	03012021	admindb	admindb	1653058466	1653058466
-f	2021	1	1	4	2	04012021	admindb	admindb	1653058466	1653058466
-f	2021	1	1	5	3	05012021	admindb	admindb	1653058466	1653058466
-f	2021	1	1	6	4	06012021	admindb	admindb	1653058466	1653058466
-f	2021	1	1	7	5	07012021	admindb	admindb	1653058466	1653058466
-f	2021	1	1	8	6	08012021	admindb	admindb	1653058466	1653058466
-f	2021	1	1	9	7	09012021	admindb	admindb	1653058466	1653058466
-f	2021	1	1	10	1	10012021	admindb	admindb	1653058466	1653058466
-f	2021	1	1	11	2	11012021	admindb	admindb	1653058466	1653058466
-f	2021	1	1	12	3	12012021	admindb	admindb	1653058466	1653058466
-f	2021	1	1	13	4	13012021	admindb	admindb	1653058466	1653058466
-f	2021	1	1	14	5	14012021	admindb	admindb	1653058466	1653058466
-f	2021	1	1	15	6	15012021	admindb	admindb	1653058466	1653058466
-f	2021	1	1	16	7	16012021	admindb	admindb	1653058466	1653058466
-f	2021	1	1	17	1	17012021	admindb	admindb	1653058466	1653058466
-f	2021	1	1	18	2	18012021	admindb	admindb	1653058466	1653058466
-f	2021	1	1	19	3	19012021	admindb	admindb	1653058466	1653058466
-f	2021	1	1	20	4	20012021	admindb	admindb	1653058466	1653058466
-f	2021	1	1	21	5	21012021	admindb	admindb	1653058466	1653058466
-f	2021	1	1	22	6	22012021	admindb	admindb	1653058466	1653058466
-f	2021	1	1	23	7	23012021	admindb	admindb	1653058466	1653058466
-f	2021	1	1	24	1	24012021	admindb	admindb	1653058466	1653058466
-f	2021	1	1	25	2	25012021	admindb	admindb	1653058466	1653058466
-f	2021	1	1	26	3	26012021	admindb	admindb	1653058466	1653058466
-f	2021	1	1	27	4	27012021	admindb	admindb	1653058466	1653058466
-f	2021	1	1	28	5	28012021	admindb	admindb	1653058466	1653058466
-f	2021	1	1	29	6	29012021	admindb	admindb	1653058466	1653058466
-f	2021	1	1	30	7	30012021	admindb	admindb	1653058466	1653058466
-f	2021	1	1	31	1	31012021	admindb	admindb	1653058466	1653058466
-f	2021	1	2	1	2	01022021	admindb	admindb	1653058466	1653058466
-f	2021	1	2	2	3	02022021	admindb	admindb	1653058466	1653058466
-f	2021	1	2	3	4	03022021	admindb	admindb	1653058466	1653058466
-f	2021	1	2	4	5	04022021	admindb	admindb	1653058466	1653058466
-f	2021	1	2	5	6	05022021	admindb	admindb	1653058466	1653058466
-f	2021	1	2	6	7	06022021	admindb	admindb	1653058466	1653058466
-f	2021	1	2	7	1	07022021	admindb	admindb	1653058466	1653058466
-f	2021	1	2	8	2	08022021	admindb	admindb	1653058466	1653058466
-f	2021	1	2	9	3	09022021	admindb	admindb	1653058466	1653058466
-f	2021	1	2	10	4	10022021	admindb	admindb	1653058466	1653058466
-f	2021	1	2	11	5	11022021	admindb	admindb	1653058466	1653058466
-f	2021	1	2	12	6	12022021	admindb	admindb	1653058466	1653058466
-f	2021	1	2	13	7	13022021	admindb	admindb	1653058466	1653058466
-f	2021	1	2	14	1	14022021	admindb	admindb	1653058466	1653058466
-f	2021	1	2	15	2	15022021	admindb	admindb	1653058466	1653058466
-f	2021	1	2	16	3	16022021	admindb	admindb	1653058466	1653058466
-f	2021	1	2	17	4	17022021	admindb	admindb	1653058466	1653058466
-f	2021	1	2	18	5	18022021	admindb	admindb	1653058466	1653058466
-f	2021	1	2	19	6	19022021	admindb	admindb	1653058466	1653058466
-f	2021	1	2	20	7	20022021	admindb	admindb	1653058466	1653058466
-f	2021	1	2	21	1	21022021	admindb	admindb	1653058466	1653058466
-f	2021	1	2	22	2	22022021	admindb	admindb	1653058466	1653058466
-f	2021	1	2	23	3	23022021	admindb	admindb	1653058466	1653058466
-f	2021	1	2	24	4	24022021	admindb	admindb	1653058466	1653058466
-f	2021	1	2	25	5	25022021	admindb	admindb	1653058466	1653058466
-f	2021	1	2	26	6	26022021	admindb	admindb	1653058466	1653058466
-f	2021	1	2	27	7	27022021	admindb	admindb	1653058466	1653058466
-f	2021	1	2	28	1	28022021	admindb	admindb	1653058466	1653058466
-f	2021	1	3	1	2	01032021	admindb	admindb	1653058466	1653058466
-f	2021	1	3	2	3	02032021	admindb	admindb	1653058466	1653058466
-f	2021	1	3	3	4	03032021	admindb	admindb	1653058466	1653058466
-f	2021	1	3	4	5	04032021	admindb	admindb	1653058466	1653058466
-f	2021	1	3	5	6	05032021	admindb	admindb	1653058466	1653058466
-f	2021	1	3	6	7	06032021	admindb	admindb	1653058466	1653058466
-f	2021	1	3	7	1	07032021	admindb	admindb	1653058466	1653058466
-f	2021	1	3	8	2	08032021	admindb	admindb	1653058466	1653058466
-f	2021	1	3	9	3	09032021	admindb	admindb	1653058466	1653058466
-f	2021	1	3	10	4	10032021	admindb	admindb	1653058466	1653058466
-f	2021	1	3	11	5	11032021	admindb	admindb	1653058466	1653058466
-f	2021	1	3	12	6	12032021	admindb	admindb	1653058466	1653058466
-f	2021	1	3	13	7	13032021	admindb	admindb	1653058466	1653058466
-f	2021	1	3	14	1	14032021	admindb	admindb	1653058466	1653058466
-f	2021	1	3	15	2	15032021	admindb	admindb	1653058466	1653058466
-f	2021	1	3	16	3	16032021	admindb	admindb	1653058466	1653058466
-f	2021	1	3	17	4	17032021	admindb	admindb	1653058466	1653058466
-f	2021	1	3	18	5	18032021	admindb	admindb	1653058466	1653058466
-f	2021	1	3	19	6	19032021	admindb	admindb	1653058466	1653058466
-f	2021	1	3	20	7	20032021	admindb	admindb	1653058466	1653058466
-f	2021	1	3	21	1	21032021	admindb	admindb	1653058466	1653058466
-f	2021	1	3	22	2	22032021	admindb	admindb	1653058466	1653058466
-f	2021	1	3	23	3	23032021	admindb	admindb	1653058466	1653058466
-f	2021	1	3	24	4	24032021	admindb	admindb	1653058466	1653058466
-f	2021	1	3	25	5	25032021	admindb	admindb	1653058466	1653058466
-f	2021	1	3	26	6	26032021	admindb	admindb	1653058466	1653058466
-f	2021	1	3	27	7	27032021	admindb	admindb	1653058466	1653058466
-f	2021	1	3	28	1	28032021	admindb	admindb	1653058466	1653058466
-f	2021	1	3	29	2	29032021	admindb	admindb	1653058466	1653058466
-f	2021	1	3	30	3	30032021	admindb	admindb	1653058466	1653058466
-f	2021	1	3	31	4	31032021	admindb	admindb	1653058466	1653058466
-f	2021	2	4	1	5	01042021	admindb	admindb	1653058466	1653058466
-f	2021	2	4	2	6	02042021	admindb	admindb	1653058466	1653058466
-f	2021	2	4	3	7	03042021	admindb	admindb	1653058466	1653058466
-f	2021	2	4	4	1	04042021	admindb	admindb	1653058466	1653058466
-f	2021	2	4	5	2	05042021	admindb	admindb	1653058466	1653058466
-f	2021	2	4	6	3	06042021	admindb	admindb	1653058466	1653058466
-f	2021	2	4	7	4	07042021	admindb	admindb	1653058466	1653058466
-f	2021	2	4	8	5	08042021	admindb	admindb	1653058466	1653058466
-f	2021	2	4	9	6	09042021	admindb	admindb	1653058466	1653058466
-f	2021	2	4	10	7	10042021	admindb	admindb	1653058466	1653058466
-f	2021	2	4	11	1	11042021	admindb	admindb	1653058466	1653058466
-f	2021	2	4	12	2	12042021	admindb	admindb	1653058466	1653058466
-f	2021	2	4	13	3	13042021	admindb	admindb	1653058466	1653058466
-f	2021	2	4	14	4	14042021	admindb	admindb	1653058466	1653058466
-f	2021	2	4	15	5	15042021	admindb	admindb	1653058466	1653058466
-f	2021	2	4	16	6	16042021	admindb	admindb	1653058466	1653058466
-f	2021	2	4	17	7	17042021	admindb	admindb	1653058466	1653058466
-f	2021	2	4	18	1	18042021	admindb	admindb	1653058466	1653058466
-f	2021	2	4	19	2	19042021	admindb	admindb	1653058466	1653058466
-f	2021	2	4	20	3	20042021	admindb	admindb	1653058466	1653058466
-f	2021	2	4	21	4	21042021	admindb	admindb	1653058466	1653058466
-f	2021	2	4	22	5	22042021	admindb	admindb	1653058466	1653058466
-f	2021	2	4	23	6	23042021	admindb	admindb	1653058466	1653058466
-f	2021	2	4	24	7	24042021	admindb	admindb	1653058466	1653058466
-f	2021	2	4	25	1	25042021	admindb	admindb	1653058466	1653058466
-f	2021	2	4	26	2	26042021	admindb	admindb	1653058466	1653058466
-f	2021	2	4	27	3	27042021	admindb	admindb	1653058466	1653058466
-f	2021	2	4	28	4	28042021	admindb	admindb	1653058466	1653058466
-f	2021	2	4	29	5	29042021	admindb	admindb	1653058466	1653058466
-f	2021	2	4	30	6	30042021	admindb	admindb	1653058466	1653058466
-f	2021	2	5	1	7	01052021	admindb	admindb	1653058466	1653058466
-f	2021	2	5	2	1	02052021	admindb	admindb	1653058466	1653058466
-f	2021	2	5	3	2	03052021	admindb	admindb	1653058466	1653058466
-f	2021	2	5	4	3	04052021	admindb	admindb	1653058466	1653058466
-f	2021	2	5	5	4	05052021	admindb	admindb	1653058466	1653058466
-f	2021	2	5	6	5	06052021	admindb	admindb	1653058466	1653058466
-f	2021	2	5	7	6	07052021	admindb	admindb	1653058466	1653058466
-f	2021	2	5	8	7	08052021	admindb	admindb	1653058466	1653058466
-f	2021	2	5	9	1	09052021	admindb	admindb	1653058466	1653058466
-f	2021	2	5	10	2	10052021	admindb	admindb	1653058466	1653058466
-f	2021	2	5	11	3	11052021	admindb	admindb	1653058466	1653058466
-f	2021	2	5	12	4	12052021	admindb	admindb	1653058466	1653058466
-f	2021	2	5	13	5	13052021	admindb	admindb	1653058466	1653058466
-f	2021	2	5	14	6	14052021	admindb	admindb	1653058466	1653058466
-f	2021	2	5	15	7	15052021	admindb	admindb	1653058466	1653058466
-f	2021	2	5	16	1	16052021	admindb	admindb	1653058466	1653058466
-f	2021	2	5	17	2	17052021	admindb	admindb	1653058466	1653058466
-f	2021	2	5	18	3	18052021	admindb	admindb	1653058466	1653058466
-f	2021	2	5	19	4	19052021	admindb	admindb	1653058466	1653058466
-f	2021	2	5	20	5	20052021	admindb	admindb	1653058466	1653058466
-f	2021	2	5	21	6	21052021	admindb	admindb	1653058466	1653058466
-f	2021	2	5	22	7	22052021	admindb	admindb	1653058466	1653058466
-f	2021	2	5	23	1	23052021	admindb	admindb	1653058466	1653058466
-f	2021	2	5	24	2	24052021	admindb	admindb	1653058466	1653058466
-f	2021	2	5	25	3	25052021	admindb	admindb	1653058466	1653058466
-f	2021	2	5	26	4	26052021	admindb	admindb	1653058466	1653058466
-f	2021	2	5	27	5	27052021	admindb	admindb	1653058466	1653058466
-f	2021	2	5	28	6	28052021	admindb	admindb	1653058466	1653058466
-f	2021	2	5	29	7	29052021	admindb	admindb	1653058466	1653058466
-f	2021	2	5	30	1	30052021	admindb	admindb	1653058466	1653058466
-f	2021	2	5	31	2	31052021	admindb	admindb	1653058466	1653058466
-f	2021	2	6	1	3	01062021	admindb	admindb	1653058466	1653058466
-f	2021	2	6	2	4	02062021	admindb	admindb	1653058466	1653058466
-f	2021	2	6	3	5	03062021	admindb	admindb	1653058466	1653058466
-f	2021	2	6	4	6	04062021	admindb	admindb	1653058466	1653058466
-f	2021	2	6	5	7	05062021	admindb	admindb	1653058466	1653058466
-f	2021	2	6	6	1	06062021	admindb	admindb	1653058466	1653058466
-f	2021	2	6	7	2	07062021	admindb	admindb	1653058466	1653058466
-f	2021	2	6	8	3	08062021	admindb	admindb	1653058466	1653058466
-f	2021	2	6	9	4	09062021	admindb	admindb	1653058466	1653058466
-f	2021	2	6	10	5	10062021	admindb	admindb	1653058466	1653058466
-f	2021	2	6	11	6	11062021	admindb	admindb	1653058466	1653058466
-f	2021	2	6	12	7	12062021	admindb	admindb	1653058466	1653058466
-f	2021	2	6	13	1	13062021	admindb	admindb	1653058466	1653058466
-f	2021	2	6	14	2	14062021	admindb	admindb	1653058466	1653058466
-f	2021	2	6	15	3	15062021	admindb	admindb	1653058466	1653058466
-f	2021	2	6	16	4	16062021	admindb	admindb	1653058466	1653058466
-f	2021	2	6	17	5	17062021	admindb	admindb	1653058466	1653058466
-f	2021	2	6	18	6	18062021	admindb	admindb	1653058466	1653058466
-f	2021	2	6	19	7	19062021	admindb	admindb	1653058466	1653058466
-f	2021	2	6	20	1	20062021	admindb	admindb	1653058466	1653058466
-f	2021	2	6	21	2	21062021	admindb	admindb	1653058466	1653058466
-f	2021	2	6	22	3	22062021	admindb	admindb	1653058466	1653058466
-f	2021	2	6	23	4	23062021	admindb	admindb	1653058466	1653058466
-f	2021	2	6	24	5	24062021	admindb	admindb	1653058466	1653058466
-f	2021	2	6	25	6	25062021	admindb	admindb	1653058466	1653058466
-f	2021	2	6	26	7	26062021	admindb	admindb	1653058466	1653058466
-f	2021	2	6	27	1	27062021	admindb	admindb	1653058466	1653058466
-f	2021	2	6	28	2	28062021	admindb	admindb	1653058466	1653058466
-f	2021	2	6	29	3	29062021	admindb	admindb	1653058466	1653058466
-f	2021	2	6	30	4	30062021	admindb	admindb	1653058466	1653058466
-f	2021	3	7	1	5	01072021	admindb	admindb	1653058466	1653058466
-f	2021	3	7	2	6	02072021	admindb	admindb	1653058466	1653058466
-f	2021	3	7	3	7	03072021	admindb	admindb	1653058466	1653058466
-f	2021	3	7	4	1	04072021	admindb	admindb	1653058466	1653058466
-f	2021	3	7	5	2	05072021	admindb	admindb	1653058466	1653058466
-f	2021	3	7	6	3	06072021	admindb	admindb	1653058466	1653058466
-f	2021	3	7	7	4	07072021	admindb	admindb	1653058466	1653058466
-f	2021	3	7	8	5	08072021	admindb	admindb	1653058466	1653058466
-f	2021	3	7	9	6	09072021	admindb	admindb	1653058466	1653058466
-f	2021	3	7	10	7	10072021	admindb	admindb	1653058466	1653058466
-f	2021	3	7	11	1	11072021	admindb	admindb	1653058466	1653058466
-f	2021	3	7	12	2	12072021	admindb	admindb	1653058466	1653058466
-f	2021	3	7	13	3	13072021	admindb	admindb	1653058466	1653058466
-f	2021	3	7	14	4	14072021	admindb	admindb	1653058466	1653058466
-f	2021	3	7	15	5	15072021	admindb	admindb	1653058466	1653058466
-f	2021	3	7	16	6	16072021	admindb	admindb	1653058466	1653058466
-f	2021	3	7	17	7	17072021	admindb	admindb	1653058466	1653058466
-f	2021	3	7	18	1	18072021	admindb	admindb	1653058466	1653058466
-f	2021	3	7	19	2	19072021	admindb	admindb	1653058466	1653058466
-f	2021	3	7	20	3	20072021	admindb	admindb	1653058466	1653058466
-f	2021	3	7	21	4	21072021	admindb	admindb	1653058466	1653058466
-f	2021	3	7	22	5	22072021	admindb	admindb	1653058466	1653058466
-f	2021	3	7	23	6	23072021	admindb	admindb	1653058466	1653058466
-f	2021	3	7	24	7	24072021	admindb	admindb	1653058466	1653058466
-f	2021	3	7	25	1	25072021	admindb	admindb	1653058466	1653058466
-f	2021	3	7	26	2	26072021	admindb	admindb	1653058466	1653058466
-f	2021	3	7	27	3	27072021	admindb	admindb	1653058466	1653058466
-f	2021	3	7	28	4	28072021	admindb	admindb	1653058466	1653058466
-f	2021	3	7	29	5	29072021	admindb	admindb	1653058466	1653058466
-f	2021	3	7	30	6	30072021	admindb	admindb	1653058466	1653058466
-f	2021	3	7	31	7	31072021	admindb	admindb	1653058466	1653058466
-f	2021	3	8	1	1	01082021	admindb	admindb	1653058466	1653058466
-f	2021	3	8	2	2	02082021	admindb	admindb	1653058466	1653058466
-f	2021	3	8	3	3	03082021	admindb	admindb	1653058466	1653058466
-f	2021	3	8	4	4	04082021	admindb	admindb	1653058466	1653058466
-f	2021	3	8	5	5	05082021	admindb	admindb	1653058466	1653058466
-f	2021	3	8	6	6	06082021	admindb	admindb	1653058466	1653058466
-f	2021	3	8	7	7	07082021	admindb	admindb	1653058466	1653058466
-f	2021	3	8	8	1	08082021	admindb	admindb	1653058466	1653058466
-f	2021	3	8	9	2	09082021	admindb	admindb	1653058466	1653058466
-f	2021	3	8	10	3	10082021	admindb	admindb	1653058466	1653058466
-f	2021	3	8	11	4	11082021	admindb	admindb	1653058466	1653058466
-f	2021	3	8	12	5	12082021	admindb	admindb	1653058466	1653058466
-f	2021	3	8	13	6	13082021	admindb	admindb	1653058466	1653058466
-f	2021	3	8	14	7	14082021	admindb	admindb	1653058466	1653058466
-f	2021	3	8	15	1	15082021	admindb	admindb	1653058466	1653058466
-f	2021	3	8	16	2	16082021	admindb	admindb	1653058466	1653058466
-f	2021	3	8	17	3	17082021	admindb	admindb	1653058466	1653058466
-f	2021	3	8	18	4	18082021	admindb	admindb	1653058466	1653058466
-f	2021	3	8	19	5	19082021	admindb	admindb	1653058466	1653058466
-f	2021	3	8	20	6	20082021	admindb	admindb	1653058466	1653058466
-f	2021	3	8	21	7	21082021	admindb	admindb	1653058466	1653058466
-f	2021	3	8	22	1	22082021	admindb	admindb	1653058466	1653058466
-f	2021	3	8	23	2	23082021	admindb	admindb	1653058466	1653058466
-f	2021	3	8	24	3	24082021	admindb	admindb	1653058466	1653058466
-f	2021	3	8	25	4	25082021	admindb	admindb	1653058466	1653058466
-f	2021	3	8	26	5	26082021	admindb	admindb	1653058466	1653058466
-f	2021	3	8	27	6	27082021	admindb	admindb	1653058466	1653058466
-f	2021	3	8	28	7	28082021	admindb	admindb	1653058466	1653058466
-f	2021	3	8	29	1	29082021	admindb	admindb	1653058466	1653058466
-f	2021	3	8	30	2	30082021	admindb	admindb	1653058466	1653058466
-f	2021	3	8	31	3	31082021	admindb	admindb	1653058466	1653058466
-f	2021	3	9	1	4	01092021	admindb	admindb	1653058466	1653058466
-f	2021	3	9	2	5	02092021	admindb	admindb	1653058466	1653058466
-f	2021	3	9	3	6	03092021	admindb	admindb	1653058466	1653058466
-f	2021	3	9	4	7	04092021	admindb	admindb	1653058466	1653058466
-f	2021	3	9	5	1	05092021	admindb	admindb	1653058466	1653058466
-f	2021	3	9	6	2	06092021	admindb	admindb	1653058466	1653058466
-f	2021	3	9	7	3	07092021	admindb	admindb	1653058466	1653058466
-f	2021	3	9	8	4	08092021	admindb	admindb	1653058466	1653058466
-f	2021	3	9	9	5	09092021	admindb	admindb	1653058466	1653058466
-f	2021	3	9	10	6	10092021	admindb	admindb	1653058466	1653058466
-f	2021	3	9	11	7	11092021	admindb	admindb	1653058466	1653058466
-f	2021	3	9	12	1	12092021	admindb	admindb	1653058466	1653058466
-f	2021	3	9	13	2	13092021	admindb	admindb	1653058466	1653058466
-f	2021	3	9	14	3	14092021	admindb	admindb	1653058466	1653058466
-f	2021	3	9	15	4	15092021	admindb	admindb	1653058466	1653058466
-f	2021	3	9	16	5	16092021	admindb	admindb	1653058466	1653058466
-f	2021	3	9	17	6	17092021	admindb	admindb	1653058466	1653058466
-f	2021	3	9	18	7	18092021	admindb	admindb	1653058466	1653058466
-f	2021	3	9	19	1	19092021	admindb	admindb	1653058466	1653058466
-f	2021	3	9	20	2	20092021	admindb	admindb	1653058466	1653058466
-f	2021	3	9	21	3	21092021	admindb	admindb	1653058466	1653058466
-f	2021	3	9	22	4	22092021	admindb	admindb	1653058466	1653058466
-f	2021	3	9	23	5	23092021	admindb	admindb	1653058466	1653058466
-f	2021	3	9	24	6	24092021	admindb	admindb	1653058466	1653058466
-f	2021	3	9	25	7	25092021	admindb	admindb	1653058466	1653058466
-f	2021	3	9	26	1	26092021	admindb	admindb	1653058466	1653058466
-f	2021	3	9	27	2	27092021	admindb	admindb	1653058466	1653058466
-f	2021	3	9	28	3	28092021	admindb	admindb	1653058466	1653058466
-f	2021	3	9	29	4	29092021	admindb	admindb	1653058466	1653058466
-f	2021	3	9	30	5	30092021	admindb	admindb	1653058466	1653058466
-f	2021	4	10	1	6	01102021	admindb	admindb	1653058466	1653058466
-f	2021	4	10	2	7	02102021	admindb	admindb	1653058466	1653058466
-f	2021	4	10	3	1	03102021	admindb	admindb	1653058466	1653058466
-f	2021	4	10	4	2	04102021	admindb	admindb	1653058466	1653058466
-f	2021	4	10	5	3	05102021	admindb	admindb	1653058466	1653058466
-f	2021	4	10	6	4	06102021	admindb	admindb	1653058466	1653058466
-f	2021	4	10	7	5	07102021	admindb	admindb	1653058466	1653058466
-f	2021	4	10	8	6	08102021	admindb	admindb	1653058466	1653058466
-f	2021	4	10	9	7	09102021	admindb	admindb	1653058466	1653058466
-f	2021	4	10	10	1	10102021	admindb	admindb	1653058466	1653058466
-f	2021	4	10	11	2	11102021	admindb	admindb	1653058466	1653058466
-f	2021	4	10	12	3	12102021	admindb	admindb	1653058466	1653058466
-f	2021	4	10	13	4	13102021	admindb	admindb	1653058466	1653058466
-f	2021	4	10	14	5	14102021	admindb	admindb	1653058466	1653058466
-f	2021	4	10	15	6	15102021	admindb	admindb	1653058466	1653058466
-f	2021	4	10	16	7	16102021	admindb	admindb	1653058466	1653058466
-f	2021	4	10	17	1	17102021	admindb	admindb	1653058466	1653058466
-f	2021	4	10	18	2	18102021	admindb	admindb	1653058466	1653058466
-f	2021	4	10	19	3	19102021	admindb	admindb	1653058466	1653058466
-f	2021	4	10	20	4	20102021	admindb	admindb	1653058466	1653058466
-f	2021	4	10	21	5	21102021	admindb	admindb	1653058466	1653058466
-f	2021	4	10	22	6	22102021	admindb	admindb	1653058466	1653058466
-f	2021	4	10	23	7	23102021	admindb	admindb	1653058466	1653058466
-f	2021	4	10	24	1	24102021	admindb	admindb	1653058466	1653058466
-f	2021	4	10	25	2	25102021	admindb	admindb	1653058466	1653058466
-f	2021	4	10	26	3	26102021	admindb	admindb	1653058466	1653058466
-f	2021	4	10	27	4	27102021	admindb	admindb	1653058466	1653058466
-f	2021	4	10	28	5	28102021	admindb	admindb	1653058466	1653058466
-f	2021	4	10	29	6	29102021	admindb	admindb	1653058466	1653058466
-f	2021	4	10	30	7	30102021	admindb	admindb	1653058466	1653058466
-f	2021	4	10	31	1	31102021	admindb	admindb	1653058466	1653058466
-f	2021	4	11	1	2	01112021	admindb	admindb	1653058466	1653058466
-f	2021	4	11	2	3	02112021	admindb	admindb	1653058466	1653058466
-f	2021	4	11	3	4	03112021	admindb	admindb	1653058466	1653058466
-f	2021	4	11	4	5	04112021	admindb	admindb	1653058466	1653058466
-f	2021	4	11	5	6	05112021	admindb	admindb	1653058466	1653058466
-f	2021	4	11	6	7	06112021	admindb	admindb	1653058466	1653058466
-f	2021	4	11	7	1	07112021	admindb	admindb	1653058466	1653058466
-f	2021	4	11	8	2	08112021	admindb	admindb	1653058466	1653058466
-f	2021	4	11	9	3	09112021	admindb	admindb	1653058466	1653058466
-f	2021	4	11	10	4	10112021	admindb	admindb	1653058466	1653058466
-f	2021	4	11	11	5	11112021	admindb	admindb	1653058466	1653058466
-f	2021	4	11	12	6	12112021	admindb	admindb	1653058466	1653058466
-f	2021	4	11	13	7	13112021	admindb	admindb	1653058466	1653058466
-f	2021	4	11	14	1	14112021	admindb	admindb	1653058466	1653058466
-f	2021	4	11	15	2	15112021	admindb	admindb	1653058466	1653058466
-f	2021	4	11	16	3	16112021	admindb	admindb	1653058466	1653058466
-f	2021	4	11	17	4	17112021	admindb	admindb	1653058466	1653058466
-f	2021	4	11	18	5	18112021	admindb	admindb	1653058466	1653058466
-f	2021	4	11	19	6	19112021	admindb	admindb	1653058466	1653058466
-f	2021	4	11	20	7	20112021	admindb	admindb	1653058466	1653058466
-f	2021	4	11	21	1	21112021	admindb	admindb	1653058466	1653058466
-f	2021	4	11	22	2	22112021	admindb	admindb	1653058466	1653058466
-f	2021	4	11	23	3	23112021	admindb	admindb	1653058466	1653058466
-f	2021	4	11	24	4	24112021	admindb	admindb	1653058466	1653058466
-f	2021	4	11	25	5	25112021	admindb	admindb	1653058466	1653058466
-f	2021	4	11	26	6	26112021	admindb	admindb	1653058466	1653058466
-f	2021	4	11	27	7	27112021	admindb	admindb	1653058466	1653058466
-f	2021	4	11	28	1	28112021	admindb	admindb	1653058466	1653058466
-f	2021	4	11	29	2	29112021	admindb	admindb	1653058466	1653058466
-f	2021	4	11	30	3	30112021	admindb	admindb	1653058466	1653058466
-f	2021	4	12	1	4	01122021	admindb	admindb	1653058466	1653058466
-f	2021	4	12	2	5	02122021	admindb	admindb	1653058466	1653058466
-f	2021	4	12	3	6	03122021	admindb	admindb	1653058466	1653058466
-f	2021	4	12	4	7	04122021	admindb	admindb	1653058466	1653058466
-f	2021	4	12	5	1	05122021	admindb	admindb	1653058466	1653058466
-f	2021	4	12	6	2	06122021	admindb	admindb	1653058466	1653058466
-f	2021	4	12	7	3	07122021	admindb	admindb	1653058466	1653058466
-f	2021	4	12	8	4	08122021	admindb	admindb	1653058466	1653058466
-f	2021	4	12	9	5	09122021	admindb	admindb	1653058466	1653058466
-f	2021	4	12	10	6	10122021	admindb	admindb	1653058466	1653058466
-f	2021	4	12	11	7	11122021	admindb	admindb	1653058466	1653058466
-f	2021	4	12	12	1	12122021	admindb	admindb	1653058466	1653058466
-f	2021	4	12	13	2	13122021	admindb	admindb	1653058466	1653058466
-f	2021	4	12	14	3	14122021	admindb	admindb	1653058466	1653058466
-f	2021	4	12	15	4	15122021	admindb	admindb	1653058466	1653058466
-f	2021	4	12	16	5	16122021	admindb	admindb	1653058466	1653058466
-f	2021	4	12	17	6	17122021	admindb	admindb	1653058466	1653058466
-f	2021	4	12	18	7	18122021	admindb	admindb	1653058466	1653058466
-f	2021	4	12	19	1	19122021	admindb	admindb	1653058466	1653058466
-f	2021	4	12	20	2	20122021	admindb	admindb	1653058466	1653058466
-f	2021	4	12	21	3	21122021	admindb	admindb	1653058466	1653058466
-f	2021	4	12	22	4	22122021	admindb	admindb	1653058466	1653058466
-f	2021	4	12	23	5	23122021	admindb	admindb	1653058466	1653058466
-f	2021	4	12	24	6	24122021	admindb	admindb	1653058466	1653058466
-f	2021	4	12	25	7	25122021	admindb	admindb	1653058466	1653058466
-f	2021	4	12	26	1	26122021	admindb	admindb	1653058466	1653058466
-f	2021	4	12	27	2	27122021	admindb	admindb	1653058466	1653058466
-f	2021	4	12	28	3	28122021	admindb	admindb	1653058466	1653058466
-f	2021	4	12	29	4	29122021	admindb	admindb	1653058466	1653058466
-f	2021	4	12	30	5	30122021	admindb	admindb	1653058466	1653058466
-f	2021	4	12	31	6	31122021	admindb	admindb	1653058466	1653058466
-f	2022	1	1	1	7	01012022	admindb	admindb	1653058466	1653058466
-f	2022	1	1	2	1	02012022	admindb	admindb	1653058466	1653058466
-f	2022	1	1	3	2	03012022	admindb	admindb	1653058466	1653058466
-f	2022	1	1	4	3	04012022	admindb	admindb	1653058466	1653058466
-f	2022	1	1	5	4	05012022	admindb	admindb	1653058466	1653058466
-f	2022	1	1	6	5	06012022	admindb	admindb	1653058466	1653058466
-f	2022	1	1	7	6	07012022	admindb	admindb	1653058466	1653058466
-f	2022	1	1	8	7	08012022	admindb	admindb	1653058466	1653058466
-f	2022	1	1	9	1	09012022	admindb	admindb	1653058466	1653058466
-f	2022	1	1	10	2	10012022	admindb	admindb	1653058466	1653058466
-f	2022	1	1	11	3	11012022	admindb	admindb	1653058466	1653058466
-f	2022	1	1	12	4	12012022	admindb	admindb	1653058466	1653058466
-f	2022	1	1	13	5	13012022	admindb	admindb	1653058466	1653058466
-f	2022	1	1	14	6	14012022	admindb	admindb	1653058466	1653058466
-f	2022	1	1	15	7	15012022	admindb	admindb	1653058466	1653058466
-f	2022	1	1	16	1	16012022	admindb	admindb	1653058466	1653058466
-f	2022	1	1	17	2	17012022	admindb	admindb	1653058466	1653058466
-f	2022	1	1	18	3	18012022	admindb	admindb	1653058466	1653058466
-f	2022	1	1	19	4	19012022	admindb	admindb	1653058466	1653058466
-f	2022	1	1	20	5	20012022	admindb	admindb	1653058466	1653058466
-f	2022	1	1	21	6	21012022	admindb	admindb	1653058466	1653058466
-f	2022	1	1	22	7	22012022	admindb	admindb	1653058466	1653058466
-f	2022	1	1	23	1	23012022	admindb	admindb	1653058466	1653058466
-f	2022	1	1	24	2	24012022	admindb	admindb	1653058466	1653058466
-f	2022	1	1	25	3	25012022	admindb	admindb	1653058466	1653058466
-f	2022	1	1	26	4	26012022	admindb	admindb	1653058466	1653058466
-f	2022	1	1	27	5	27012022	admindb	admindb	1653058466	1653058466
-f	2022	1	1	28	6	28012022	admindb	admindb	1653058466	1653058466
-f	2022	1	1	29	7	29012022	admindb	admindb	1653058466	1653058466
-f	2022	1	1	30	1	30012022	admindb	admindb	1653058466	1653058466
-f	2022	1	1	31	2	31012022	admindb	admindb	1653058466	1653058466
-f	2022	1	2	1	3	01022022	admindb	admindb	1653058466	1653058466
-f	2022	1	2	2	4	02022022	admindb	admindb	1653058466	1653058466
-f	2022	1	2	3	5	03022022	admindb	admindb	1653058466	1653058466
-f	2022	1	2	4	6	04022022	admindb	admindb	1653058466	1653058466
-f	2022	1	2	5	7	05022022	admindb	admindb	1653058466	1653058466
-f	2022	1	2	6	1	06022022	admindb	admindb	1653058466	1653058466
-f	2022	1	2	7	2	07022022	admindb	admindb	1653058466	1653058466
-f	2022	1	2	8	3	08022022	admindb	admindb	1653058466	1653058466
-f	2022	1	2	9	4	09022022	admindb	admindb	1653058466	1653058466
-f	2022	1	2	10	5	10022022	admindb	admindb	1653058466	1653058466
-f	2022	1	2	11	6	11022022	admindb	admindb	1653058466	1653058466
-f	2022	1	2	12	7	12022022	admindb	admindb	1653058466	1653058466
-f	2022	1	2	13	1	13022022	admindb	admindb	1653058466	1653058466
-f	2022	1	2	14	2	14022022	admindb	admindb	1653058466	1653058466
-f	2022	1	2	15	3	15022022	admindb	admindb	1653058466	1653058466
-f	2022	1	2	16	4	16022022	admindb	admindb	1653058466	1653058466
-f	2022	1	2	17	5	17022022	admindb	admindb	1653058466	1653058466
-f	2022	1	2	18	6	18022022	admindb	admindb	1653058466	1653058466
-f	2022	1	2	19	7	19022022	admindb	admindb	1653058466	1653058466
-f	2022	1	2	20	1	20022022	admindb	admindb	1653058466	1653058466
-f	2022	1	2	21	2	21022022	admindb	admindb	1653058466	1653058466
-f	2022	1	2	22	3	22022022	admindb	admindb	1653058466	1653058466
-f	2022	1	2	23	4	23022022	admindb	admindb	1653058466	1653058466
-f	2022	1	2	24	5	24022022	admindb	admindb	1653058466	1653058466
-f	2022	1	2	25	6	25022022	admindb	admindb	1653058466	1653058466
-f	2022	1	2	26	7	26022022	admindb	admindb	1653058466	1653058466
-f	2022	1	2	27	1	27022022	admindb	admindb	1653058466	1653058466
-f	2022	1	2	28	2	28022022	admindb	admindb	1653058466	1653058466
-f	2022	1	3	1	3	01032022	admindb	admindb	1653058466	1653058466
-f	2022	1	3	2	4	02032022	admindb	admindb	1653058466	1653058466
-f	2022	1	3	3	5	03032022	admindb	admindb	1653058466	1653058466
-f	2022	1	3	4	6	04032022	admindb	admindb	1653058466	1653058466
-f	2022	1	3	5	7	05032022	admindb	admindb	1653058466	1653058466
-f	2022	1	3	6	1	06032022	admindb	admindb	1653058466	1653058466
-f	2022	1	3	7	2	07032022	admindb	admindb	1653058466	1653058466
-f	2022	1	3	8	3	08032022	admindb	admindb	1653058466	1653058466
-f	2022	1	3	9	4	09032022	admindb	admindb	1653058466	1653058466
-f	2022	1	3	10	5	10032022	admindb	admindb	1653058466	1653058466
-f	2022	1	3	11	6	11032022	admindb	admindb	1653058466	1653058466
-f	2022	1	3	12	7	12032022	admindb	admindb	1653058466	1653058466
-f	2022	1	3	13	1	13032022	admindb	admindb	1653058466	1653058466
-f	2022	1	3	14	2	14032022	admindb	admindb	1653058466	1653058466
-f	2022	1	3	15	3	15032022	admindb	admindb	1653058466	1653058466
-f	2022	1	3	16	4	16032022	admindb	admindb	1653058466	1653058466
-f	2022	1	3	17	5	17032022	admindb	admindb	1653058466	1653058466
-f	2022	1	3	18	6	18032022	admindb	admindb	1653058466	1653058466
-f	2022	1	3	19	7	19032022	admindb	admindb	1653058466	1653058466
-f	2022	1	3	20	1	20032022	admindb	admindb	1653058466	1653058466
-f	2022	1	3	21	2	21032022	admindb	admindb	1653058466	1653058466
-f	2022	1	3	22	3	22032022	admindb	admindb	1653058466	1653058466
-f	2022	1	3	23	4	23032022	admindb	admindb	1653058466	1653058466
-f	2022	1	3	24	5	24032022	admindb	admindb	1653058466	1653058466
-f	2022	1	3	25	6	25032022	admindb	admindb	1653058466	1653058466
-f	2022	1	3	26	7	26032022	admindb	admindb	1653058466	1653058466
-f	2022	1	3	27	1	27032022	admindb	admindb	1653058466	1653058466
-f	2022	1	3	28	2	28032022	admindb	admindb	1653058466	1653058466
-f	2022	1	3	29	3	29032022	admindb	admindb	1653058466	1653058466
-f	2022	1	3	30	4	30032022	admindb	admindb	1653058466	1653058466
-f	2022	1	3	31	5	31032022	admindb	admindb	1653058466	1653058466
-f	2022	2	4	1	6	01042022	admindb	admindb	1653058466	1653058466
-f	2022	2	4	2	7	02042022	admindb	admindb	1653058466	1653058466
-f	2022	2	4	3	1	03042022	admindb	admindb	1653058466	1653058466
-f	2022	2	4	4	2	04042022	admindb	admindb	1653058466	1653058466
-f	2022	2	4	5	3	05042022	admindb	admindb	1653058466	1653058466
-f	2022	2	4	6	4	06042022	admindb	admindb	1653058466	1653058466
-f	2022	2	4	7	5	07042022	admindb	admindb	1653058466	1653058466
-f	2022	2	4	8	6	08042022	admindb	admindb	1653058466	1653058466
-f	2022	2	4	9	7	09042022	admindb	admindb	1653058466	1653058466
-f	2022	2	4	10	1	10042022	admindb	admindb	1653058466	1653058466
-f	2022	2	4	11	2	11042022	admindb	admindb	1653058466	1653058466
-f	2022	2	4	12	3	12042022	admindb	admindb	1653058466	1653058466
-f	2022	2	4	13	4	13042022	admindb	admindb	1653058466	1653058466
-f	2022	2	4	14	5	14042022	admindb	admindb	1653058466	1653058466
-f	2022	2	4	15	6	15042022	admindb	admindb	1653058466	1653058466
-f	2022	2	4	16	7	16042022	admindb	admindb	1653058466	1653058466
-f	2022	2	4	17	1	17042022	admindb	admindb	1653058466	1653058466
-f	2022	2	4	18	2	18042022	admindb	admindb	1653058466	1653058466
-f	2022	2	4	19	3	19042022	admindb	admindb	1653058466	1653058466
-f	2022	2	4	20	4	20042022	admindb	admindb	1653058466	1653058466
-f	2022	2	4	21	5	21042022	admindb	admindb	1653058466	1653058466
-f	2022	2	4	22	6	22042022	admindb	admindb	1653058466	1653058466
-f	2022	2	4	23	7	23042022	admindb	admindb	1653058466	1653058466
-f	2022	2	4	24	1	24042022	admindb	admindb	1653058466	1653058466
-f	2022	2	4	25	2	25042022	admindb	admindb	1653058466	1653058466
-f	2022	2	4	26	3	26042022	admindb	admindb	1653058466	1653058466
-f	2022	2	4	27	4	27042022	admindb	admindb	1653058466	1653058466
-f	2022	2	4	28	5	28042022	admindb	admindb	1653058466	1653058466
-f	2022	2	4	29	6	29042022	admindb	admindb	1653058466	1653058466
-f	2022	2	4	30	7	30042022	admindb	admindb	1653058466	1653058466
-f	2022	2	5	1	1	01052022	admindb	admindb	1653058466	1653058466
-f	2022	2	5	2	2	02052022	admindb	admindb	1653058466	1653058466
-f	2022	2	5	3	3	03052022	admindb	admindb	1653058466	1653058466
-f	2022	2	5	4	4	04052022	admindb	admindb	1653058466	1653058466
-f	2022	2	5	5	5	05052022	admindb	admindb	1653058466	1653058466
-f	2022	2	5	6	6	06052022	admindb	admindb	1653058466	1653058466
-f	2022	2	5	7	7	07052022	admindb	admindb	1653058466	1653058466
-f	2022	2	5	8	1	08052022	admindb	admindb	1653058466	1653058466
-f	2022	2	5	9	2	09052022	admindb	admindb	1653058466	1653058466
-f	2022	2	5	10	3	10052022	admindb	admindb	1653058466	1653058466
-f	2022	2	5	11	4	11052022	admindb	admindb	1653058466	1653058466
-f	2022	2	5	12	5	12052022	admindb	admindb	1653058466	1653058466
-f	2022	2	5	13	6	13052022	admindb	admindb	1653058466	1653058466
-f	2022	2	5	14	7	14052022	admindb	admindb	1653058466	1653058466
-f	2022	2	5	15	1	15052022	admindb	admindb	1653058466	1653058466
-f	2022	2	5	16	2	16052022	admindb	admindb	1653058466	1653058466
-f	2022	2	5	17	3	17052022	admindb	admindb	1653058466	1653058466
-f	2022	2	5	18	4	18052022	admindb	admindb	1653058466	1653058466
-f	2022	2	5	19	5	19052022	admindb	admindb	1653058466	1653058466
-f	2022	2	5	20	6	20052022	admindb	admindb	1653058466	1653058466
-f	2022	2	5	21	7	21052022	admindb	admindb	1653058466	1653058466
-f	2022	2	5	22	1	22052022	admindb	admindb	1653058466	1653058466
-f	2022	2	5	23	2	23052022	admindb	admindb	1653058466	1653058466
-f	2022	2	5	24	3	24052022	admindb	admindb	1653058466	1653058466
-f	2022	2	5	25	4	25052022	admindb	admindb	1653058466	1653058466
-f	2022	2	5	26	5	26052022	admindb	admindb	1653058466	1653058466
-f	2022	2	5	27	6	27052022	admindb	admindb	1653058466	1653058466
-f	2022	2	5	28	7	28052022	admindb	admindb	1653058466	1653058466
-f	2022	2	5	29	1	29052022	admindb	admindb	1653058466	1653058466
-f	2022	2	5	30	2	30052022	admindb	admindb	1653058466	1653058466
-f	2022	2	5	31	3	31052022	admindb	admindb	1653058466	1653058466
-f	2022	2	6	1	4	01062022	admindb	admindb	1653058466	1653058466
-f	2022	2	6	2	5	02062022	admindb	admindb	1653058466	1653058466
-f	2022	2	6	3	6	03062022	admindb	admindb	1653058466	1653058466
-f	2022	2	6	4	7	04062022	admindb	admindb	1653058466	1653058466
-f	2022	2	6	5	1	05062022	admindb	admindb	1653058466	1653058466
-f	2022	2	6	6	2	06062022	admindb	admindb	1653058466	1653058466
-f	2022	2	6	7	3	07062022	admindb	admindb	1653058466	1653058466
-f	2022	2	6	8	4	08062022	admindb	admindb	1653058466	1653058466
-f	2022	2	6	9	5	09062022	admindb	admindb	1653058466	1653058466
-f	2022	2	6	10	6	10062022	admindb	admindb	1653058466	1653058466
-f	2022	2	6	11	7	11062022	admindb	admindb	1653058466	1653058466
-f	2022	2	6	12	1	12062022	admindb	admindb	1653058466	1653058466
-f	2022	2	6	13	2	13062022	admindb	admindb	1653058466	1653058466
-f	2022	2	6	14	3	14062022	admindb	admindb	1653058466	1653058466
-f	2022	2	6	15	4	15062022	admindb	admindb	1653058466	1653058466
-f	2022	2	6	16	5	16062022	admindb	admindb	1653058466	1653058466
-f	2022	2	6	17	6	17062022	admindb	admindb	1653058466	1653058466
-f	2022	2	6	18	7	18062022	admindb	admindb	1653058466	1653058466
-f	2022	2	6	19	1	19062022	admindb	admindb	1653058466	1653058466
-f	2022	2	6	20	2	20062022	admindb	admindb	1653058466	1653058466
-f	2022	2	6	21	3	21062022	admindb	admindb	1653058466	1653058466
-f	2022	2	6	22	4	22062022	admindb	admindb	1653058466	1653058466
-f	2022	2	6	23	5	23062022	admindb	admindb	1653058466	1653058466
-f	2022	2	6	24	6	24062022	admindb	admindb	1653058466	1653058466
-f	2022	2	6	25	7	25062022	admindb	admindb	1653058466	1653058466
-f	2022	2	6	26	1	26062022	admindb	admindb	1653058466	1653058466
-f	2022	2	6	27	2	27062022	admindb	admindb	1653058466	1653058466
-f	2022	2	6	28	3	28062022	admindb	admindb	1653058466	1653058466
-f	2022	2	6	29	4	29062022	admindb	admindb	1653058466	1653058466
-f	2022	2	6	30	5	30062022	admindb	admindb	1653058466	1653058466
-f	2022	3	7	1	6	01072022	admindb	admindb	1653058466	1653058466
-f	2022	3	7	2	7	02072022	admindb	admindb	1653058466	1653058466
-f	2022	3	7	3	1	03072022	admindb	admindb	1653058466	1653058466
-f	2022	3	7	4	2	04072022	admindb	admindb	1653058466	1653058466
-f	2022	3	7	5	3	05072022	admindb	admindb	1653058466	1653058466
-f	2022	3	7	6	4	06072022	admindb	admindb	1653058466	1653058466
-f	2022	3	7	7	5	07072022	admindb	admindb	1653058466	1653058466
-f	2022	3	7	8	6	08072022	admindb	admindb	1653058466	1653058466
-f	2022	3	7	9	7	09072022	admindb	admindb	1653058466	1653058466
-f	2022	3	7	10	1	10072022	admindb	admindb	1653058466	1653058466
-f	2022	3	7	11	2	11072022	admindb	admindb	1653058466	1653058466
-f	2022	3	7	12	3	12072022	admindb	admindb	1653058466	1653058466
-f	2022	3	7	13	4	13072022	admindb	admindb	1653058466	1653058466
-f	2022	3	7	14	5	14072022	admindb	admindb	1653058466	1653058466
-f	2022	3	7	15	6	15072022	admindb	admindb	1653058466	1653058466
-f	2022	3	7	16	7	16072022	admindb	admindb	1653058466	1653058466
-f	2022	3	7	17	1	17072022	admindb	admindb	1653058466	1653058466
-f	2022	3	7	18	2	18072022	admindb	admindb	1653058466	1653058466
-f	2022	3	7	19	3	19072022	admindb	admindb	1653058466	1653058466
-f	2022	3	7	20	4	20072022	admindb	admindb	1653058466	1653058466
-f	2022	3	7	21	5	21072022	admindb	admindb	1653058466	1653058466
-f	2022	3	7	22	6	22072022	admindb	admindb	1653058466	1653058466
-f	2022	3	7	23	7	23072022	admindb	admindb	1653058466	1653058466
-f	2022	3	7	24	1	24072022	admindb	admindb	1653058466	1653058466
-f	2022	3	7	25	2	25072022	admindb	admindb	1653058466	1653058466
-f	2022	3	7	26	3	26072022	admindb	admindb	1653058466	1653058466
-f	2022	3	7	27	4	27072022	admindb	admindb	1653058466	1653058466
-f	2022	3	7	28	5	28072022	admindb	admindb	1653058466	1653058466
-f	2022	3	7	29	6	29072022	admindb	admindb	1653058466	1653058466
-f	2022	3	7	30	7	30072022	admindb	admindb	1653058466	1653058466
-f	2022	3	7	31	1	31072022	admindb	admindb	1653058466	1653058466
-f	2022	3	8	1	2	01082022	admindb	admindb	1653058466	1653058466
-f	2022	3	8	2	3	02082022	admindb	admindb	1653058466	1653058466
-f	2022	3	8	3	4	03082022	admindb	admindb	1653058466	1653058466
-f	2022	3	8	4	5	04082022	admindb	admindb	1653058466	1653058466
-f	2022	3	8	5	6	05082022	admindb	admindb	1653058466	1653058466
-f	2022	3	8	6	7	06082022	admindb	admindb	1653058466	1653058466
-f	2022	3	8	7	1	07082022	admindb	admindb	1653058466	1653058466
-f	2022	3	8	8	2	08082022	admindb	admindb	1653058466	1653058466
-f	2022	3	8	9	3	09082022	admindb	admindb	1653058466	1653058466
-f	2022	3	8	10	4	10082022	admindb	admindb	1653058466	1653058466
-f	2022	3	8	11	5	11082022	admindb	admindb	1653058466	1653058466
-f	2022	3	8	12	6	12082022	admindb	admindb	1653058466	1653058466
-f	2022	3	8	13	7	13082022	admindb	admindb	1653058466	1653058466
-f	2022	3	8	14	1	14082022	admindb	admindb	1653058466	1653058466
-f	2022	3	8	15	2	15082022	admindb	admindb	1653058466	1653058466
-f	2022	3	8	16	3	16082022	admindb	admindb	1653058466	1653058466
-f	2022	3	8	17	4	17082022	admindb	admindb	1653058466	1653058466
-f	2022	3	8	18	5	18082022	admindb	admindb	1653058466	1653058466
-f	2022	3	8	19	6	19082022	admindb	admindb	1653058466	1653058466
-f	2022	3	8	20	7	20082022	admindb	admindb	1653058466	1653058466
-f	2022	3	8	21	1	21082022	admindb	admindb	1653058466	1653058466
-f	2022	3	8	22	2	22082022	admindb	admindb	1653058466	1653058466
-f	2022	3	8	23	3	23082022	admindb	admindb	1653058466	1653058466
-f	2022	3	8	24	4	24082022	admindb	admindb	1653058466	1653058466
-f	2022	3	8	25	5	25082022	admindb	admindb	1653058466	1653058466
-f	2022	3	8	26	6	26082022	admindb	admindb	1653058466	1653058466
-f	2022	3	8	27	7	27082022	admindb	admindb	1653058466	1653058466
-f	2022	3	8	28	1	28082022	admindb	admindb	1653058466	1653058466
-f	2022	3	8	29	2	29082022	admindb	admindb	1653058466	1653058466
-f	2022	3	8	30	3	30082022	admindb	admindb	1653058466	1653058466
-f	2022	3	8	31	4	31082022	admindb	admindb	1653058466	1653058466
-f	2022	3	9	1	5	01092022	admindb	admindb	1653058466	1653058466
-f	2022	3	9	2	6	02092022	admindb	admindb	1653058466	1653058466
-f	2022	3	9	3	7	03092022	admindb	admindb	1653058466	1653058466
-f	2022	3	9	4	1	04092022	admindb	admindb	1653058466	1653058466
-f	2022	3	9	5	2	05092022	admindb	admindb	1653058466	1653058466
-f	2022	3	9	6	3	06092022	admindb	admindb	1653058466	1653058466
-f	2022	3	9	7	4	07092022	admindb	admindb	1653058466	1653058466
-f	2022	3	9	8	5	08092022	admindb	admindb	1653058466	1653058466
-f	2022	3	9	9	6	09092022	admindb	admindb	1653058466	1653058466
-f	2022	3	9	10	7	10092022	admindb	admindb	1653058466	1653058466
-f	2022	3	9	11	1	11092022	admindb	admindb	1653058466	1653058466
-f	2022	3	9	12	2	12092022	admindb	admindb	1653058466	1653058466
-f	2022	3	9	13	3	13092022	admindb	admindb	1653058466	1653058466
-f	2022	3	9	14	4	14092022	admindb	admindb	1653058466	1653058466
-f	2022	3	9	15	5	15092022	admindb	admindb	1653058466	1653058466
-f	2022	3	9	16	6	16092022	admindb	admindb	1653058466	1653058466
-f	2022	3	9	17	7	17092022	admindb	admindb	1653058466	1653058466
-f	2022	3	9	18	1	18092022	admindb	admindb	1653058466	1653058466
-f	2022	3	9	19	2	19092022	admindb	admindb	1653058466	1653058466
-f	2022	3	9	20	3	20092022	admindb	admindb	1653058466	1653058466
-f	2022	3	9	21	4	21092022	admindb	admindb	1653058466	1653058466
-f	2022	3	9	22	5	22092022	admindb	admindb	1653058466	1653058466
-f	2022	3	9	23	6	23092022	admindb	admindb	1653058466	1653058466
-f	2022	3	9	24	7	24092022	admindb	admindb	1653058466	1653058466
-f	2022	3	9	25	1	25092022	admindb	admindb	1653058466	1653058466
-f	2022	3	9	26	2	26092022	admindb	admindb	1653058466	1653058466
-f	2022	3	9	27	3	27092022	admindb	admindb	1653058466	1653058466
-f	2022	3	9	28	4	28092022	admindb	admindb	1653058466	1653058466
-f	2022	3	9	29	5	29092022	admindb	admindb	1653058466	1653058466
-f	2022	3	9	30	6	30092022	admindb	admindb	1653058466	1653058466
-f	2022	4	10	1	7	01102022	admindb	admindb	1653058466	1653058466
-f	2022	4	10	2	1	02102022	admindb	admindb	1653058466	1653058466
-f	2022	4	10	3	2	03102022	admindb	admindb	1653058466	1653058466
-f	2022	4	10	4	3	04102022	admindb	admindb	1653058466	1653058466
-f	2022	4	10	5	4	05102022	admindb	admindb	1653058466	1653058466
-f	2022	4	10	6	5	06102022	admindb	admindb	1653058466	1653058466
-f	2022	4	10	7	6	07102022	admindb	admindb	1653058466	1653058466
-f	2022	4	10	8	7	08102022	admindb	admindb	1653058466	1653058466
-f	2022	4	10	9	1	09102022	admindb	admindb	1653058466	1653058466
-f	2022	4	10	10	2	10102022	admindb	admindb	1653058466	1653058466
-f	2022	4	10	11	3	11102022	admindb	admindb	1653058466	1653058466
-f	2022	4	10	12	4	12102022	admindb	admindb	1653058466	1653058466
-f	2022	4	10	13	5	13102022	admindb	admindb	1653058466	1653058466
-f	2022	4	10	14	6	14102022	admindb	admindb	1653058466	1653058466
-f	2022	4	10	15	7	15102022	admindb	admindb	1653058466	1653058466
-f	2022	4	10	16	1	16102022	admindb	admindb	1653058466	1653058466
-f	2022	4	10	17	2	17102022	admindb	admindb	1653058466	1653058466
-f	2022	4	10	18	3	18102022	admindb	admindb	1653058466	1653058466
-f	2022	4	10	19	4	19102022	admindb	admindb	1653058466	1653058466
-f	2022	4	10	20	5	20102022	admindb	admindb	1653058466	1653058466
-f	2022	4	10	21	6	21102022	admindb	admindb	1653058466	1653058466
-f	2022	4	10	22	7	22102022	admindb	admindb	1653058466	1653058466
-f	2022	4	10	23	1	23102022	admindb	admindb	1653058466	1653058466
-f	2022	4	10	24	2	24102022	admindb	admindb	1653058466	1653058466
-f	2022	4	10	25	3	25102022	admindb	admindb	1653058466	1653058466
-f	2022	4	10	26	4	26102022	admindb	admindb	1653058466	1653058466
-f	2022	4	10	27	5	27102022	admindb	admindb	1653058466	1653058466
-f	2022	4	10	28	6	28102022	admindb	admindb	1653058466	1653058466
-f	2022	4	10	29	7	29102022	admindb	admindb	1653058466	1653058466
-f	2022	4	10	30	1	30102022	admindb	admindb	1653058466	1653058466
-f	2022	4	10	31	2	31102022	admindb	admindb	1653058466	1653058466
-f	2022	4	11	1	3	01112022	admindb	admindb	1653058466	1653058466
-f	2022	4	11	2	4	02112022	admindb	admindb	1653058466	1653058466
-f	2022	4	11	3	5	03112022	admindb	admindb	1653058466	1653058466
-f	2022	4	11	4	6	04112022	admindb	admindb	1653058466	1653058466
-f	2022	4	11	5	7	05112022	admindb	admindb	1653058466	1653058466
-f	2022	4	11	6	1	06112022	admindb	admindb	1653058466	1653058466
-f	2022	4	11	7	2	07112022	admindb	admindb	1653058466	1653058466
-f	2022	4	11	8	3	08112022	admindb	admindb	1653058466	1653058466
-f	2022	4	11	9	4	09112022	admindb	admindb	1653058466	1653058466
-f	2022	4	11	10	5	10112022	admindb	admindb	1653058466	1653058466
-f	2022	4	11	11	6	11112022	admindb	admindb	1653058466	1653058466
-f	2022	4	11	12	7	12112022	admindb	admindb	1653058466	1653058466
-f	2022	4	11	13	1	13112022	admindb	admindb	1653058466	1653058466
-f	2022	4	11	14	2	14112022	admindb	admindb	1653058466	1653058466
-f	2022	4	11	15	3	15112022	admindb	admindb	1653058466	1653058466
-f	2022	4	11	16	4	16112022	admindb	admindb	1653058466	1653058466
-f	2022	4	11	17	5	17112022	admindb	admindb	1653058466	1653058466
-f	2022	4	11	18	6	18112022	admindb	admindb	1653058466	1653058466
-f	2022	4	11	19	7	19112022	admindb	admindb	1653058466	1653058466
-f	2022	4	11	20	1	20112022	admindb	admindb	1653058466	1653058466
-f	2022	4	11	21	2	21112022	admindb	admindb	1653058466	1653058466
-f	2022	4	11	22	3	22112022	admindb	admindb	1653058466	1653058466
-f	2022	4	11	23	4	23112022	admindb	admindb	1653058466	1653058466
-f	2022	4	11	24	5	24112022	admindb	admindb	1653058466	1653058466
-f	2022	4	11	25	6	25112022	admindb	admindb	1653058466	1653058466
-f	2022	4	11	26	7	26112022	admindb	admindb	1653058466	1653058466
-f	2022	4	11	27	1	27112022	admindb	admindb	1653058466	1653058466
-f	2022	4	11	28	2	28112022	admindb	admindb	1653058466	1653058466
-f	2022	4	11	29	3	29112022	admindb	admindb	1653058466	1653058466
-f	2022	4	11	30	4	30112022	admindb	admindb	1653058466	1653058466
-f	2022	4	12	1	5	01122022	admindb	admindb	1653058466	1653058466
-f	2022	4	12	2	6	02122022	admindb	admindb	1653058466	1653058466
-f	2022	4	12	3	7	03122022	admindb	admindb	1653058466	1653058466
-f	2022	4	12	4	1	04122022	admindb	admindb	1653058466	1653058466
-f	2022	4	12	5	2	05122022	admindb	admindb	1653058466	1653058466
-f	2022	4	12	6	3	06122022	admindb	admindb	1653058466	1653058466
-f	2022	4	12	7	4	07122022	admindb	admindb	1653058466	1653058466
-f	2022	4	12	8	5	08122022	admindb	admindb	1653058466	1653058466
-f	2022	4	12	9	6	09122022	admindb	admindb	1653058466	1653058466
-f	2022	4	12	10	7	10122022	admindb	admindb	1653058466	1653058466
-f	2022	4	12	11	1	11122022	admindb	admindb	1653058466	1653058466
-f	2022	4	12	12	2	12122022	admindb	admindb	1653058466	1653058466
-f	2022	4	12	13	3	13122022	admindb	admindb	1653058466	1653058466
-f	2022	4	12	14	4	14122022	admindb	admindb	1653058466	1653058466
-f	2022	4	12	15	5	15122022	admindb	admindb	1653058466	1653058466
-f	2022	4	12	16	6	16122022	admindb	admindb	1653058466	1653058466
-f	2022	4	12	17	7	17122022	admindb	admindb	1653058466	1653058466
-f	2022	4	12	18	1	18122022	admindb	admindb	1653058466	1653058466
-f	2022	4	12	19	2	19122022	admindb	admindb	1653058466	1653058466
-f	2022	4	12	20	3	20122022	admindb	admindb	1653058466	1653058466
-f	2022	4	12	21	4	21122022	admindb	admindb	1653058466	1653058466
-f	2022	4	12	22	5	22122022	admindb	admindb	1653058466	1653058466
-f	2022	4	12	23	6	23122022	admindb	admindb	1653058466	1653058466
-f	2022	4	12	24	7	24122022	admindb	admindb	1653058466	1653058466
-f	2022	4	12	25	1	25122022	admindb	admindb	1653058466	1653058466
-f	2022	4	12	26	2	26122022	admindb	admindb	1653058466	1653058466
-f	2022	4	12	27	3	27122022	admindb	admindb	1653058466	1653058466
-f	2022	4	12	28	4	28122022	admindb	admindb	1653058466	1653058466
-f	2022	4	12	29	5	29122022	admindb	admindb	1653058466	1653058466
-f	2022	4	12	30	6	30122022	admindb	admindb	1653058466	1653058466
-f	2022	4	12	31	7	31122022	admindb	admindb	1653058466	1653058466
-f	2023	1	1	1	1	01012023	admindb	admindb	1653058466	1653058466
-f	2023	1	1	2	2	02012023	admindb	admindb	1653058466	1653058466
-f	2023	1	1	3	3	03012023	admindb	admindb	1653058466	1653058466
-f	2023	1	1	4	4	04012023	admindb	admindb	1653058466	1653058466
-f	2023	1	1	5	5	05012023	admindb	admindb	1653058466	1653058466
-f	2023	1	1	6	6	06012023	admindb	admindb	1653058466	1653058466
-f	2023	1	1	7	7	07012023	admindb	admindb	1653058466	1653058466
-f	2023	1	1	8	1	08012023	admindb	admindb	1653058466	1653058466
-f	2023	1	1	9	2	09012023	admindb	admindb	1653058466	1653058466
-f	2023	1	1	10	3	10012023	admindb	admindb	1653058466	1653058466
-f	2023	1	1	11	4	11012023	admindb	admindb	1653058466	1653058466
-f	2023	1	1	12	5	12012023	admindb	admindb	1653058466	1653058466
-f	2023	1	1	13	6	13012023	admindb	admindb	1653058466	1653058466
-f	2023	1	1	14	7	14012023	admindb	admindb	1653058466	1653058466
-f	2023	1	1	15	1	15012023	admindb	admindb	1653058466	1653058466
-f	2023	1	1	16	2	16012023	admindb	admindb	1653058466	1653058466
-f	2023	1	1	17	3	17012023	admindb	admindb	1653058466	1653058466
-f	2023	1	1	18	4	18012023	admindb	admindb	1653058466	1653058466
-f	2023	1	1	19	5	19012023	admindb	admindb	1653058466	1653058466
-f	2023	1	1	20	6	20012023	admindb	admindb	1653058466	1653058466
-f	2023	1	1	21	7	21012023	admindb	admindb	1653058466	1653058466
-f	2023	1	1	22	1	22012023	admindb	admindb	1653058466	1653058466
-f	2023	1	1	23	2	23012023	admindb	admindb	1653058466	1653058466
-f	2023	1	1	24	3	24012023	admindb	admindb	1653058466	1653058466
-f	2023	1	1	25	4	25012023	admindb	admindb	1653058466	1653058466
-f	2023	1	1	26	5	26012023	admindb	admindb	1653058466	1653058466
-f	2023	1	1	27	6	27012023	admindb	admindb	1653058466	1653058466
-f	2023	1	1	28	7	28012023	admindb	admindb	1653058466	1653058466
-f	2023	1	1	29	1	29012023	admindb	admindb	1653058466	1653058466
-f	2023	1	1	30	2	30012023	admindb	admindb	1653058466	1653058466
-f	2023	1	1	31	3	31012023	admindb	admindb	1653058466	1653058466
-f	2023	1	2	1	4	01022023	admindb	admindb	1653058466	1653058466
-f	2023	1	2	2	5	02022023	admindb	admindb	1653058466	1653058466
-f	2023	1	2	3	6	03022023	admindb	admindb	1653058466	1653058466
-f	2023	1	2	4	7	04022023	admindb	admindb	1653058466	1653058466
-f	2023	1	2	5	1	05022023	admindb	admindb	1653058466	1653058466
-f	2023	1	2	6	2	06022023	admindb	admindb	1653058466	1653058466
-f	2023	1	2	7	3	07022023	admindb	admindb	1653058466	1653058466
-f	2023	1	2	8	4	08022023	admindb	admindb	1653058466	1653058466
-f	2023	1	2	9	5	09022023	admindb	admindb	1653058466	1653058466
-f	2023	1	2	10	6	10022023	admindb	admindb	1653058466	1653058466
-f	2023	1	2	11	7	11022023	admindb	admindb	1653058466	1653058466
-f	2023	1	2	12	1	12022023	admindb	admindb	1653058466	1653058466
-f	2023	1	2	13	2	13022023	admindb	admindb	1653058466	1653058466
-f	2023	1	2	14	3	14022023	admindb	admindb	1653058466	1653058466
-f	2023	1	2	15	4	15022023	admindb	admindb	1653058466	1653058466
-f	2023	1	2	16	5	16022023	admindb	admindb	1653058466	1653058466
-f	2023	1	2	17	6	17022023	admindb	admindb	1653058466	1653058466
-f	2023	1	2	18	7	18022023	admindb	admindb	1653058466	1653058466
-f	2023	1	2	19	1	19022023	admindb	admindb	1653058466	1653058466
-f	2023	1	2	20	2	20022023	admindb	admindb	1653058466	1653058466
-f	2023	1	2	21	3	21022023	admindb	admindb	1653058466	1653058466
-f	2023	1	2	22	4	22022023	admindb	admindb	1653058466	1653058466
-f	2023	1	2	23	5	23022023	admindb	admindb	1653058466	1653058466
-f	2023	1	2	24	6	24022023	admindb	admindb	1653058466	1653058466
-f	2023	1	2	25	7	25022023	admindb	admindb	1653058466	1653058466
-f	2023	1	2	26	1	26022023	admindb	admindb	1653058466	1653058466
-f	2023	1	2	27	2	27022023	admindb	admindb	1653058466	1653058466
-f	2023	1	2	28	3	28022023	admindb	admindb	1653058466	1653058466
-f	2023	1	3	1	4	01032023	admindb	admindb	1653058466	1653058466
-f	2023	1	3	2	5	02032023	admindb	admindb	1653058466	1653058466
-f	2023	1	3	3	6	03032023	admindb	admindb	1653058466	1653058466
-f	2023	1	3	4	7	04032023	admindb	admindb	1653058466	1653058466
-f	2023	1	3	5	1	05032023	admindb	admindb	1653058466	1653058466
-f	2023	1	3	6	2	06032023	admindb	admindb	1653058466	1653058466
-f	2023	1	3	7	3	07032023	admindb	admindb	1653058466	1653058466
-f	2023	1	3	8	4	08032023	admindb	admindb	1653058466	1653058466
-f	2023	1	3	9	5	09032023	admindb	admindb	1653058466	1653058466
-f	2023	1	3	10	6	10032023	admindb	admindb	1653058466	1653058466
-f	2023	1	3	11	7	11032023	admindb	admindb	1653058466	1653058466
-f	2023	1	3	12	1	12032023	admindb	admindb	1653058466	1653058466
-f	2023	1	3	13	2	13032023	admindb	admindb	1653058466	1653058466
-f	2023	1	3	14	3	14032023	admindb	admindb	1653058466	1653058466
-f	2023	1	3	15	4	15032023	admindb	admindb	1653058466	1653058466
-f	2023	1	3	16	5	16032023	admindb	admindb	1653058466	1653058466
-f	2023	1	3	17	6	17032023	admindb	admindb	1653058466	1653058466
-f	2023	1	3	18	7	18032023	admindb	admindb	1653058466	1653058466
-f	2023	1	3	19	1	19032023	admindb	admindb	1653058466	1653058466
-f	2023	1	3	20	2	20032023	admindb	admindb	1653058466	1653058466
-f	2023	1	3	21	3	21032023	admindb	admindb	1653058466	1653058466
-f	2023	1	3	22	4	22032023	admindb	admindb	1653058466	1653058466
-f	2023	1	3	23	5	23032023	admindb	admindb	1653058466	1653058466
-f	2023	1	3	24	6	24032023	admindb	admindb	1653058466	1653058466
-f	2023	1	3	25	7	25032023	admindb	admindb	1653058466	1653058466
-f	2023	1	3	26	1	26032023	admindb	admindb	1653058466	1653058466
-f	2023	1	3	27	2	27032023	admindb	admindb	1653058466	1653058466
-f	2023	1	3	28	3	28032023	admindb	admindb	1653058466	1653058466
-f	2023	1	3	29	4	29032023	admindb	admindb	1653058466	1653058466
-f	2023	1	3	30	5	30032023	admindb	admindb	1653058466	1653058466
-f	2023	1	3	31	6	31032023	admindb	admindb	1653058466	1653058466
-f	2023	2	4	1	7	01042023	admindb	admindb	1653058466	1653058466
-f	2023	2	4	2	1	02042023	admindb	admindb	1653058466	1653058466
-f	2023	2	4	3	2	03042023	admindb	admindb	1653058466	1653058466
-f	2023	2	4	4	3	04042023	admindb	admindb	1653058466	1653058466
-f	2023	2	4	5	4	05042023	admindb	admindb	1653058466	1653058466
-f	2023	2	4	6	5	06042023	admindb	admindb	1653058466	1653058466
-f	2023	2	4	7	6	07042023	admindb	admindb	1653058466	1653058466
-f	2023	2	4	8	7	08042023	admindb	admindb	1653058466	1653058466
-f	2023	2	4	9	1	09042023	admindb	admindb	1653058466	1653058466
-f	2023	2	4	10	2	10042023	admindb	admindb	1653058466	1653058466
-f	2023	2	4	11	3	11042023	admindb	admindb	1653058466	1653058466
-f	2023	2	4	12	4	12042023	admindb	admindb	1653058466	1653058466
-f	2023	2	4	13	5	13042023	admindb	admindb	1653058466	1653058466
-f	2023	2	4	14	6	14042023	admindb	admindb	1653058466	1653058466
-f	2023	2	4	15	7	15042023	admindb	admindb	1653058466	1653058466
-f	2023	2	4	16	1	16042023	admindb	admindb	1653058466	1653058466
-f	2023	2	4	17	2	17042023	admindb	admindb	1653058466	1653058466
-f	2023	2	4	18	3	18042023	admindb	admindb	1653058466	1653058466
-f	2023	2	4	19	4	19042023	admindb	admindb	1653058466	1653058466
-f	2023	2	4	20	5	20042023	admindb	admindb	1653058466	1653058466
-f	2023	2	4	21	6	21042023	admindb	admindb	1653058466	1653058466
-f	2023	2	4	22	7	22042023	admindb	admindb	1653058466	1653058466
-f	2023	2	4	23	1	23042023	admindb	admindb	1653058466	1653058466
-f	2023	2	4	24	2	24042023	admindb	admindb	1653058466	1653058466
-f	2023	2	4	25	3	25042023	admindb	admindb	1653058466	1653058466
-f	2023	2	4	26	4	26042023	admindb	admindb	1653058466	1653058466
-f	2023	2	4	27	5	27042023	admindb	admindb	1653058466	1653058466
-f	2023	2	4	28	6	28042023	admindb	admindb	1653058466	1653058466
-f	2023	2	4	29	7	29042023	admindb	admindb	1653058466	1653058466
-f	2023	2	4	30	1	30042023	admindb	admindb	1653058466	1653058466
-f	2023	2	5	1	2	01052023	admindb	admindb	1653058466	1653058466
-f	2023	2	5	2	3	02052023	admindb	admindb	1653058466	1653058466
-f	2023	2	5	3	4	03052023	admindb	admindb	1653058466	1653058466
-f	2023	2	5	4	5	04052023	admindb	admindb	1653058466	1653058466
-f	2023	2	5	5	6	05052023	admindb	admindb	1653058466	1653058466
-f	2023	2	5	6	7	06052023	admindb	admindb	1653058466	1653058466
-f	2023	2	5	7	1	07052023	admindb	admindb	1653058466	1653058466
-f	2023	2	5	8	2	08052023	admindb	admindb	1653058466	1653058466
-f	2023	2	5	9	3	09052023	admindb	admindb	1653058466	1653058466
-f	2023	2	5	10	4	10052023	admindb	admindb	1653058466	1653058466
-f	2023	2	5	11	5	11052023	admindb	admindb	1653058466	1653058466
-f	2023	2	5	12	6	12052023	admindb	admindb	1653058466	1653058466
-f	2023	2	5	13	7	13052023	admindb	admindb	1653058466	1653058466
-f	2023	2	5	14	1	14052023	admindb	admindb	1653058466	1653058466
-f	2023	2	5	15	2	15052023	admindb	admindb	1653058466	1653058466
-f	2023	2	5	16	3	16052023	admindb	admindb	1653058466	1653058466
-f	2023	2	5	17	4	17052023	admindb	admindb	1653058466	1653058466
-f	2023	2	5	18	5	18052023	admindb	admindb	1653058466	1653058466
-f	2023	2	5	19	6	19052023	admindb	admindb	1653058466	1653058466
-f	2023	2	5	20	7	20052023	admindb	admindb	1653058466	1653058466
-f	2023	2	5	21	1	21052023	admindb	admindb	1653058466	1653058466
-f	2023	2	5	22	2	22052023	admindb	admindb	1653058466	1653058466
-f	2023	2	5	23	3	23052023	admindb	admindb	1653058466	1653058466
-f	2023	2	5	24	4	24052023	admindb	admindb	1653058466	1653058466
-f	2023	2	5	25	5	25052023	admindb	admindb	1653058466	1653058466
-f	2023	2	5	26	6	26052023	admindb	admindb	1653058466	1653058466
-f	2023	2	5	27	7	27052023	admindb	admindb	1653058466	1653058466
-f	2023	2	5	28	1	28052023	admindb	admindb	1653058466	1653058466
-f	2023	2	5	29	2	29052023	admindb	admindb	1653058466	1653058466
-f	2023	2	5	30	3	30052023	admindb	admindb	1653058466	1653058466
-f	2023	2	5	31	4	31052023	admindb	admindb	1653058466	1653058466
-f	2023	2	6	1	5	01062023	admindb	admindb	1653058466	1653058466
-f	2023	2	6	2	6	02062023	admindb	admindb	1653058466	1653058466
-f	2023	2	6	3	7	03062023	admindb	admindb	1653058466	1653058466
-f	2023	2	6	4	1	04062023	admindb	admindb	1653058466	1653058466
-f	2023	2	6	5	2	05062023	admindb	admindb	1653058466	1653058466
-f	2023	2	6	6	3	06062023	admindb	admindb	1653058466	1653058466
-f	2023	2	6	7	4	07062023	admindb	admindb	1653058466	1653058466
-f	2023	2	6	8	5	08062023	admindb	admindb	1653058466	1653058466
-f	2023	2	6	9	6	09062023	admindb	admindb	1653058466	1653058466
-f	2023	2	6	10	7	10062023	admindb	admindb	1653058466	1653058466
-f	2023	2	6	11	1	11062023	admindb	admindb	1653058466	1653058466
-f	2023	2	6	12	2	12062023	admindb	admindb	1653058466	1653058466
-f	2023	2	6	13	3	13062023	admindb	admindb	1653058466	1653058466
-f	2023	2	6	14	4	14062023	admindb	admindb	1653058466	1653058466
-f	2023	2	6	15	5	15062023	admindb	admindb	1653058466	1653058466
-f	2023	2	6	16	6	16062023	admindb	admindb	1653058466	1653058466
-f	2023	2	6	17	7	17062023	admindb	admindb	1653058466	1653058466
-f	2023	2	6	18	1	18062023	admindb	admindb	1653058466	1653058466
-f	2023	2	6	19	2	19062023	admindb	admindb	1653058466	1653058466
-f	2023	2	6	20	3	20062023	admindb	admindb	1653058466	1653058466
-f	2023	2	6	21	4	21062023	admindb	admindb	1653058466	1653058466
-f	2023	2	6	22	5	22062023	admindb	admindb	1653058466	1653058466
-f	2023	2	6	23	6	23062023	admindb	admindb	1653058466	1653058466
-f	2023	2	6	24	7	24062023	admindb	admindb	1653058466	1653058466
-f	2023	2	6	25	1	25062023	admindb	admindb	1653058466	1653058466
-f	2023	2	6	26	2	26062023	admindb	admindb	1653058466	1653058466
-f	2023	2	6	27	3	27062023	admindb	admindb	1653058466	1653058466
-f	2023	2	6	28	4	28062023	admindb	admindb	1653058466	1653058466
-f	2023	2	6	29	5	29062023	admindb	admindb	1653058466	1653058466
-f	2023	2	6	30	6	30062023	admindb	admindb	1653058466	1653058466
-f	2023	3	7	1	7	01072023	admindb	admindb	1653058466	1653058466
-f	2023	3	7	2	1	02072023	admindb	admindb	1653058466	1653058466
-f	2023	3	7	3	2	03072023	admindb	admindb	1653058466	1653058466
-f	2023	3	7	4	3	04072023	admindb	admindb	1653058466	1653058466
-f	2023	3	7	5	4	05072023	admindb	admindb	1653058466	1653058466
-f	2023	3	7	6	5	06072023	admindb	admindb	1653058466	1653058466
-f	2023	3	7	7	6	07072023	admindb	admindb	1653058466	1653058466
-f	2023	3	7	8	7	08072023	admindb	admindb	1653058466	1653058466
-f	2023	3	7	9	1	09072023	admindb	admindb	1653058466	1653058466
-f	2023	3	7	10	2	10072023	admindb	admindb	1653058466	1653058466
-f	2023	3	7	11	3	11072023	admindb	admindb	1653058466	1653058466
-f	2023	3	7	12	4	12072023	admindb	admindb	1653058466	1653058466
-f	2023	3	7	13	5	13072023	admindb	admindb	1653058466	1653058466
-f	2023	3	7	14	6	14072023	admindb	admindb	1653058466	1653058466
-f	2023	3	7	15	7	15072023	admindb	admindb	1653058466	1653058466
-f	2023	3	7	16	1	16072023	admindb	admindb	1653058466	1653058466
-f	2023	3	7	17	2	17072023	admindb	admindb	1653058466	1653058466
-f	2023	3	7	18	3	18072023	admindb	admindb	1653058466	1653058466
-f	2023	3	7	19	4	19072023	admindb	admindb	1653058466	1653058466
-f	2023	3	7	20	5	20072023	admindb	admindb	1653058466	1653058466
-f	2023	3	7	21	6	21072023	admindb	admindb	1653058466	1653058466
-f	2023	3	7	22	7	22072023	admindb	admindb	1653058466	1653058466
-f	2023	3	7	23	1	23072023	admindb	admindb	1653058466	1653058466
-f	2023	3	7	24	2	24072023	admindb	admindb	1653058466	1653058466
-f	2023	3	7	25	3	25072023	admindb	admindb	1653058466	1653058466
-f	2023	3	7	26	4	26072023	admindb	admindb	1653058466	1653058466
-f	2023	3	7	27	5	27072023	admindb	admindb	1653058466	1653058466
-f	2023	3	7	28	6	28072023	admindb	admindb	1653058466	1653058466
-f	2023	3	7	29	7	29072023	admindb	admindb	1653058466	1653058466
-f	2023	3	7	30	1	30072023	admindb	admindb	1653058466	1653058466
-f	2023	3	7	31	2	31072023	admindb	admindb	1653058466	1653058466
-f	2023	3	8	1	3	01082023	admindb	admindb	1653058466	1653058466
-f	2023	3	8	2	4	02082023	admindb	admindb	1653058466	1653058466
-f	2023	3	8	3	5	03082023	admindb	admindb	1653058466	1653058466
-f	2023	3	8	4	6	04082023	admindb	admindb	1653058466	1653058466
-f	2023	3	8	5	7	05082023	admindb	admindb	1653058466	1653058466
-f	2023	3	8	6	1	06082023	admindb	admindb	1653058466	1653058466
-f	2023	3	8	7	2	07082023	admindb	admindb	1653058466	1653058466
-f	2023	3	8	8	3	08082023	admindb	admindb	1653058466	1653058466
-f	2023	3	8	9	4	09082023	admindb	admindb	1653058466	1653058466
-f	2023	3	8	10	5	10082023	admindb	admindb	1653058466	1653058466
-f	2023	3	8	11	6	11082023	admindb	admindb	1653058466	1653058466
-f	2023	3	8	12	7	12082023	admindb	admindb	1653058466	1653058466
-f	2023	3	8	13	1	13082023	admindb	admindb	1653058466	1653058466
-f	2023	3	8	14	2	14082023	admindb	admindb	1653058466	1653058466
-f	2023	3	8	15	3	15082023	admindb	admindb	1653058466	1653058466
-f	2023	3	8	16	4	16082023	admindb	admindb	1653058466	1653058466
-f	2023	3	8	17	5	17082023	admindb	admindb	1653058466	1653058466
-f	2023	3	8	18	6	18082023	admindb	admindb	1653058466	1653058466
-f	2023	3	8	19	7	19082023	admindb	admindb	1653058466	1653058466
-f	2023	3	8	20	1	20082023	admindb	admindb	1653058466	1653058466
-f	2023	3	8	21	2	21082023	admindb	admindb	1653058466	1653058466
-f	2023	3	8	22	3	22082023	admindb	admindb	1653058466	1653058466
-f	2023	3	8	23	4	23082023	admindb	admindb	1653058466	1653058466
-f	2023	3	8	24	5	24082023	admindb	admindb	1653058466	1653058466
-f	2023	3	8	25	6	25082023	admindb	admindb	1653058466	1653058466
-f	2023	3	8	26	7	26082023	admindb	admindb	1653058466	1653058466
-f	2023	3	8	27	1	27082023	admindb	admindb	1653058466	1653058466
-f	2023	3	8	28	2	28082023	admindb	admindb	1653058466	1653058466
-f	2023	3	8	29	3	29082023	admindb	admindb	1653058466	1653058466
-f	2023	3	8	30	4	30082023	admindb	admindb	1653058466	1653058466
-f	2023	3	8	31	5	31082023	admindb	admindb	1653058466	1653058466
-f	2023	3	9	1	6	01092023	admindb	admindb	1653058466	1653058466
-f	2023	3	9	2	7	02092023	admindb	admindb	1653058466	1653058466
-f	2023	3	9	3	1	03092023	admindb	admindb	1653058466	1653058466
-f	2023	3	9	4	2	04092023	admindb	admindb	1653058466	1653058466
-f	2023	3	9	5	3	05092023	admindb	admindb	1653058466	1653058466
-f	2023	3	9	6	4	06092023	admindb	admindb	1653058466	1653058466
-f	2023	3	9	7	5	07092023	admindb	admindb	1653058466	1653058466
-f	2023	3	9	8	6	08092023	admindb	admindb	1653058466	1653058466
-f	2023	3	9	9	7	09092023	admindb	admindb	1653058466	1653058466
-f	2023	3	9	10	1	10092023	admindb	admindb	1653058466	1653058466
-f	2023	3	9	11	2	11092023	admindb	admindb	1653058466	1653058466
-f	2023	3	9	12	3	12092023	admindb	admindb	1653058466	1653058466
-f	2023	3	9	13	4	13092023	admindb	admindb	1653058466	1653058466
-f	2023	3	9	14	5	14092023	admindb	admindb	1653058466	1653058466
-f	2023	3	9	15	6	15092023	admindb	admindb	1653058466	1653058466
-f	2023	3	9	16	7	16092023	admindb	admindb	1653058466	1653058466
-f	2023	3	9	17	1	17092023	admindb	admindb	1653058466	1653058466
-f	2023	3	9	18	2	18092023	admindb	admindb	1653058466	1653058466
-f	2023	3	9	19	3	19092023	admindb	admindb	1653058466	1653058466
-f	2023	3	9	20	4	20092023	admindb	admindb	1653058466	1653058466
-f	2023	3	9	21	5	21092023	admindb	admindb	1653058466	1653058466
-f	2023	3	9	22	6	22092023	admindb	admindb	1653058466	1653058466
-f	2023	3	9	23	7	23092023	admindb	admindb	1653058466	1653058466
-f	2023	3	9	24	1	24092023	admindb	admindb	1653058466	1653058466
-f	2023	3	9	25	2	25092023	admindb	admindb	1653058466	1653058466
-f	2023	3	9	26	3	26092023	admindb	admindb	1653058466	1653058466
-f	2023	3	9	27	4	27092023	admindb	admindb	1653058466	1653058466
-f	2023	3	9	28	5	28092023	admindb	admindb	1653058466	1653058466
-f	2023	3	9	29	6	29092023	admindb	admindb	1653058466	1653058466
-f	2023	3	9	30	7	30092023	admindb	admindb	1653058466	1653058466
-f	2023	4	10	1	1	01102023	admindb	admindb	1653058466	1653058466
-f	2023	4	10	2	2	02102023	admindb	admindb	1653058466	1653058466
-f	2023	4	10	3	3	03102023	admindb	admindb	1653058466	1653058466
-f	2023	4	10	4	4	04102023	admindb	admindb	1653058466	1653058466
-f	2023	4	10	5	5	05102023	admindb	admindb	1653058466	1653058466
-f	2023	4	10	6	6	06102023	admindb	admindb	1653058466	1653058466
-f	2023	4	10	7	7	07102023	admindb	admindb	1653058466	1653058466
-f	2023	4	10	8	1	08102023	admindb	admindb	1653058466	1653058466
-f	2023	4	10	9	2	09102023	admindb	admindb	1653058466	1653058466
-f	2023	4	10	10	3	10102023	admindb	admindb	1653058466	1653058466
-f	2023	4	10	11	4	11102023	admindb	admindb	1653058466	1653058466
-f	2023	4	10	12	5	12102023	admindb	admindb	1653058466	1653058466
-f	2023	4	10	13	6	13102023	admindb	admindb	1653058466	1653058466
-f	2023	4	10	14	7	14102023	admindb	admindb	1653058466	1653058466
-f	2023	4	10	15	1	15102023	admindb	admindb	1653058466	1653058466
-f	2023	4	10	16	2	16102023	admindb	admindb	1653058466	1653058466
-f	2023	4	10	17	3	17102023	admindb	admindb	1653058466	1653058466
-f	2023	4	10	18	4	18102023	admindb	admindb	1653058466	1653058466
-f	2023	4	10	19	5	19102023	admindb	admindb	1653058466	1653058466
-f	2023	4	10	20	6	20102023	admindb	admindb	1653058466	1653058466
-f	2023	4	10	21	7	21102023	admindb	admindb	1653058466	1653058466
-f	2023	4	10	22	1	22102023	admindb	admindb	1653058466	1653058466
-f	2023	4	10	23	2	23102023	admindb	admindb	1653058466	1653058466
-f	2023	4	10	24	3	24102023	admindb	admindb	1653058466	1653058466
-f	2023	4	10	25	4	25102023	admindb	admindb	1653058466	1653058466
-f	2023	4	10	26	5	26102023	admindb	admindb	1653058466	1653058466
-f	2023	4	10	27	6	27102023	admindb	admindb	1653058466	1653058466
-f	2023	4	10	28	7	28102023	admindb	admindb	1653058466	1653058466
-f	2023	4	10	29	1	29102023	admindb	admindb	1653058466	1653058466
-f	2023	4	10	30	2	30102023	admindb	admindb	1653058466	1653058466
-f	2023	4	10	31	3	31102023	admindb	admindb	1653058466	1653058466
-f	2023	4	11	1	4	01112023	admindb	admindb	1653058466	1653058466
-f	2023	4	11	2	5	02112023	admindb	admindb	1653058466	1653058466
-f	2023	4	11	3	6	03112023	admindb	admindb	1653058466	1653058466
-f	2023	4	11	4	7	04112023	admindb	admindb	1653058466	1653058466
-f	2023	4	11	5	1	05112023	admindb	admindb	1653058466	1653058466
-f	2023	4	11	6	2	06112023	admindb	admindb	1653058466	1653058466
-f	2023	4	11	7	3	07112023	admindb	admindb	1653058466	1653058466
-f	2023	4	11	8	4	08112023	admindb	admindb	1653058466	1653058466
-f	2023	4	11	9	5	09112023	admindb	admindb	1653058466	1653058466
-f	2023	4	11	10	6	10112023	admindb	admindb	1653058466	1653058466
-f	2023	4	11	11	7	11112023	admindb	admindb	1653058466	1653058466
-f	2023	4	11	12	1	12112023	admindb	admindb	1653058466	1653058466
-f	2023	4	11	13	2	13112023	admindb	admindb	1653058466	1653058466
-f	2023	4	11	14	3	14112023	admindb	admindb	1653058466	1653058466
-f	2023	4	11	15	4	15112023	admindb	admindb	1653058466	1653058466
-f	2023	4	11	16	5	16112023	admindb	admindb	1653058466	1653058466
-f	2023	4	11	17	6	17112023	admindb	admindb	1653058466	1653058466
-f	2023	4	11	18	7	18112023	admindb	admindb	1653058466	1653058466
-f	2023	4	11	19	1	19112023	admindb	admindb	1653058466	1653058466
-f	2023	4	11	20	2	20112023	admindb	admindb	1653058466	1653058466
-f	2023	4	11	21	3	21112023	admindb	admindb	1653058466	1653058466
-f	2023	4	11	22	4	22112023	admindb	admindb	1653058466	1653058466
-f	2023	4	11	23	5	23112023	admindb	admindb	1653058466	1653058466
-f	2023	4	11	24	6	24112023	admindb	admindb	1653058466	1653058466
-f	2023	4	11	25	7	25112023	admindb	admindb	1653058466	1653058466
-f	2023	4	11	26	1	26112023	admindb	admindb	1653058466	1653058466
-f	2023	4	11	27	2	27112023	admindb	admindb	1653058466	1653058466
-f	2023	4	11	28	3	28112023	admindb	admindb	1653058466	1653058466
-f	2023	4	11	29	4	29112023	admindb	admindb	1653058466	1653058466
-f	2023	4	11	30	5	30112023	admindb	admindb	1653058466	1653058466
-f	2023	4	12	1	6	01122023	admindb	admindb	1653058466	1653058466
-f	2023	4	12	2	7	02122023	admindb	admindb	1653058466	1653058466
-f	2023	4	12	3	1	03122023	admindb	admindb	1653058466	1653058466
-f	2023	4	12	4	2	04122023	admindb	admindb	1653058466	1653058466
-f	2023	4	12	5	3	05122023	admindb	admindb	1653058466	1653058466
-f	2023	4	12	6	4	06122023	admindb	admindb	1653058466	1653058466
-f	2023	4	12	7	5	07122023	admindb	admindb	1653058466	1653058466
-f	2023	4	12	8	6	08122023	admindb	admindb	1653058466	1653058466
-f	2023	4	12	9	7	09122023	admindb	admindb	1653058466	1653058466
-f	2023	4	12	10	1	10122023	admindb	admindb	1653058466	1653058466
-f	2023	4	12	11	2	11122023	admindb	admindb	1653058466	1653058466
-f	2023	4	12	12	3	12122023	admindb	admindb	1653058466	1653058466
-f	2023	4	12	13	4	13122023	admindb	admindb	1653058466	1653058466
-f	2023	4	12	14	5	14122023	admindb	admindb	1653058466	1653058466
-f	2023	4	12	15	6	15122023	admindb	admindb	1653058466	1653058466
-f	2023	4	12	16	7	16122023	admindb	admindb	1653058466	1653058466
-f	2023	4	12	17	1	17122023	admindb	admindb	1653058466	1653058466
-f	2023	4	12	18	2	18122023	admindb	admindb	1653058466	1653058466
-f	2023	4	12	19	3	19122023	admindb	admindb	1653058466	1653058466
-f	2023	4	12	20	4	20122023	admindb	admindb	1653058466	1653058466
-f	2023	4	12	21	5	21122023	admindb	admindb	1653058466	1653058466
-f	2023	4	12	22	6	22122023	admindb	admindb	1653058466	1653058466
-f	2023	4	12	23	7	23122023	admindb	admindb	1653058466	1653058466
-f	2023	4	12	24	1	24122023	admindb	admindb	1653058466	1653058466
-f	2023	4	12	25	2	25122023	admindb	admindb	1653058466	1653058466
-f	2023	4	12	26	3	26122023	admindb	admindb	1653058466	1653058466
-f	2023	4	12	27	4	27122023	admindb	admindb	1653058466	1653058466
-f	2023	4	12	28	5	28122023	admindb	admindb	1653058466	1653058466
-f	2023	4	12	29	6	29122023	admindb	admindb	1653058466	1653058466
-f	2023	4	12	30	7	30122023	admindb	admindb	1653058466	1653058466
-f	2023	4	12	31	1	31122023	admindb	admindb	1653058466	1653058466
+f	2021	1	1	1	6	01012021	admindb	admindb	1653283839	1653283839
+f	2021	1	1	2	7	02012021	admindb	admindb	1653283839	1653283839
+f	2021	1	1	3	1	03012021	admindb	admindb	1653283839	1653283839
+f	2021	1	1	4	2	04012021	admindb	admindb	1653283839	1653283839
+f	2021	1	1	5	3	05012021	admindb	admindb	1653283839	1653283839
+f	2021	1	1	6	4	06012021	admindb	admindb	1653283839	1653283839
+f	2021	1	1	7	5	07012021	admindb	admindb	1653283839	1653283839
+f	2021	1	1	8	6	08012021	admindb	admindb	1653283839	1653283839
+f	2021	1	1	9	7	09012021	admindb	admindb	1653283839	1653283839
+f	2021	1	1	10	1	10012021	admindb	admindb	1653283839	1653283839
+f	2021	1	1	11	2	11012021	admindb	admindb	1653283839	1653283839
+f	2021	1	1	12	3	12012021	admindb	admindb	1653283839	1653283839
+f	2021	1	1	13	4	13012021	admindb	admindb	1653283839	1653283839
+f	2021	1	1	14	5	14012021	admindb	admindb	1653283839	1653283839
+f	2021	1	1	15	6	15012021	admindb	admindb	1653283839	1653283839
+f	2021	1	1	16	7	16012021	admindb	admindb	1653283839	1653283839
+f	2021	1	1	17	1	17012021	admindb	admindb	1653283839	1653283839
+f	2021	1	1	18	2	18012021	admindb	admindb	1653283839	1653283839
+f	2021	1	1	19	3	19012021	admindb	admindb	1653283839	1653283839
+f	2021	1	1	20	4	20012021	admindb	admindb	1653283839	1653283839
+f	2021	1	1	21	5	21012021	admindb	admindb	1653283839	1653283839
+f	2021	1	1	22	6	22012021	admindb	admindb	1653283839	1653283839
+f	2021	1	1	23	7	23012021	admindb	admindb	1653283839	1653283839
+f	2021	1	1	24	1	24012021	admindb	admindb	1653283839	1653283839
+f	2021	1	1	25	2	25012021	admindb	admindb	1653283839	1653283839
+f	2021	1	1	26	3	26012021	admindb	admindb	1653283839	1653283839
+f	2021	1	1	27	4	27012021	admindb	admindb	1653283839	1653283839
+f	2021	1	1	28	5	28012021	admindb	admindb	1653283839	1653283839
+f	2021	1	1	29	6	29012021	admindb	admindb	1653283839	1653283839
+f	2021	1	1	30	7	30012021	admindb	admindb	1653283839	1653283839
+f	2021	1	1	31	1	31012021	admindb	admindb	1653283839	1653283839
+f	2021	1	2	1	2	01022021	admindb	admindb	1653283839	1653283839
+f	2021	1	2	2	3	02022021	admindb	admindb	1653283839	1653283839
+f	2021	1	2	3	4	03022021	admindb	admindb	1653283839	1653283839
+f	2021	1	2	4	5	04022021	admindb	admindb	1653283839	1653283839
+f	2021	1	2	5	6	05022021	admindb	admindb	1653283839	1653283839
+f	2021	1	2	6	7	06022021	admindb	admindb	1653283839	1653283839
+f	2021	1	2	7	1	07022021	admindb	admindb	1653283839	1653283839
+f	2021	1	2	8	2	08022021	admindb	admindb	1653283839	1653283839
+f	2021	1	2	9	3	09022021	admindb	admindb	1653283839	1653283839
+f	2021	1	2	10	4	10022021	admindb	admindb	1653283839	1653283839
+f	2021	1	2	11	5	11022021	admindb	admindb	1653283839	1653283839
+f	2021	1	2	12	6	12022021	admindb	admindb	1653283839	1653283839
+f	2021	1	2	13	7	13022021	admindb	admindb	1653283839	1653283839
+f	2021	1	2	14	1	14022021	admindb	admindb	1653283839	1653283839
+f	2021	1	2	15	2	15022021	admindb	admindb	1653283839	1653283839
+f	2021	1	2	16	3	16022021	admindb	admindb	1653283839	1653283839
+f	2021	1	2	17	4	17022021	admindb	admindb	1653283839	1653283839
+f	2021	1	2	18	5	18022021	admindb	admindb	1653283839	1653283839
+f	2021	1	2	19	6	19022021	admindb	admindb	1653283839	1653283839
+f	2021	1	2	20	7	20022021	admindb	admindb	1653283839	1653283839
+f	2021	1	2	21	1	21022021	admindb	admindb	1653283839	1653283839
+f	2021	1	2	22	2	22022021	admindb	admindb	1653283839	1653283839
+f	2021	1	2	23	3	23022021	admindb	admindb	1653283839	1653283839
+f	2021	1	2	24	4	24022021	admindb	admindb	1653283839	1653283839
+f	2021	1	2	25	5	25022021	admindb	admindb	1653283839	1653283839
+f	2021	1	2	26	6	26022021	admindb	admindb	1653283839	1653283839
+f	2021	1	2	27	7	27022021	admindb	admindb	1653283839	1653283839
+f	2021	1	2	28	1	28022021	admindb	admindb	1653283839	1653283839
+f	2021	1	3	1	2	01032021	admindb	admindb	1653283839	1653283839
+f	2021	1	3	2	3	02032021	admindb	admindb	1653283839	1653283839
+f	2021	1	3	3	4	03032021	admindb	admindb	1653283839	1653283839
+f	2021	1	3	4	5	04032021	admindb	admindb	1653283839	1653283839
+f	2021	1	3	5	6	05032021	admindb	admindb	1653283839	1653283839
+f	2021	1	3	6	7	06032021	admindb	admindb	1653283839	1653283839
+f	2021	1	3	7	1	07032021	admindb	admindb	1653283839	1653283839
+f	2021	1	3	8	2	08032021	admindb	admindb	1653283839	1653283839
+f	2021	1	3	9	3	09032021	admindb	admindb	1653283839	1653283839
+f	2021	1	3	10	4	10032021	admindb	admindb	1653283839	1653283839
+f	2021	1	3	11	5	11032021	admindb	admindb	1653283839	1653283839
+f	2021	1	3	12	6	12032021	admindb	admindb	1653283839	1653283839
+f	2021	1	3	13	7	13032021	admindb	admindb	1653283839	1653283839
+f	2021	1	3	14	1	14032021	admindb	admindb	1653283839	1653283839
+f	2021	1	3	15	2	15032021	admindb	admindb	1653283839	1653283839
+f	2021	1	3	16	3	16032021	admindb	admindb	1653283839	1653283839
+f	2021	1	3	17	4	17032021	admindb	admindb	1653283839	1653283839
+f	2021	1	3	18	5	18032021	admindb	admindb	1653283839	1653283839
+f	2021	1	3	19	6	19032021	admindb	admindb	1653283839	1653283839
+f	2021	1	3	20	7	20032021	admindb	admindb	1653283839	1653283839
+f	2021	1	3	21	1	21032021	admindb	admindb	1653283839	1653283839
+f	2021	1	3	22	2	22032021	admindb	admindb	1653283839	1653283839
+f	2021	1	3	23	3	23032021	admindb	admindb	1653283839	1653283839
+f	2021	1	3	24	4	24032021	admindb	admindb	1653283839	1653283839
+f	2021	1	3	25	5	25032021	admindb	admindb	1653283839	1653283839
+f	2021	1	3	26	6	26032021	admindb	admindb	1653283839	1653283839
+f	2021	1	3	27	7	27032021	admindb	admindb	1653283839	1653283839
+f	2021	1	3	28	1	28032021	admindb	admindb	1653283839	1653283839
+f	2021	1	3	29	2	29032021	admindb	admindb	1653283839	1653283839
+f	2021	1	3	30	3	30032021	admindb	admindb	1653283839	1653283839
+f	2021	1	3	31	4	31032021	admindb	admindb	1653283839	1653283839
+f	2021	2	4	1	5	01042021	admindb	admindb	1653283839	1653283839
+f	2021	2	4	2	6	02042021	admindb	admindb	1653283839	1653283839
+f	2021	2	4	3	7	03042021	admindb	admindb	1653283839	1653283839
+f	2021	2	4	4	1	04042021	admindb	admindb	1653283839	1653283839
+f	2021	2	4	5	2	05042021	admindb	admindb	1653283839	1653283839
+f	2021	2	4	6	3	06042021	admindb	admindb	1653283839	1653283839
+f	2021	2	4	7	4	07042021	admindb	admindb	1653283839	1653283839
+f	2021	2	4	8	5	08042021	admindb	admindb	1653283839	1653283839
+f	2021	2	4	9	6	09042021	admindb	admindb	1653283839	1653283839
+f	2021	2	4	10	7	10042021	admindb	admindb	1653283839	1653283839
+f	2021	2	4	11	1	11042021	admindb	admindb	1653283839	1653283839
+f	2021	2	4	12	2	12042021	admindb	admindb	1653283839	1653283839
+f	2021	2	4	13	3	13042021	admindb	admindb	1653283839	1653283839
+f	2021	2	4	14	4	14042021	admindb	admindb	1653283839	1653283839
+f	2021	2	4	15	5	15042021	admindb	admindb	1653283839	1653283839
+f	2021	2	4	16	6	16042021	admindb	admindb	1653283839	1653283839
+f	2021	2	4	17	7	17042021	admindb	admindb	1653283839	1653283839
+f	2021	2	4	18	1	18042021	admindb	admindb	1653283839	1653283839
+f	2021	2	4	19	2	19042021	admindb	admindb	1653283839	1653283839
+f	2021	2	4	20	3	20042021	admindb	admindb	1653283839	1653283839
+f	2021	2	4	21	4	21042021	admindb	admindb	1653283839	1653283839
+f	2021	2	4	22	5	22042021	admindb	admindb	1653283839	1653283839
+f	2021	2	4	23	6	23042021	admindb	admindb	1653283839	1653283839
+f	2021	2	4	24	7	24042021	admindb	admindb	1653283839	1653283839
+f	2021	2	4	25	1	25042021	admindb	admindb	1653283839	1653283839
+f	2021	2	4	26	2	26042021	admindb	admindb	1653283839	1653283839
+f	2021	2	4	27	3	27042021	admindb	admindb	1653283839	1653283839
+f	2021	2	4	28	4	28042021	admindb	admindb	1653283839	1653283839
+f	2021	2	4	29	5	29042021	admindb	admindb	1653283839	1653283839
+f	2021	2	4	30	6	30042021	admindb	admindb	1653283839	1653283839
+f	2021	2	5	1	7	01052021	admindb	admindb	1653283839	1653283839
+f	2021	2	5	2	1	02052021	admindb	admindb	1653283839	1653283839
+f	2021	2	5	3	2	03052021	admindb	admindb	1653283839	1653283839
+f	2021	2	5	4	3	04052021	admindb	admindb	1653283839	1653283839
+f	2021	2	5	5	4	05052021	admindb	admindb	1653283839	1653283839
+f	2021	2	5	6	5	06052021	admindb	admindb	1653283839	1653283839
+f	2021	2	5	7	6	07052021	admindb	admindb	1653283839	1653283839
+f	2021	2	5	8	7	08052021	admindb	admindb	1653283839	1653283839
+f	2021	2	5	9	1	09052021	admindb	admindb	1653283839	1653283839
+f	2021	2	5	10	2	10052021	admindb	admindb	1653283839	1653283839
+f	2021	2	5	11	3	11052021	admindb	admindb	1653283839	1653283839
+f	2021	2	5	12	4	12052021	admindb	admindb	1653283839	1653283839
+f	2021	2	5	13	5	13052021	admindb	admindb	1653283839	1653283839
+f	2021	2	5	14	6	14052021	admindb	admindb	1653283839	1653283839
+f	2021	2	5	15	7	15052021	admindb	admindb	1653283839	1653283839
+f	2021	2	5	16	1	16052021	admindb	admindb	1653283839	1653283839
+f	2021	2	5	17	2	17052021	admindb	admindb	1653283839	1653283839
+f	2021	2	5	18	3	18052021	admindb	admindb	1653283839	1653283839
+f	2021	2	5	19	4	19052021	admindb	admindb	1653283839	1653283839
+f	2021	2	5	20	5	20052021	admindb	admindb	1653283839	1653283839
+f	2021	2	5	21	6	21052021	admindb	admindb	1653283839	1653283839
+f	2021	2	5	22	7	22052021	admindb	admindb	1653283839	1653283839
+f	2021	2	5	23	1	23052021	admindb	admindb	1653283839	1653283839
+f	2021	2	5	24	2	24052021	admindb	admindb	1653283839	1653283839
+f	2021	2	5	25	3	25052021	admindb	admindb	1653283839	1653283839
+f	2021	2	5	26	4	26052021	admindb	admindb	1653283839	1653283839
+f	2021	2	5	27	5	27052021	admindb	admindb	1653283839	1653283839
+f	2021	2	5	28	6	28052021	admindb	admindb	1653283839	1653283839
+f	2021	2	5	29	7	29052021	admindb	admindb	1653283839	1653283839
+f	2021	2	5	30	1	30052021	admindb	admindb	1653283839	1653283839
+f	2021	2	5	31	2	31052021	admindb	admindb	1653283839	1653283839
+f	2021	2	6	1	3	01062021	admindb	admindb	1653283839	1653283839
+f	2021	2	6	2	4	02062021	admindb	admindb	1653283839	1653283839
+f	2021	2	6	3	5	03062021	admindb	admindb	1653283839	1653283839
+f	2021	2	6	4	6	04062021	admindb	admindb	1653283839	1653283839
+f	2021	2	6	5	7	05062021	admindb	admindb	1653283839	1653283839
+f	2021	2	6	6	1	06062021	admindb	admindb	1653283839	1653283839
+f	2021	2	6	7	2	07062021	admindb	admindb	1653283839	1653283839
+f	2021	2	6	8	3	08062021	admindb	admindb	1653283839	1653283839
+f	2021	2	6	9	4	09062021	admindb	admindb	1653283839	1653283839
+f	2021	2	6	10	5	10062021	admindb	admindb	1653283839	1653283839
+f	2021	2	6	11	6	11062021	admindb	admindb	1653283839	1653283839
+f	2021	2	6	12	7	12062021	admindb	admindb	1653283839	1653283839
+f	2021	2	6	13	1	13062021	admindb	admindb	1653283839	1653283839
+f	2021	2	6	14	2	14062021	admindb	admindb	1653283839	1653283839
+f	2021	2	6	15	3	15062021	admindb	admindb	1653283839	1653283839
+f	2021	2	6	16	4	16062021	admindb	admindb	1653283839	1653283839
+f	2021	2	6	17	5	17062021	admindb	admindb	1653283839	1653283839
+f	2021	2	6	18	6	18062021	admindb	admindb	1653283839	1653283839
+f	2021	2	6	19	7	19062021	admindb	admindb	1653283839	1653283839
+f	2021	2	6	20	1	20062021	admindb	admindb	1653283839	1653283839
+f	2021	2	6	21	2	21062021	admindb	admindb	1653283839	1653283839
+f	2021	2	6	22	3	22062021	admindb	admindb	1653283839	1653283839
+f	2021	2	6	23	4	23062021	admindb	admindb	1653283839	1653283839
+f	2021	2	6	24	5	24062021	admindb	admindb	1653283839	1653283839
+f	2021	2	6	25	6	25062021	admindb	admindb	1653283839	1653283839
+f	2021	2	6	26	7	26062021	admindb	admindb	1653283839	1653283839
+f	2021	2	6	27	1	27062021	admindb	admindb	1653283839	1653283839
+f	2021	2	6	28	2	28062021	admindb	admindb	1653283839	1653283839
+f	2021	2	6	29	3	29062021	admindb	admindb	1653283839	1653283839
+f	2021	2	6	30	4	30062021	admindb	admindb	1653283839	1653283839
+f	2021	3	7	1	5	01072021	admindb	admindb	1653283839	1653283839
+f	2021	3	7	2	6	02072021	admindb	admindb	1653283839	1653283839
+f	2021	3	7	3	7	03072021	admindb	admindb	1653283839	1653283839
+f	2021	3	7	4	1	04072021	admindb	admindb	1653283839	1653283839
+f	2021	3	7	5	2	05072021	admindb	admindb	1653283839	1653283839
+f	2021	3	7	6	3	06072021	admindb	admindb	1653283839	1653283839
+f	2021	3	7	7	4	07072021	admindb	admindb	1653283839	1653283839
+f	2021	3	7	8	5	08072021	admindb	admindb	1653283839	1653283839
+f	2021	3	7	9	6	09072021	admindb	admindb	1653283839	1653283839
+f	2021	3	7	10	7	10072021	admindb	admindb	1653283839	1653283839
+f	2021	3	7	11	1	11072021	admindb	admindb	1653283839	1653283839
+f	2021	3	7	12	2	12072021	admindb	admindb	1653283839	1653283839
+f	2021	3	7	13	3	13072021	admindb	admindb	1653283839	1653283839
+f	2021	3	7	14	4	14072021	admindb	admindb	1653283839	1653283839
+f	2021	3	7	15	5	15072021	admindb	admindb	1653283839	1653283839
+f	2021	3	7	16	6	16072021	admindb	admindb	1653283839	1653283839
+f	2021	3	7	17	7	17072021	admindb	admindb	1653283839	1653283839
+f	2021	3	7	18	1	18072021	admindb	admindb	1653283839	1653283839
+f	2021	3	7	19	2	19072021	admindb	admindb	1653283839	1653283839
+f	2021	3	7	20	3	20072021	admindb	admindb	1653283839	1653283839
+f	2021	3	7	21	4	21072021	admindb	admindb	1653283839	1653283839
+f	2021	3	7	22	5	22072021	admindb	admindb	1653283839	1653283839
+f	2021	3	7	23	6	23072021	admindb	admindb	1653283839	1653283839
+f	2021	3	7	24	7	24072021	admindb	admindb	1653283839	1653283839
+f	2021	3	7	25	1	25072021	admindb	admindb	1653283839	1653283839
+f	2021	3	7	26	2	26072021	admindb	admindb	1653283839	1653283839
+f	2021	3	7	27	3	27072021	admindb	admindb	1653283839	1653283839
+f	2021	3	7	28	4	28072021	admindb	admindb	1653283839	1653283839
+f	2021	3	7	29	5	29072021	admindb	admindb	1653283839	1653283839
+f	2021	3	7	30	6	30072021	admindb	admindb	1653283839	1653283839
+f	2021	3	7	31	7	31072021	admindb	admindb	1653283839	1653283839
+f	2021	3	8	1	1	01082021	admindb	admindb	1653283839	1653283839
+f	2021	3	8	2	2	02082021	admindb	admindb	1653283839	1653283839
+f	2021	3	8	3	3	03082021	admindb	admindb	1653283839	1653283839
+f	2021	3	8	4	4	04082021	admindb	admindb	1653283839	1653283839
+f	2021	3	8	5	5	05082021	admindb	admindb	1653283839	1653283839
+f	2021	3	8	6	6	06082021	admindb	admindb	1653283839	1653283839
+f	2021	3	8	7	7	07082021	admindb	admindb	1653283839	1653283839
+f	2021	3	8	8	1	08082021	admindb	admindb	1653283839	1653283839
+f	2021	3	8	9	2	09082021	admindb	admindb	1653283839	1653283839
+f	2021	3	8	10	3	10082021	admindb	admindb	1653283839	1653283839
+f	2021	3	8	11	4	11082021	admindb	admindb	1653283839	1653283839
+f	2021	3	8	12	5	12082021	admindb	admindb	1653283839	1653283839
+f	2021	3	8	13	6	13082021	admindb	admindb	1653283839	1653283839
+f	2021	3	8	14	7	14082021	admindb	admindb	1653283839	1653283839
+f	2021	3	8	15	1	15082021	admindb	admindb	1653283839	1653283839
+f	2021	3	8	16	2	16082021	admindb	admindb	1653283839	1653283839
+f	2021	3	8	17	3	17082021	admindb	admindb	1653283839	1653283839
+f	2021	3	8	18	4	18082021	admindb	admindb	1653283839	1653283839
+f	2021	3	8	19	5	19082021	admindb	admindb	1653283839	1653283839
+f	2021	3	8	20	6	20082021	admindb	admindb	1653283839	1653283839
+f	2021	3	8	21	7	21082021	admindb	admindb	1653283839	1653283839
+f	2021	3	8	22	1	22082021	admindb	admindb	1653283839	1653283839
+f	2021	3	8	23	2	23082021	admindb	admindb	1653283839	1653283839
+f	2021	3	8	24	3	24082021	admindb	admindb	1653283839	1653283839
+f	2021	3	8	25	4	25082021	admindb	admindb	1653283839	1653283839
+f	2021	3	8	26	5	26082021	admindb	admindb	1653283839	1653283839
+f	2021	3	8	27	6	27082021	admindb	admindb	1653283839	1653283839
+f	2021	3	8	28	7	28082021	admindb	admindb	1653283839	1653283839
+f	2021	3	8	29	1	29082021	admindb	admindb	1653283839	1653283839
+f	2021	3	8	30	2	30082021	admindb	admindb	1653283839	1653283839
+f	2021	3	8	31	3	31082021	admindb	admindb	1653283839	1653283839
+f	2021	3	9	1	4	01092021	admindb	admindb	1653283839	1653283839
+f	2021	3	9	2	5	02092021	admindb	admindb	1653283839	1653283839
+f	2021	3	9	3	6	03092021	admindb	admindb	1653283839	1653283839
+f	2021	3	9	4	7	04092021	admindb	admindb	1653283839	1653283839
+f	2021	3	9	5	1	05092021	admindb	admindb	1653283839	1653283839
+f	2021	3	9	6	2	06092021	admindb	admindb	1653283839	1653283839
+f	2021	3	9	7	3	07092021	admindb	admindb	1653283839	1653283839
+f	2021	3	9	8	4	08092021	admindb	admindb	1653283839	1653283839
+f	2021	3	9	9	5	09092021	admindb	admindb	1653283839	1653283839
+f	2021	3	9	10	6	10092021	admindb	admindb	1653283839	1653283839
+f	2021	3	9	11	7	11092021	admindb	admindb	1653283839	1653283839
+f	2021	3	9	12	1	12092021	admindb	admindb	1653283839	1653283839
+f	2021	3	9	13	2	13092021	admindb	admindb	1653283839	1653283839
+f	2021	3	9	14	3	14092021	admindb	admindb	1653283839	1653283839
+f	2021	3	9	15	4	15092021	admindb	admindb	1653283839	1653283839
+f	2021	3	9	16	5	16092021	admindb	admindb	1653283839	1653283839
+f	2021	3	9	17	6	17092021	admindb	admindb	1653283839	1653283839
+f	2021	3	9	18	7	18092021	admindb	admindb	1653283839	1653283839
+f	2021	3	9	19	1	19092021	admindb	admindb	1653283839	1653283839
+f	2021	3	9	20	2	20092021	admindb	admindb	1653283839	1653283839
+f	2021	3	9	21	3	21092021	admindb	admindb	1653283839	1653283839
+f	2021	3	9	22	4	22092021	admindb	admindb	1653283839	1653283839
+f	2021	3	9	23	5	23092021	admindb	admindb	1653283839	1653283839
+f	2021	3	9	24	6	24092021	admindb	admindb	1653283839	1653283839
+f	2021	3	9	25	7	25092021	admindb	admindb	1653283839	1653283839
+f	2021	3	9	26	1	26092021	admindb	admindb	1653283839	1653283839
+f	2021	3	9	27	2	27092021	admindb	admindb	1653283839	1653283839
+f	2021	3	9	28	3	28092021	admindb	admindb	1653283839	1653283839
+f	2021	3	9	29	4	29092021	admindb	admindb	1653283839	1653283839
+f	2021	3	9	30	5	30092021	admindb	admindb	1653283839	1653283839
+f	2021	4	10	1	6	01102021	admindb	admindb	1653283839	1653283839
+f	2021	4	10	2	7	02102021	admindb	admindb	1653283839	1653283839
+f	2021	4	10	3	1	03102021	admindb	admindb	1653283839	1653283839
+f	2021	4	10	4	2	04102021	admindb	admindb	1653283839	1653283839
+f	2021	4	10	5	3	05102021	admindb	admindb	1653283839	1653283839
+f	2021	4	10	6	4	06102021	admindb	admindb	1653283839	1653283839
+f	2021	4	10	7	5	07102021	admindb	admindb	1653283839	1653283839
+f	2021	4	10	8	6	08102021	admindb	admindb	1653283839	1653283839
+f	2021	4	10	9	7	09102021	admindb	admindb	1653283839	1653283839
+f	2021	4	10	10	1	10102021	admindb	admindb	1653283839	1653283839
+f	2021	4	10	11	2	11102021	admindb	admindb	1653283839	1653283839
+f	2021	4	10	12	3	12102021	admindb	admindb	1653283839	1653283839
+f	2021	4	10	13	4	13102021	admindb	admindb	1653283839	1653283839
+f	2021	4	10	14	5	14102021	admindb	admindb	1653283839	1653283839
+f	2021	4	10	15	6	15102021	admindb	admindb	1653283839	1653283839
+f	2021	4	10	16	7	16102021	admindb	admindb	1653283839	1653283839
+f	2021	4	10	17	1	17102021	admindb	admindb	1653283839	1653283839
+f	2021	4	10	18	2	18102021	admindb	admindb	1653283839	1653283839
+f	2021	4	10	19	3	19102021	admindb	admindb	1653283839	1653283839
+f	2021	4	10	20	4	20102021	admindb	admindb	1653283839	1653283839
+f	2021	4	10	21	5	21102021	admindb	admindb	1653283839	1653283839
+f	2021	4	10	22	6	22102021	admindb	admindb	1653283839	1653283839
+f	2021	4	10	23	7	23102021	admindb	admindb	1653283839	1653283839
+f	2021	4	10	24	1	24102021	admindb	admindb	1653283839	1653283839
+f	2021	4	10	25	2	25102021	admindb	admindb	1653283839	1653283839
+f	2021	4	10	26	3	26102021	admindb	admindb	1653283839	1653283839
+f	2021	4	10	27	4	27102021	admindb	admindb	1653283839	1653283839
+f	2021	4	10	28	5	28102021	admindb	admindb	1653283839	1653283839
+f	2021	4	10	29	6	29102021	admindb	admindb	1653283839	1653283839
+f	2021	4	10	30	7	30102021	admindb	admindb	1653283839	1653283839
+f	2021	4	10	31	1	31102021	admindb	admindb	1653283839	1653283839
+f	2021	4	11	1	2	01112021	admindb	admindb	1653283839	1653283839
+f	2021	4	11	2	3	02112021	admindb	admindb	1653283839	1653283839
+f	2021	4	11	3	4	03112021	admindb	admindb	1653283839	1653283839
+f	2021	4	11	4	5	04112021	admindb	admindb	1653283839	1653283839
+f	2021	4	11	5	6	05112021	admindb	admindb	1653283839	1653283839
+f	2021	4	11	6	7	06112021	admindb	admindb	1653283839	1653283839
+f	2021	4	11	7	1	07112021	admindb	admindb	1653283839	1653283839
+f	2021	4	11	8	2	08112021	admindb	admindb	1653283839	1653283839
+f	2021	4	11	9	3	09112021	admindb	admindb	1653283839	1653283839
+f	2021	4	11	10	4	10112021	admindb	admindb	1653283839	1653283839
+f	2021	4	11	11	5	11112021	admindb	admindb	1653283839	1653283839
+f	2021	4	11	12	6	12112021	admindb	admindb	1653283839	1653283839
+f	2021	4	11	13	7	13112021	admindb	admindb	1653283839	1653283839
+f	2021	4	11	14	1	14112021	admindb	admindb	1653283839	1653283839
+f	2021	4	11	15	2	15112021	admindb	admindb	1653283839	1653283839
+f	2021	4	11	16	3	16112021	admindb	admindb	1653283839	1653283839
+f	2021	4	11	17	4	17112021	admindb	admindb	1653283839	1653283839
+f	2021	4	11	18	5	18112021	admindb	admindb	1653283839	1653283839
+f	2021	4	11	19	6	19112021	admindb	admindb	1653283839	1653283839
+f	2021	4	11	20	7	20112021	admindb	admindb	1653283839	1653283839
+f	2021	4	11	21	1	21112021	admindb	admindb	1653283839	1653283839
+f	2021	4	11	22	2	22112021	admindb	admindb	1653283839	1653283839
+f	2021	4	11	23	3	23112021	admindb	admindb	1653283839	1653283839
+f	2021	4	11	24	4	24112021	admindb	admindb	1653283839	1653283839
+f	2021	4	11	25	5	25112021	admindb	admindb	1653283839	1653283839
+f	2021	4	11	26	6	26112021	admindb	admindb	1653283839	1653283839
+f	2021	4	11	27	7	27112021	admindb	admindb	1653283839	1653283839
+f	2021	4	11	28	1	28112021	admindb	admindb	1653283839	1653283839
+f	2021	4	11	29	2	29112021	admindb	admindb	1653283839	1653283839
+f	2021	4	11	30	3	30112021	admindb	admindb	1653283839	1653283839
+f	2021	4	12	1	4	01122021	admindb	admindb	1653283839	1653283839
+f	2021	4	12	2	5	02122021	admindb	admindb	1653283839	1653283839
+f	2021	4	12	3	6	03122021	admindb	admindb	1653283839	1653283839
+f	2021	4	12	4	7	04122021	admindb	admindb	1653283839	1653283839
+f	2021	4	12	5	1	05122021	admindb	admindb	1653283839	1653283839
+f	2021	4	12	6	2	06122021	admindb	admindb	1653283839	1653283839
+f	2021	4	12	7	3	07122021	admindb	admindb	1653283839	1653283839
+f	2021	4	12	8	4	08122021	admindb	admindb	1653283839	1653283839
+f	2021	4	12	9	5	09122021	admindb	admindb	1653283839	1653283839
+f	2021	4	12	10	6	10122021	admindb	admindb	1653283839	1653283839
+f	2021	4	12	11	7	11122021	admindb	admindb	1653283839	1653283839
+f	2021	4	12	12	1	12122021	admindb	admindb	1653283839	1653283839
+f	2021	4	12	13	2	13122021	admindb	admindb	1653283839	1653283839
+f	2021	4	12	14	3	14122021	admindb	admindb	1653283839	1653283839
+f	2021	4	12	15	4	15122021	admindb	admindb	1653283839	1653283839
+f	2021	4	12	16	5	16122021	admindb	admindb	1653283839	1653283839
+f	2021	4	12	17	6	17122021	admindb	admindb	1653283839	1653283839
+f	2021	4	12	18	7	18122021	admindb	admindb	1653283839	1653283839
+f	2021	4	12	19	1	19122021	admindb	admindb	1653283839	1653283839
+f	2021	4	12	20	2	20122021	admindb	admindb	1653283839	1653283839
+f	2021	4	12	21	3	21122021	admindb	admindb	1653283839	1653283839
+f	2021	4	12	22	4	22122021	admindb	admindb	1653283839	1653283839
+f	2021	4	12	23	5	23122021	admindb	admindb	1653283839	1653283839
+f	2021	4	12	24	6	24122021	admindb	admindb	1653283839	1653283839
+f	2021	4	12	25	7	25122021	admindb	admindb	1653283839	1653283839
+f	2021	4	12	26	1	26122021	admindb	admindb	1653283839	1653283839
+f	2021	4	12	27	2	27122021	admindb	admindb	1653283839	1653283839
+f	2021	4	12	28	3	28122021	admindb	admindb	1653283839	1653283839
+f	2021	4	12	29	4	29122021	admindb	admindb	1653283839	1653283839
+f	2021	4	12	30	5	30122021	admindb	admindb	1653283839	1653283839
+f	2021	4	12	31	6	31122021	admindb	admindb	1653283839	1653283839
+f	2022	1	1	1	7	01012022	admindb	admindb	1653283839	1653283839
+f	2022	1	1	2	1	02012022	admindb	admindb	1653283839	1653283839
+f	2022	1	1	3	2	03012022	admindb	admindb	1653283839	1653283839
+f	2022	1	1	4	3	04012022	admindb	admindb	1653283839	1653283839
+f	2022	1	1	5	4	05012022	admindb	admindb	1653283839	1653283839
+f	2022	1	1	6	5	06012022	admindb	admindb	1653283839	1653283839
+f	2022	1	1	7	6	07012022	admindb	admindb	1653283839	1653283839
+f	2022	1	1	8	7	08012022	admindb	admindb	1653283839	1653283839
+f	2022	1	1	9	1	09012022	admindb	admindb	1653283839	1653283839
+f	2022	1	1	10	2	10012022	admindb	admindb	1653283839	1653283839
+f	2022	1	1	11	3	11012022	admindb	admindb	1653283839	1653283839
+f	2022	1	1	12	4	12012022	admindb	admindb	1653283839	1653283839
+f	2022	1	1	13	5	13012022	admindb	admindb	1653283839	1653283839
+f	2022	1	1	14	6	14012022	admindb	admindb	1653283839	1653283839
+f	2022	1	1	15	7	15012022	admindb	admindb	1653283839	1653283839
+f	2022	1	1	16	1	16012022	admindb	admindb	1653283839	1653283839
+f	2022	1	1	17	2	17012022	admindb	admindb	1653283839	1653283839
+f	2022	1	1	18	3	18012022	admindb	admindb	1653283839	1653283839
+f	2022	1	1	19	4	19012022	admindb	admindb	1653283839	1653283839
+f	2022	1	1	20	5	20012022	admindb	admindb	1653283839	1653283839
+f	2022	1	1	21	6	21012022	admindb	admindb	1653283839	1653283839
+f	2022	1	1	22	7	22012022	admindb	admindb	1653283839	1653283839
+f	2022	1	1	23	1	23012022	admindb	admindb	1653283839	1653283839
+f	2022	1	1	24	2	24012022	admindb	admindb	1653283839	1653283839
+f	2022	1	1	25	3	25012022	admindb	admindb	1653283839	1653283839
+f	2022	1	1	26	4	26012022	admindb	admindb	1653283839	1653283839
+f	2022	1	1	27	5	27012022	admindb	admindb	1653283839	1653283839
+f	2022	1	1	28	6	28012022	admindb	admindb	1653283839	1653283839
+f	2022	1	1	29	7	29012022	admindb	admindb	1653283839	1653283839
+f	2022	1	1	30	1	30012022	admindb	admindb	1653283839	1653283839
+f	2022	1	1	31	2	31012022	admindb	admindb	1653283839	1653283839
+f	2022	1	2	1	3	01022022	admindb	admindb	1653283839	1653283839
+f	2022	1	2	2	4	02022022	admindb	admindb	1653283839	1653283839
+f	2022	1	2	3	5	03022022	admindb	admindb	1653283839	1653283839
+f	2022	1	2	4	6	04022022	admindb	admindb	1653283839	1653283839
+f	2022	1	2	5	7	05022022	admindb	admindb	1653283839	1653283839
+f	2022	1	2	6	1	06022022	admindb	admindb	1653283839	1653283839
+f	2022	1	2	7	2	07022022	admindb	admindb	1653283839	1653283839
+f	2022	1	2	8	3	08022022	admindb	admindb	1653283839	1653283839
+f	2022	1	2	9	4	09022022	admindb	admindb	1653283839	1653283839
+f	2022	1	2	10	5	10022022	admindb	admindb	1653283839	1653283839
+f	2022	1	2	11	6	11022022	admindb	admindb	1653283839	1653283839
+f	2022	1	2	12	7	12022022	admindb	admindb	1653283839	1653283839
+f	2022	1	2	13	1	13022022	admindb	admindb	1653283839	1653283839
+f	2022	1	2	14	2	14022022	admindb	admindb	1653283839	1653283839
+f	2022	1	2	15	3	15022022	admindb	admindb	1653283839	1653283839
+f	2022	1	2	16	4	16022022	admindb	admindb	1653283839	1653283839
+f	2022	1	2	17	5	17022022	admindb	admindb	1653283839	1653283839
+f	2022	1	2	18	6	18022022	admindb	admindb	1653283839	1653283839
+f	2022	1	2	19	7	19022022	admindb	admindb	1653283839	1653283839
+f	2022	1	2	20	1	20022022	admindb	admindb	1653283839	1653283839
+f	2022	1	2	21	2	21022022	admindb	admindb	1653283839	1653283839
+f	2022	1	2	22	3	22022022	admindb	admindb	1653283839	1653283839
+f	2022	1	2	23	4	23022022	admindb	admindb	1653283839	1653283839
+f	2022	1	2	24	5	24022022	admindb	admindb	1653283839	1653283839
+f	2022	1	2	25	6	25022022	admindb	admindb	1653283839	1653283839
+f	2022	1	2	26	7	26022022	admindb	admindb	1653283839	1653283839
+f	2022	1	2	27	1	27022022	admindb	admindb	1653283839	1653283839
+f	2022	1	2	28	2	28022022	admindb	admindb	1653283839	1653283839
+f	2022	1	3	1	3	01032022	admindb	admindb	1653283839	1653283839
+f	2022	1	3	2	4	02032022	admindb	admindb	1653283839	1653283839
+f	2022	1	3	3	5	03032022	admindb	admindb	1653283839	1653283839
+f	2022	1	3	4	6	04032022	admindb	admindb	1653283839	1653283839
+f	2022	1	3	5	7	05032022	admindb	admindb	1653283839	1653283839
+f	2022	1	3	6	1	06032022	admindb	admindb	1653283839	1653283839
+f	2022	1	3	7	2	07032022	admindb	admindb	1653283839	1653283839
+f	2022	1	3	8	3	08032022	admindb	admindb	1653283839	1653283839
+f	2022	1	3	9	4	09032022	admindb	admindb	1653283839	1653283839
+f	2022	1	3	10	5	10032022	admindb	admindb	1653283839	1653283839
+f	2022	1	3	11	6	11032022	admindb	admindb	1653283839	1653283839
+f	2022	1	3	12	7	12032022	admindb	admindb	1653283839	1653283839
+f	2022	1	3	13	1	13032022	admindb	admindb	1653283839	1653283839
+f	2022	1	3	14	2	14032022	admindb	admindb	1653283839	1653283839
+f	2022	1	3	15	3	15032022	admindb	admindb	1653283839	1653283839
+f	2022	1	3	16	4	16032022	admindb	admindb	1653283839	1653283839
+f	2022	1	3	17	5	17032022	admindb	admindb	1653283839	1653283839
+f	2022	1	3	18	6	18032022	admindb	admindb	1653283839	1653283839
+f	2022	1	3	19	7	19032022	admindb	admindb	1653283839	1653283839
+f	2022	1	3	20	1	20032022	admindb	admindb	1653283839	1653283839
+f	2022	1	3	21	2	21032022	admindb	admindb	1653283839	1653283839
+f	2022	1	3	22	3	22032022	admindb	admindb	1653283839	1653283839
+f	2022	1	3	23	4	23032022	admindb	admindb	1653283839	1653283839
+f	2022	1	3	24	5	24032022	admindb	admindb	1653283839	1653283839
+f	2022	1	3	25	6	25032022	admindb	admindb	1653283839	1653283839
+f	2022	1	3	26	7	26032022	admindb	admindb	1653283839	1653283839
+f	2022	1	3	27	1	27032022	admindb	admindb	1653283839	1653283839
+f	2022	1	3	28	2	28032022	admindb	admindb	1653283839	1653283839
+f	2022	1	3	29	3	29032022	admindb	admindb	1653283839	1653283839
+f	2022	1	3	30	4	30032022	admindb	admindb	1653283839	1653283839
+f	2022	1	3	31	5	31032022	admindb	admindb	1653283839	1653283839
+f	2022	2	4	1	6	01042022	admindb	admindb	1653283839	1653283839
+f	2022	2	4	2	7	02042022	admindb	admindb	1653283839	1653283839
+f	2022	2	4	3	1	03042022	admindb	admindb	1653283839	1653283839
+f	2022	2	4	4	2	04042022	admindb	admindb	1653283839	1653283839
+f	2022	2	4	5	3	05042022	admindb	admindb	1653283839	1653283839
+f	2022	2	4	6	4	06042022	admindb	admindb	1653283839	1653283839
+f	2022	2	4	7	5	07042022	admindb	admindb	1653283839	1653283839
+f	2022	2	4	8	6	08042022	admindb	admindb	1653283839	1653283839
+f	2022	2	4	9	7	09042022	admindb	admindb	1653283839	1653283839
+f	2022	2	4	10	1	10042022	admindb	admindb	1653283839	1653283839
+f	2022	2	4	11	2	11042022	admindb	admindb	1653283839	1653283839
+f	2022	2	4	12	3	12042022	admindb	admindb	1653283839	1653283839
+f	2022	2	4	13	4	13042022	admindb	admindb	1653283839	1653283839
+f	2022	2	4	14	5	14042022	admindb	admindb	1653283839	1653283839
+f	2022	2	4	15	6	15042022	admindb	admindb	1653283839	1653283839
+f	2022	2	4	16	7	16042022	admindb	admindb	1653283839	1653283839
+f	2022	2	4	17	1	17042022	admindb	admindb	1653283839	1653283839
+f	2022	2	4	18	2	18042022	admindb	admindb	1653283839	1653283839
+f	2022	2	4	19	3	19042022	admindb	admindb	1653283839	1653283839
+f	2022	2	4	20	4	20042022	admindb	admindb	1653283839	1653283839
+f	2022	2	4	21	5	21042022	admindb	admindb	1653283839	1653283839
+f	2022	2	4	22	6	22042022	admindb	admindb	1653283839	1653283839
+f	2022	2	4	23	7	23042022	admindb	admindb	1653283839	1653283839
+f	2022	2	4	24	1	24042022	admindb	admindb	1653283839	1653283839
+f	2022	2	4	25	2	25042022	admindb	admindb	1653283839	1653283839
+f	2022	2	4	26	3	26042022	admindb	admindb	1653283839	1653283839
+f	2022	2	4	27	4	27042022	admindb	admindb	1653283839	1653283839
+f	2022	2	4	28	5	28042022	admindb	admindb	1653283839	1653283839
+f	2022	2	4	29	6	29042022	admindb	admindb	1653283839	1653283839
+f	2022	2	4	30	7	30042022	admindb	admindb	1653283839	1653283839
+f	2022	2	5	1	1	01052022	admindb	admindb	1653283839	1653283839
+f	2022	2	5	2	2	02052022	admindb	admindb	1653283839	1653283839
+f	2022	2	5	3	3	03052022	admindb	admindb	1653283839	1653283839
+f	2022	2	5	4	4	04052022	admindb	admindb	1653283839	1653283839
+f	2022	2	5	5	5	05052022	admindb	admindb	1653283839	1653283839
+f	2022	2	5	6	6	06052022	admindb	admindb	1653283839	1653283839
+f	2022	2	5	7	7	07052022	admindb	admindb	1653283839	1653283839
+f	2022	2	5	8	1	08052022	admindb	admindb	1653283839	1653283839
+f	2022	2	5	9	2	09052022	admindb	admindb	1653283839	1653283839
+f	2022	2	5	10	3	10052022	admindb	admindb	1653283839	1653283839
+f	2022	2	5	11	4	11052022	admindb	admindb	1653283839	1653283839
+f	2022	2	5	12	5	12052022	admindb	admindb	1653283839	1653283839
+f	2022	2	5	13	6	13052022	admindb	admindb	1653283839	1653283839
+f	2022	2	5	14	7	14052022	admindb	admindb	1653283839	1653283839
+f	2022	2	5	15	1	15052022	admindb	admindb	1653283839	1653283839
+f	2022	2	5	16	2	16052022	admindb	admindb	1653283839	1653283839
+f	2022	2	5	17	3	17052022	admindb	admindb	1653283839	1653283839
+f	2022	2	5	18	4	18052022	admindb	admindb	1653283839	1653283839
+f	2022	2	5	19	5	19052022	admindb	admindb	1653283839	1653283839
+f	2022	2	5	20	6	20052022	admindb	admindb	1653283839	1653283839
+f	2022	2	5	21	7	21052022	admindb	admindb	1653283839	1653283839
+f	2022	2	5	22	1	22052022	admindb	admindb	1653283839	1653283839
+f	2022	2	5	23	2	23052022	admindb	admindb	1653283839	1653283839
+f	2022	2	5	24	3	24052022	admindb	admindb	1653283839	1653283839
+f	2022	2	5	25	4	25052022	admindb	admindb	1653283839	1653283839
+f	2022	2	5	26	5	26052022	admindb	admindb	1653283839	1653283839
+f	2022	2	5	27	6	27052022	admindb	admindb	1653283839	1653283839
+f	2022	2	5	28	7	28052022	admindb	admindb	1653283839	1653283839
+f	2022	2	5	29	1	29052022	admindb	admindb	1653283839	1653283839
+f	2022	2	5	30	2	30052022	admindb	admindb	1653283839	1653283839
+f	2022	2	5	31	3	31052022	admindb	admindb	1653283839	1653283839
+f	2022	2	6	1	4	01062022	admindb	admindb	1653283839	1653283839
+f	2022	2	6	2	5	02062022	admindb	admindb	1653283839	1653283839
+f	2022	2	6	3	6	03062022	admindb	admindb	1653283839	1653283839
+f	2022	2	6	4	7	04062022	admindb	admindb	1653283839	1653283839
+f	2022	2	6	5	1	05062022	admindb	admindb	1653283839	1653283839
+f	2022	2	6	6	2	06062022	admindb	admindb	1653283839	1653283839
+f	2022	2	6	7	3	07062022	admindb	admindb	1653283839	1653283839
+f	2022	2	6	8	4	08062022	admindb	admindb	1653283839	1653283839
+f	2022	2	6	9	5	09062022	admindb	admindb	1653283839	1653283839
+f	2022	2	6	10	6	10062022	admindb	admindb	1653283839	1653283839
+f	2022	2	6	11	7	11062022	admindb	admindb	1653283839	1653283839
+f	2022	2	6	12	1	12062022	admindb	admindb	1653283839	1653283839
+f	2022	2	6	13	2	13062022	admindb	admindb	1653283839	1653283839
+f	2022	2	6	14	3	14062022	admindb	admindb	1653283839	1653283839
+f	2022	2	6	15	4	15062022	admindb	admindb	1653283839	1653283839
+f	2022	2	6	16	5	16062022	admindb	admindb	1653283839	1653283839
+f	2022	2	6	17	6	17062022	admindb	admindb	1653283839	1653283839
+f	2022	2	6	18	7	18062022	admindb	admindb	1653283839	1653283839
+f	2022	2	6	19	1	19062022	admindb	admindb	1653283839	1653283839
+f	2022	2	6	20	2	20062022	admindb	admindb	1653283839	1653283839
+f	2022	2	6	21	3	21062022	admindb	admindb	1653283839	1653283839
+f	2022	2	6	22	4	22062022	admindb	admindb	1653283839	1653283839
+f	2022	2	6	23	5	23062022	admindb	admindb	1653283839	1653283839
+f	2022	2	6	24	6	24062022	admindb	admindb	1653283839	1653283839
+f	2022	2	6	25	7	25062022	admindb	admindb	1653283839	1653283839
+f	2022	2	6	26	1	26062022	admindb	admindb	1653283839	1653283839
+f	2022	2	6	27	2	27062022	admindb	admindb	1653283839	1653283839
+f	2022	2	6	28	3	28062022	admindb	admindb	1653283839	1653283839
+f	2022	2	6	29	4	29062022	admindb	admindb	1653283839	1653283839
+f	2022	2	6	30	5	30062022	admindb	admindb	1653283839	1653283839
+f	2022	3	7	1	6	01072022	admindb	admindb	1653283839	1653283839
+f	2022	3	7	2	7	02072022	admindb	admindb	1653283839	1653283839
+f	2022	3	7	3	1	03072022	admindb	admindb	1653283839	1653283839
+f	2022	3	7	4	2	04072022	admindb	admindb	1653283839	1653283839
+f	2022	3	7	5	3	05072022	admindb	admindb	1653283839	1653283839
+f	2022	3	7	6	4	06072022	admindb	admindb	1653283839	1653283839
+f	2022	3	7	7	5	07072022	admindb	admindb	1653283839	1653283839
+f	2022	3	7	8	6	08072022	admindb	admindb	1653283839	1653283839
+f	2022	3	7	9	7	09072022	admindb	admindb	1653283839	1653283839
+f	2022	3	7	10	1	10072022	admindb	admindb	1653283839	1653283839
+f	2022	3	7	11	2	11072022	admindb	admindb	1653283839	1653283839
+f	2022	3	7	12	3	12072022	admindb	admindb	1653283839	1653283839
+f	2022	3	7	13	4	13072022	admindb	admindb	1653283839	1653283839
+f	2022	3	7	14	5	14072022	admindb	admindb	1653283839	1653283839
+f	2022	3	7	15	6	15072022	admindb	admindb	1653283839	1653283839
+f	2022	3	7	16	7	16072022	admindb	admindb	1653283839	1653283839
+f	2022	3	7	17	1	17072022	admindb	admindb	1653283839	1653283839
+f	2022	3	7	18	2	18072022	admindb	admindb	1653283839	1653283839
+f	2022	3	7	19	3	19072022	admindb	admindb	1653283839	1653283839
+f	2022	3	7	20	4	20072022	admindb	admindb	1653283839	1653283839
+f	2022	3	7	21	5	21072022	admindb	admindb	1653283839	1653283839
+f	2022	3	7	22	6	22072022	admindb	admindb	1653283839	1653283839
+f	2022	3	7	23	7	23072022	admindb	admindb	1653283839	1653283839
+f	2022	3	7	24	1	24072022	admindb	admindb	1653283839	1653283839
+f	2022	3	7	25	2	25072022	admindb	admindb	1653283839	1653283839
+f	2022	3	7	26	3	26072022	admindb	admindb	1653283839	1653283839
+f	2022	3	7	27	4	27072022	admindb	admindb	1653283839	1653283839
+f	2022	3	7	28	5	28072022	admindb	admindb	1653283839	1653283839
+f	2022	3	7	29	6	29072022	admindb	admindb	1653283839	1653283839
+f	2022	3	7	30	7	30072022	admindb	admindb	1653283839	1653283839
+f	2022	3	7	31	1	31072022	admindb	admindb	1653283839	1653283839
+f	2022	3	8	1	2	01082022	admindb	admindb	1653283839	1653283839
+f	2022	3	8	2	3	02082022	admindb	admindb	1653283839	1653283839
+f	2022	3	8	3	4	03082022	admindb	admindb	1653283839	1653283839
+f	2022	3	8	4	5	04082022	admindb	admindb	1653283839	1653283839
+f	2022	3	8	5	6	05082022	admindb	admindb	1653283839	1653283839
+f	2022	3	8	6	7	06082022	admindb	admindb	1653283839	1653283839
+f	2022	3	8	7	1	07082022	admindb	admindb	1653283839	1653283839
+f	2022	3	8	8	2	08082022	admindb	admindb	1653283839	1653283839
+f	2022	3	8	9	3	09082022	admindb	admindb	1653283839	1653283839
+f	2022	3	8	10	4	10082022	admindb	admindb	1653283839	1653283839
+f	2022	3	8	11	5	11082022	admindb	admindb	1653283839	1653283839
+f	2022	3	8	12	6	12082022	admindb	admindb	1653283839	1653283839
+f	2022	3	8	13	7	13082022	admindb	admindb	1653283839	1653283839
+f	2022	3	8	14	1	14082022	admindb	admindb	1653283839	1653283839
+f	2022	3	8	15	2	15082022	admindb	admindb	1653283839	1653283839
+f	2022	3	8	16	3	16082022	admindb	admindb	1653283839	1653283839
+f	2022	3	8	17	4	17082022	admindb	admindb	1653283839	1653283839
+f	2022	3	8	18	5	18082022	admindb	admindb	1653283839	1653283839
+f	2022	3	8	19	6	19082022	admindb	admindb	1653283839	1653283839
+f	2022	3	8	20	7	20082022	admindb	admindb	1653283839	1653283839
+f	2022	3	8	21	1	21082022	admindb	admindb	1653283839	1653283839
+f	2022	3	8	22	2	22082022	admindb	admindb	1653283839	1653283839
+f	2022	3	8	23	3	23082022	admindb	admindb	1653283839	1653283839
+f	2022	3	8	24	4	24082022	admindb	admindb	1653283839	1653283839
+f	2022	3	8	25	5	25082022	admindb	admindb	1653283839	1653283839
+f	2022	3	8	26	6	26082022	admindb	admindb	1653283839	1653283839
+f	2022	3	8	27	7	27082022	admindb	admindb	1653283839	1653283839
+f	2022	3	8	28	1	28082022	admindb	admindb	1653283839	1653283839
+f	2022	3	8	29	2	29082022	admindb	admindb	1653283839	1653283839
+f	2022	3	8	30	3	30082022	admindb	admindb	1653283839	1653283839
+f	2022	3	8	31	4	31082022	admindb	admindb	1653283839	1653283839
+f	2022	3	9	1	5	01092022	admindb	admindb	1653283839	1653283839
+f	2022	3	9	2	6	02092022	admindb	admindb	1653283839	1653283839
+f	2022	3	9	3	7	03092022	admindb	admindb	1653283839	1653283839
+f	2022	3	9	4	1	04092022	admindb	admindb	1653283839	1653283839
+f	2022	3	9	5	2	05092022	admindb	admindb	1653283839	1653283839
+f	2022	3	9	6	3	06092022	admindb	admindb	1653283839	1653283839
+f	2022	3	9	7	4	07092022	admindb	admindb	1653283839	1653283839
+f	2022	3	9	8	5	08092022	admindb	admindb	1653283839	1653283839
+f	2022	3	9	9	6	09092022	admindb	admindb	1653283839	1653283839
+f	2022	3	9	10	7	10092022	admindb	admindb	1653283839	1653283839
+f	2022	3	9	11	1	11092022	admindb	admindb	1653283839	1653283839
+f	2022	3	9	12	2	12092022	admindb	admindb	1653283839	1653283839
+f	2022	3	9	13	3	13092022	admindb	admindb	1653283839	1653283839
+f	2022	3	9	14	4	14092022	admindb	admindb	1653283839	1653283839
+f	2022	3	9	15	5	15092022	admindb	admindb	1653283839	1653283839
+f	2022	3	9	16	6	16092022	admindb	admindb	1653283839	1653283839
+f	2022	3	9	17	7	17092022	admindb	admindb	1653283839	1653283839
+f	2022	3	9	18	1	18092022	admindb	admindb	1653283839	1653283839
+f	2022	3	9	19	2	19092022	admindb	admindb	1653283839	1653283839
+f	2022	3	9	20	3	20092022	admindb	admindb	1653283839	1653283839
+f	2022	3	9	21	4	21092022	admindb	admindb	1653283839	1653283839
+f	2022	3	9	22	5	22092022	admindb	admindb	1653283839	1653283839
+f	2022	3	9	23	6	23092022	admindb	admindb	1653283839	1653283839
+f	2022	3	9	24	7	24092022	admindb	admindb	1653283839	1653283839
+f	2022	3	9	25	1	25092022	admindb	admindb	1653283839	1653283839
+f	2022	3	9	26	2	26092022	admindb	admindb	1653283839	1653283839
+f	2022	3	9	27	3	27092022	admindb	admindb	1653283839	1653283839
+f	2022	3	9	28	4	28092022	admindb	admindb	1653283839	1653283839
+f	2022	3	9	29	5	29092022	admindb	admindb	1653283839	1653283839
+f	2022	3	9	30	6	30092022	admindb	admindb	1653283839	1653283839
+f	2022	4	10	1	7	01102022	admindb	admindb	1653283839	1653283839
+f	2022	4	10	2	1	02102022	admindb	admindb	1653283839	1653283839
+f	2022	4	10	3	2	03102022	admindb	admindb	1653283839	1653283839
+f	2022	4	10	4	3	04102022	admindb	admindb	1653283839	1653283839
+f	2022	4	10	5	4	05102022	admindb	admindb	1653283839	1653283839
+f	2022	4	10	6	5	06102022	admindb	admindb	1653283839	1653283839
+f	2022	4	10	7	6	07102022	admindb	admindb	1653283839	1653283839
+f	2022	4	10	8	7	08102022	admindb	admindb	1653283839	1653283839
+f	2022	4	10	9	1	09102022	admindb	admindb	1653283839	1653283839
+f	2022	4	10	10	2	10102022	admindb	admindb	1653283839	1653283839
+f	2022	4	10	11	3	11102022	admindb	admindb	1653283839	1653283839
+f	2022	4	10	12	4	12102022	admindb	admindb	1653283839	1653283839
+f	2022	4	10	13	5	13102022	admindb	admindb	1653283839	1653283839
+f	2022	4	10	14	6	14102022	admindb	admindb	1653283839	1653283839
+f	2022	4	10	15	7	15102022	admindb	admindb	1653283839	1653283839
+f	2022	4	10	16	1	16102022	admindb	admindb	1653283839	1653283839
+f	2022	4	10	17	2	17102022	admindb	admindb	1653283839	1653283839
+f	2022	4	10	18	3	18102022	admindb	admindb	1653283839	1653283839
+f	2022	4	10	19	4	19102022	admindb	admindb	1653283839	1653283839
+f	2022	4	10	20	5	20102022	admindb	admindb	1653283839	1653283839
+f	2022	4	10	21	6	21102022	admindb	admindb	1653283839	1653283839
+f	2022	4	10	22	7	22102022	admindb	admindb	1653283839	1653283839
+f	2022	4	10	23	1	23102022	admindb	admindb	1653283839	1653283839
+f	2022	4	10	24	2	24102022	admindb	admindb	1653283839	1653283839
+f	2022	4	10	25	3	25102022	admindb	admindb	1653283839	1653283839
+f	2022	4	10	26	4	26102022	admindb	admindb	1653283839	1653283839
+f	2022	4	10	27	5	27102022	admindb	admindb	1653283839	1653283839
+f	2022	4	10	28	6	28102022	admindb	admindb	1653283839	1653283839
+f	2022	4	10	29	7	29102022	admindb	admindb	1653283839	1653283839
+f	2022	4	10	30	1	30102022	admindb	admindb	1653283839	1653283839
+f	2022	4	10	31	2	31102022	admindb	admindb	1653283839	1653283839
+f	2022	4	11	1	3	01112022	admindb	admindb	1653283839	1653283839
+f	2022	4	11	2	4	02112022	admindb	admindb	1653283839	1653283839
+f	2022	4	11	3	5	03112022	admindb	admindb	1653283839	1653283839
+f	2022	4	11	4	6	04112022	admindb	admindb	1653283839	1653283839
+f	2022	4	11	5	7	05112022	admindb	admindb	1653283839	1653283839
+f	2022	4	11	6	1	06112022	admindb	admindb	1653283839	1653283839
+f	2022	4	11	7	2	07112022	admindb	admindb	1653283839	1653283839
+f	2022	4	11	8	3	08112022	admindb	admindb	1653283839	1653283839
+f	2022	4	11	9	4	09112022	admindb	admindb	1653283839	1653283839
+f	2022	4	11	10	5	10112022	admindb	admindb	1653283839	1653283839
+f	2022	4	11	11	6	11112022	admindb	admindb	1653283839	1653283839
+f	2022	4	11	12	7	12112022	admindb	admindb	1653283839	1653283839
+f	2022	4	11	13	1	13112022	admindb	admindb	1653283839	1653283839
+f	2022	4	11	14	2	14112022	admindb	admindb	1653283839	1653283839
+f	2022	4	11	15	3	15112022	admindb	admindb	1653283839	1653283839
+f	2022	4	11	16	4	16112022	admindb	admindb	1653283839	1653283839
+f	2022	4	11	17	5	17112022	admindb	admindb	1653283839	1653283839
+f	2022	4	11	18	6	18112022	admindb	admindb	1653283839	1653283839
+f	2022	4	11	19	7	19112022	admindb	admindb	1653283839	1653283839
+f	2022	4	11	20	1	20112022	admindb	admindb	1653283839	1653283839
+f	2022	4	11	21	2	21112022	admindb	admindb	1653283839	1653283839
+f	2022	4	11	22	3	22112022	admindb	admindb	1653283839	1653283839
+f	2022	4	11	23	4	23112022	admindb	admindb	1653283839	1653283839
+f	2022	4	11	24	5	24112022	admindb	admindb	1653283839	1653283839
+f	2022	4	11	25	6	25112022	admindb	admindb	1653283839	1653283839
+f	2022	4	11	26	7	26112022	admindb	admindb	1653283839	1653283839
+f	2022	4	11	27	1	27112022	admindb	admindb	1653283839	1653283839
+f	2022	4	11	28	2	28112022	admindb	admindb	1653283839	1653283839
+f	2022	4	11	29	3	29112022	admindb	admindb	1653283839	1653283839
+f	2022	4	11	30	4	30112022	admindb	admindb	1653283839	1653283839
+f	2022	4	12	1	5	01122022	admindb	admindb	1653283839	1653283839
+f	2022	4	12	2	6	02122022	admindb	admindb	1653283839	1653283839
+f	2022	4	12	3	7	03122022	admindb	admindb	1653283839	1653283839
+f	2022	4	12	4	1	04122022	admindb	admindb	1653283839	1653283839
+f	2022	4	12	5	2	05122022	admindb	admindb	1653283839	1653283839
+f	2022	4	12	6	3	06122022	admindb	admindb	1653283839	1653283839
+f	2022	4	12	7	4	07122022	admindb	admindb	1653283839	1653283839
+f	2022	4	12	8	5	08122022	admindb	admindb	1653283839	1653283839
+f	2022	4	12	9	6	09122022	admindb	admindb	1653283839	1653283839
+f	2022	4	12	10	7	10122022	admindb	admindb	1653283839	1653283839
+f	2022	4	12	11	1	11122022	admindb	admindb	1653283839	1653283839
+f	2022	4	12	12	2	12122022	admindb	admindb	1653283839	1653283839
+f	2022	4	12	13	3	13122022	admindb	admindb	1653283839	1653283839
+f	2022	4	12	14	4	14122022	admindb	admindb	1653283839	1653283839
+f	2022	4	12	15	5	15122022	admindb	admindb	1653283839	1653283839
+f	2022	4	12	16	6	16122022	admindb	admindb	1653283839	1653283839
+f	2022	4	12	17	7	17122022	admindb	admindb	1653283839	1653283839
+f	2022	4	12	18	1	18122022	admindb	admindb	1653283839	1653283839
+f	2022	4	12	19	2	19122022	admindb	admindb	1653283839	1653283839
+f	2022	4	12	20	3	20122022	admindb	admindb	1653283839	1653283839
+f	2022	4	12	21	4	21122022	admindb	admindb	1653283839	1653283839
+f	2022	4	12	22	5	22122022	admindb	admindb	1653283839	1653283839
+f	2022	4	12	23	6	23122022	admindb	admindb	1653283839	1653283839
+f	2022	4	12	24	7	24122022	admindb	admindb	1653283839	1653283839
+f	2022	4	12	25	1	25122022	admindb	admindb	1653283839	1653283839
+f	2022	4	12	26	2	26122022	admindb	admindb	1653283839	1653283839
+f	2022	4	12	27	3	27122022	admindb	admindb	1653283839	1653283839
+f	2022	4	12	28	4	28122022	admindb	admindb	1653283839	1653283839
+f	2022	4	12	29	5	29122022	admindb	admindb	1653283839	1653283839
+f	2022	4	12	30	6	30122022	admindb	admindb	1653283839	1653283839
+f	2022	4	12	31	7	31122022	admindb	admindb	1653283839	1653283839
+f	2023	1	1	1	1	01012023	admindb	admindb	1653283839	1653283839
+f	2023	1	1	2	2	02012023	admindb	admindb	1653283839	1653283839
+f	2023	1	1	3	3	03012023	admindb	admindb	1653283839	1653283839
+f	2023	1	1	4	4	04012023	admindb	admindb	1653283839	1653283839
+f	2023	1	1	5	5	05012023	admindb	admindb	1653283839	1653283839
+f	2023	1	1	6	6	06012023	admindb	admindb	1653283839	1653283839
+f	2023	1	1	7	7	07012023	admindb	admindb	1653283839	1653283839
+f	2023	1	1	8	1	08012023	admindb	admindb	1653283839	1653283839
+f	2023	1	1	9	2	09012023	admindb	admindb	1653283839	1653283839
+f	2023	1	1	10	3	10012023	admindb	admindb	1653283839	1653283839
+f	2023	1	1	11	4	11012023	admindb	admindb	1653283839	1653283839
+f	2023	1	1	12	5	12012023	admindb	admindb	1653283839	1653283839
+f	2023	1	1	13	6	13012023	admindb	admindb	1653283839	1653283839
+f	2023	1	1	14	7	14012023	admindb	admindb	1653283839	1653283839
+f	2023	1	1	15	1	15012023	admindb	admindb	1653283839	1653283839
+f	2023	1	1	16	2	16012023	admindb	admindb	1653283839	1653283839
+f	2023	1	1	17	3	17012023	admindb	admindb	1653283839	1653283839
+f	2023	1	1	18	4	18012023	admindb	admindb	1653283839	1653283839
+f	2023	1	1	19	5	19012023	admindb	admindb	1653283839	1653283839
+f	2023	1	1	20	6	20012023	admindb	admindb	1653283839	1653283839
+f	2023	1	1	21	7	21012023	admindb	admindb	1653283839	1653283839
+f	2023	1	1	22	1	22012023	admindb	admindb	1653283839	1653283839
+f	2023	1	1	23	2	23012023	admindb	admindb	1653283839	1653283839
+f	2023	1	1	24	3	24012023	admindb	admindb	1653283839	1653283839
+f	2023	1	1	25	4	25012023	admindb	admindb	1653283839	1653283839
+f	2023	1	1	26	5	26012023	admindb	admindb	1653283839	1653283839
+f	2023	1	1	27	6	27012023	admindb	admindb	1653283839	1653283839
+f	2023	1	1	28	7	28012023	admindb	admindb	1653283839	1653283839
+f	2023	1	1	29	1	29012023	admindb	admindb	1653283839	1653283839
+f	2023	1	1	30	2	30012023	admindb	admindb	1653283839	1653283839
+f	2023	1	1	31	3	31012023	admindb	admindb	1653283839	1653283839
+f	2023	1	2	1	4	01022023	admindb	admindb	1653283839	1653283839
+f	2023	1	2	2	5	02022023	admindb	admindb	1653283839	1653283839
+f	2023	1	2	3	6	03022023	admindb	admindb	1653283839	1653283839
+f	2023	1	2	4	7	04022023	admindb	admindb	1653283839	1653283839
+f	2023	1	2	5	1	05022023	admindb	admindb	1653283839	1653283839
+f	2023	1	2	6	2	06022023	admindb	admindb	1653283839	1653283839
+f	2023	1	2	7	3	07022023	admindb	admindb	1653283839	1653283839
+f	2023	1	2	8	4	08022023	admindb	admindb	1653283839	1653283839
+f	2023	1	2	9	5	09022023	admindb	admindb	1653283839	1653283839
+f	2023	1	2	10	6	10022023	admindb	admindb	1653283839	1653283839
+f	2023	1	2	11	7	11022023	admindb	admindb	1653283839	1653283839
+f	2023	1	2	12	1	12022023	admindb	admindb	1653283839	1653283839
+f	2023	1	2	13	2	13022023	admindb	admindb	1653283839	1653283839
+f	2023	1	2	14	3	14022023	admindb	admindb	1653283839	1653283839
+f	2023	1	2	15	4	15022023	admindb	admindb	1653283839	1653283839
+f	2023	1	2	16	5	16022023	admindb	admindb	1653283839	1653283839
+f	2023	1	2	17	6	17022023	admindb	admindb	1653283839	1653283839
+f	2023	1	2	18	7	18022023	admindb	admindb	1653283839	1653283839
+f	2023	1	2	19	1	19022023	admindb	admindb	1653283839	1653283839
+f	2023	1	2	20	2	20022023	admindb	admindb	1653283839	1653283839
+f	2023	1	2	21	3	21022023	admindb	admindb	1653283839	1653283839
+f	2023	1	2	22	4	22022023	admindb	admindb	1653283839	1653283839
+f	2023	1	2	23	5	23022023	admindb	admindb	1653283839	1653283839
+f	2023	1	2	24	6	24022023	admindb	admindb	1653283839	1653283839
+f	2023	1	2	25	7	25022023	admindb	admindb	1653283839	1653283839
+f	2023	1	2	26	1	26022023	admindb	admindb	1653283839	1653283839
+f	2023	1	2	27	2	27022023	admindb	admindb	1653283839	1653283839
+f	2023	1	2	28	3	28022023	admindb	admindb	1653283839	1653283839
+f	2023	1	3	1	4	01032023	admindb	admindb	1653283839	1653283839
+f	2023	1	3	2	5	02032023	admindb	admindb	1653283839	1653283839
+f	2023	1	3	3	6	03032023	admindb	admindb	1653283839	1653283839
+f	2023	1	3	4	7	04032023	admindb	admindb	1653283839	1653283839
+f	2023	1	3	5	1	05032023	admindb	admindb	1653283839	1653283839
+f	2023	1	3	6	2	06032023	admindb	admindb	1653283839	1653283839
+f	2023	1	3	7	3	07032023	admindb	admindb	1653283839	1653283839
+f	2023	1	3	8	4	08032023	admindb	admindb	1653283839	1653283839
+f	2023	1	3	9	5	09032023	admindb	admindb	1653283839	1653283839
+f	2023	1	3	10	6	10032023	admindb	admindb	1653283839	1653283839
+f	2023	1	3	11	7	11032023	admindb	admindb	1653283839	1653283839
+f	2023	1	3	12	1	12032023	admindb	admindb	1653283839	1653283839
+f	2023	1	3	13	2	13032023	admindb	admindb	1653283839	1653283839
+f	2023	1	3	14	3	14032023	admindb	admindb	1653283839	1653283839
+f	2023	1	3	15	4	15032023	admindb	admindb	1653283839	1653283839
+f	2023	1	3	16	5	16032023	admindb	admindb	1653283839	1653283839
+f	2023	1	3	17	6	17032023	admindb	admindb	1653283839	1653283839
+f	2023	1	3	18	7	18032023	admindb	admindb	1653283839	1653283839
+f	2023	1	3	19	1	19032023	admindb	admindb	1653283839	1653283839
+f	2023	1	3	20	2	20032023	admindb	admindb	1653283839	1653283839
+f	2023	1	3	21	3	21032023	admindb	admindb	1653283839	1653283839
+f	2023	1	3	22	4	22032023	admindb	admindb	1653283839	1653283839
+f	2023	1	3	23	5	23032023	admindb	admindb	1653283839	1653283839
+f	2023	1	3	24	6	24032023	admindb	admindb	1653283839	1653283839
+f	2023	1	3	25	7	25032023	admindb	admindb	1653283839	1653283839
+f	2023	1	3	26	1	26032023	admindb	admindb	1653283839	1653283839
+f	2023	1	3	27	2	27032023	admindb	admindb	1653283839	1653283839
+f	2023	1	3	28	3	28032023	admindb	admindb	1653283839	1653283839
+f	2023	1	3	29	4	29032023	admindb	admindb	1653283839	1653283839
+f	2023	1	3	30	5	30032023	admindb	admindb	1653283839	1653283839
+f	2023	1	3	31	6	31032023	admindb	admindb	1653283839	1653283839
+f	2023	2	4	1	7	01042023	admindb	admindb	1653283839	1653283839
+f	2023	2	4	2	1	02042023	admindb	admindb	1653283839	1653283839
+f	2023	2	4	3	2	03042023	admindb	admindb	1653283839	1653283839
+f	2023	2	4	4	3	04042023	admindb	admindb	1653283839	1653283839
+f	2023	2	4	5	4	05042023	admindb	admindb	1653283839	1653283839
+f	2023	2	4	6	5	06042023	admindb	admindb	1653283839	1653283839
+f	2023	2	4	7	6	07042023	admindb	admindb	1653283839	1653283839
+f	2023	2	4	8	7	08042023	admindb	admindb	1653283839	1653283839
+f	2023	2	4	9	1	09042023	admindb	admindb	1653283839	1653283839
+f	2023	2	4	10	2	10042023	admindb	admindb	1653283839	1653283839
+f	2023	2	4	11	3	11042023	admindb	admindb	1653283839	1653283839
+f	2023	2	4	12	4	12042023	admindb	admindb	1653283839	1653283839
+f	2023	2	4	13	5	13042023	admindb	admindb	1653283839	1653283839
+f	2023	2	4	14	6	14042023	admindb	admindb	1653283839	1653283839
+f	2023	2	4	15	7	15042023	admindb	admindb	1653283839	1653283839
+f	2023	2	4	16	1	16042023	admindb	admindb	1653283839	1653283839
+f	2023	2	4	17	2	17042023	admindb	admindb	1653283839	1653283839
+f	2023	2	4	18	3	18042023	admindb	admindb	1653283839	1653283839
+f	2023	2	4	19	4	19042023	admindb	admindb	1653283839	1653283839
+f	2023	2	4	20	5	20042023	admindb	admindb	1653283839	1653283839
+f	2023	2	4	21	6	21042023	admindb	admindb	1653283839	1653283839
+f	2023	2	4	22	7	22042023	admindb	admindb	1653283839	1653283839
+f	2023	2	4	23	1	23042023	admindb	admindb	1653283839	1653283839
+f	2023	2	4	24	2	24042023	admindb	admindb	1653283839	1653283839
+f	2023	2	4	25	3	25042023	admindb	admindb	1653283839	1653283839
+f	2023	2	4	26	4	26042023	admindb	admindb	1653283839	1653283839
+f	2023	2	4	27	5	27042023	admindb	admindb	1653283839	1653283839
+f	2023	2	4	28	6	28042023	admindb	admindb	1653283839	1653283839
+f	2023	2	4	29	7	29042023	admindb	admindb	1653283839	1653283839
+f	2023	2	4	30	1	30042023	admindb	admindb	1653283839	1653283839
+f	2023	2	5	1	2	01052023	admindb	admindb	1653283839	1653283839
+f	2023	2	5	2	3	02052023	admindb	admindb	1653283839	1653283839
+f	2023	2	5	3	4	03052023	admindb	admindb	1653283839	1653283839
+f	2023	2	5	4	5	04052023	admindb	admindb	1653283839	1653283839
+f	2023	2	5	5	6	05052023	admindb	admindb	1653283839	1653283839
+f	2023	2	5	6	7	06052023	admindb	admindb	1653283839	1653283839
+f	2023	2	5	7	1	07052023	admindb	admindb	1653283839	1653283839
+f	2023	2	5	8	2	08052023	admindb	admindb	1653283839	1653283839
+f	2023	2	5	9	3	09052023	admindb	admindb	1653283839	1653283839
+f	2023	2	5	10	4	10052023	admindb	admindb	1653283839	1653283839
+f	2023	2	5	11	5	11052023	admindb	admindb	1653283839	1653283839
+f	2023	2	5	12	6	12052023	admindb	admindb	1653283839	1653283839
+f	2023	2	5	13	7	13052023	admindb	admindb	1653283839	1653283839
+f	2023	2	5	14	1	14052023	admindb	admindb	1653283839	1653283839
+f	2023	2	5	15	2	15052023	admindb	admindb	1653283839	1653283839
+f	2023	2	5	16	3	16052023	admindb	admindb	1653283839	1653283839
+f	2023	2	5	17	4	17052023	admindb	admindb	1653283839	1653283839
+f	2023	2	5	18	5	18052023	admindb	admindb	1653283839	1653283839
+f	2023	2	5	19	6	19052023	admindb	admindb	1653283839	1653283839
+f	2023	2	5	20	7	20052023	admindb	admindb	1653283839	1653283839
+f	2023	2	5	21	1	21052023	admindb	admindb	1653283839	1653283839
+f	2023	2	5	22	2	22052023	admindb	admindb	1653283839	1653283839
+f	2023	2	5	23	3	23052023	admindb	admindb	1653283839	1653283839
+f	2023	2	5	24	4	24052023	admindb	admindb	1653283839	1653283839
+f	2023	2	5	25	5	25052023	admindb	admindb	1653283839	1653283839
+f	2023	2	5	26	6	26052023	admindb	admindb	1653283839	1653283839
+f	2023	2	5	27	7	27052023	admindb	admindb	1653283839	1653283839
+f	2023	2	5	28	1	28052023	admindb	admindb	1653283839	1653283839
+f	2023	2	5	29	2	29052023	admindb	admindb	1653283839	1653283839
+f	2023	2	5	30	3	30052023	admindb	admindb	1653283839	1653283839
+f	2023	2	5	31	4	31052023	admindb	admindb	1653283839	1653283839
+f	2023	2	6	1	5	01062023	admindb	admindb	1653283839	1653283839
+f	2023	2	6	2	6	02062023	admindb	admindb	1653283839	1653283839
+f	2023	2	6	3	7	03062023	admindb	admindb	1653283839	1653283839
+f	2023	2	6	4	1	04062023	admindb	admindb	1653283839	1653283839
+f	2023	2	6	5	2	05062023	admindb	admindb	1653283839	1653283839
+f	2023	2	6	6	3	06062023	admindb	admindb	1653283839	1653283839
+f	2023	2	6	7	4	07062023	admindb	admindb	1653283839	1653283839
+f	2023	2	6	8	5	08062023	admindb	admindb	1653283839	1653283839
+f	2023	2	6	9	6	09062023	admindb	admindb	1653283839	1653283839
+f	2023	2	6	10	7	10062023	admindb	admindb	1653283839	1653283839
+f	2023	2	6	11	1	11062023	admindb	admindb	1653283839	1653283839
+f	2023	2	6	12	2	12062023	admindb	admindb	1653283839	1653283839
+f	2023	2	6	13	3	13062023	admindb	admindb	1653283839	1653283839
+f	2023	2	6	14	4	14062023	admindb	admindb	1653283839	1653283839
+f	2023	2	6	15	5	15062023	admindb	admindb	1653283839	1653283839
+f	2023	2	6	16	6	16062023	admindb	admindb	1653283839	1653283839
+f	2023	2	6	17	7	17062023	admindb	admindb	1653283839	1653283839
+f	2023	2	6	18	1	18062023	admindb	admindb	1653283839	1653283839
+f	2023	2	6	19	2	19062023	admindb	admindb	1653283839	1653283839
+f	2023	2	6	20	3	20062023	admindb	admindb	1653283839	1653283839
+f	2023	2	6	21	4	21062023	admindb	admindb	1653283839	1653283839
+f	2023	2	6	22	5	22062023	admindb	admindb	1653283839	1653283839
+f	2023	2	6	23	6	23062023	admindb	admindb	1653283839	1653283839
+f	2023	2	6	24	7	24062023	admindb	admindb	1653283839	1653283839
+f	2023	2	6	25	1	25062023	admindb	admindb	1653283839	1653283839
+f	2023	2	6	26	2	26062023	admindb	admindb	1653283839	1653283839
+f	2023	2	6	27	3	27062023	admindb	admindb	1653283839	1653283839
+f	2023	2	6	28	4	28062023	admindb	admindb	1653283839	1653283839
+f	2023	2	6	29	5	29062023	admindb	admindb	1653283839	1653283839
+f	2023	2	6	30	6	30062023	admindb	admindb	1653283839	1653283839
+f	2023	3	7	1	7	01072023	admindb	admindb	1653283839	1653283839
+f	2023	3	7	2	1	02072023	admindb	admindb	1653283839	1653283839
+f	2023	3	7	3	2	03072023	admindb	admindb	1653283839	1653283839
+f	2023	3	7	4	3	04072023	admindb	admindb	1653283839	1653283839
+f	2023	3	7	5	4	05072023	admindb	admindb	1653283839	1653283839
+f	2023	3	7	6	5	06072023	admindb	admindb	1653283839	1653283839
+f	2023	3	7	7	6	07072023	admindb	admindb	1653283839	1653283839
+f	2023	3	7	8	7	08072023	admindb	admindb	1653283839	1653283839
+f	2023	3	7	9	1	09072023	admindb	admindb	1653283839	1653283839
+f	2023	3	7	10	2	10072023	admindb	admindb	1653283839	1653283839
+f	2023	3	7	11	3	11072023	admindb	admindb	1653283839	1653283839
+f	2023	3	7	12	4	12072023	admindb	admindb	1653283839	1653283839
+f	2023	3	7	13	5	13072023	admindb	admindb	1653283839	1653283839
+f	2023	3	7	14	6	14072023	admindb	admindb	1653283839	1653283839
+f	2023	3	7	15	7	15072023	admindb	admindb	1653283839	1653283839
+f	2023	3	7	16	1	16072023	admindb	admindb	1653283839	1653283839
+f	2023	3	7	17	2	17072023	admindb	admindb	1653283839	1653283839
+f	2023	3	7	18	3	18072023	admindb	admindb	1653283839	1653283839
+f	2023	3	7	19	4	19072023	admindb	admindb	1653283839	1653283839
+f	2023	3	7	20	5	20072023	admindb	admindb	1653283839	1653283839
+f	2023	3	7	21	6	21072023	admindb	admindb	1653283839	1653283839
+f	2023	3	7	22	7	22072023	admindb	admindb	1653283839	1653283839
+f	2023	3	7	23	1	23072023	admindb	admindb	1653283839	1653283839
+f	2023	3	7	24	2	24072023	admindb	admindb	1653283839	1653283839
+f	2023	3	7	25	3	25072023	admindb	admindb	1653283839	1653283839
+f	2023	3	7	26	4	26072023	admindb	admindb	1653283839	1653283839
+f	2023	3	7	27	5	27072023	admindb	admindb	1653283839	1653283839
+f	2023	3	7	28	6	28072023	admindb	admindb	1653283839	1653283839
+f	2023	3	7	29	7	29072023	admindb	admindb	1653283839	1653283839
+f	2023	3	7	30	1	30072023	admindb	admindb	1653283839	1653283839
+f	2023	3	7	31	2	31072023	admindb	admindb	1653283839	1653283839
+f	2023	3	8	1	3	01082023	admindb	admindb	1653283839	1653283839
+f	2023	3	8	2	4	02082023	admindb	admindb	1653283839	1653283839
+f	2023	3	8	3	5	03082023	admindb	admindb	1653283839	1653283839
+f	2023	3	8	4	6	04082023	admindb	admindb	1653283839	1653283839
+f	2023	3	8	5	7	05082023	admindb	admindb	1653283839	1653283839
+f	2023	3	8	6	1	06082023	admindb	admindb	1653283839	1653283839
+f	2023	3	8	7	2	07082023	admindb	admindb	1653283839	1653283839
+f	2023	3	8	8	3	08082023	admindb	admindb	1653283839	1653283839
+f	2023	3	8	9	4	09082023	admindb	admindb	1653283839	1653283839
+f	2023	3	8	10	5	10082023	admindb	admindb	1653283839	1653283839
+f	2023	3	8	11	6	11082023	admindb	admindb	1653283839	1653283839
+f	2023	3	8	12	7	12082023	admindb	admindb	1653283839	1653283839
+f	2023	3	8	13	1	13082023	admindb	admindb	1653283839	1653283839
+f	2023	3	8	14	2	14082023	admindb	admindb	1653283839	1653283839
+f	2023	3	8	15	3	15082023	admindb	admindb	1653283839	1653283839
+f	2023	3	8	16	4	16082023	admindb	admindb	1653283839	1653283839
+f	2023	3	8	17	5	17082023	admindb	admindb	1653283839	1653283839
+f	2023	3	8	18	6	18082023	admindb	admindb	1653283839	1653283839
+f	2023	3	8	19	7	19082023	admindb	admindb	1653283839	1653283839
+f	2023	3	8	20	1	20082023	admindb	admindb	1653283839	1653283839
+f	2023	3	8	21	2	21082023	admindb	admindb	1653283839	1653283839
+f	2023	3	8	22	3	22082023	admindb	admindb	1653283839	1653283839
+f	2023	3	8	23	4	23082023	admindb	admindb	1653283839	1653283839
+f	2023	3	8	24	5	24082023	admindb	admindb	1653283839	1653283839
+f	2023	3	8	25	6	25082023	admindb	admindb	1653283839	1653283839
+f	2023	3	8	26	7	26082023	admindb	admindb	1653283839	1653283839
+f	2023	3	8	27	1	27082023	admindb	admindb	1653283839	1653283839
+f	2023	3	8	28	2	28082023	admindb	admindb	1653283839	1653283839
+f	2023	3	8	29	3	29082023	admindb	admindb	1653283839	1653283839
+f	2023	3	8	30	4	30082023	admindb	admindb	1653283839	1653283839
+f	2023	3	8	31	5	31082023	admindb	admindb	1653283839	1653283839
+f	2023	3	9	1	6	01092023	admindb	admindb	1653283839	1653283839
+f	2023	3	9	2	7	02092023	admindb	admindb	1653283839	1653283839
+f	2023	3	9	3	1	03092023	admindb	admindb	1653283839	1653283839
+f	2023	3	9	4	2	04092023	admindb	admindb	1653283839	1653283839
+f	2023	3	9	5	3	05092023	admindb	admindb	1653283839	1653283839
+f	2023	3	9	6	4	06092023	admindb	admindb	1653283839	1653283839
+f	2023	3	9	7	5	07092023	admindb	admindb	1653283839	1653283839
+f	2023	3	9	8	6	08092023	admindb	admindb	1653283839	1653283839
+f	2023	3	9	9	7	09092023	admindb	admindb	1653283839	1653283839
+f	2023	3	9	10	1	10092023	admindb	admindb	1653283839	1653283839
+f	2023	3	9	11	2	11092023	admindb	admindb	1653283839	1653283839
+f	2023	3	9	12	3	12092023	admindb	admindb	1653283839	1653283839
+f	2023	3	9	13	4	13092023	admindb	admindb	1653283839	1653283839
+f	2023	3	9	14	5	14092023	admindb	admindb	1653283839	1653283839
+f	2023	3	9	15	6	15092023	admindb	admindb	1653283839	1653283839
+f	2023	3	9	16	7	16092023	admindb	admindb	1653283839	1653283839
+f	2023	3	9	17	1	17092023	admindb	admindb	1653283839	1653283839
+f	2023	3	9	18	2	18092023	admindb	admindb	1653283839	1653283839
+f	2023	3	9	19	3	19092023	admindb	admindb	1653283839	1653283839
+f	2023	3	9	20	4	20092023	admindb	admindb	1653283839	1653283839
+f	2023	3	9	21	5	21092023	admindb	admindb	1653283839	1653283839
+f	2023	3	9	22	6	22092023	admindb	admindb	1653283839	1653283839
+f	2023	3	9	23	7	23092023	admindb	admindb	1653283839	1653283839
+f	2023	3	9	24	1	24092023	admindb	admindb	1653283839	1653283839
+f	2023	3	9	25	2	25092023	admindb	admindb	1653283839	1653283839
+f	2023	3	9	26	3	26092023	admindb	admindb	1653283839	1653283839
+f	2023	3	9	27	4	27092023	admindb	admindb	1653283839	1653283839
+f	2023	3	9	28	5	28092023	admindb	admindb	1653283839	1653283839
+f	2023	3	9	29	6	29092023	admindb	admindb	1653283839	1653283839
+f	2023	3	9	30	7	30092023	admindb	admindb	1653283839	1653283839
+f	2023	4	10	1	1	01102023	admindb	admindb	1653283839	1653283839
+f	2023	4	10	2	2	02102023	admindb	admindb	1653283839	1653283839
+f	2023	4	10	3	3	03102023	admindb	admindb	1653283839	1653283839
+f	2023	4	10	4	4	04102023	admindb	admindb	1653283839	1653283839
+f	2023	4	10	5	5	05102023	admindb	admindb	1653283839	1653283839
+f	2023	4	10	6	6	06102023	admindb	admindb	1653283839	1653283839
+f	2023	4	10	7	7	07102023	admindb	admindb	1653283839	1653283839
+f	2023	4	10	8	1	08102023	admindb	admindb	1653283839	1653283839
+f	2023	4	10	9	2	09102023	admindb	admindb	1653283839	1653283839
+f	2023	4	10	10	3	10102023	admindb	admindb	1653283839	1653283839
+f	2023	4	10	11	4	11102023	admindb	admindb	1653283839	1653283839
+f	2023	4	10	12	5	12102023	admindb	admindb	1653283839	1653283839
+f	2023	4	10	13	6	13102023	admindb	admindb	1653283839	1653283839
+f	2023	4	10	14	7	14102023	admindb	admindb	1653283839	1653283839
+f	2023	4	10	15	1	15102023	admindb	admindb	1653283839	1653283839
+f	2023	4	10	16	2	16102023	admindb	admindb	1653283839	1653283839
+f	2023	4	10	17	3	17102023	admindb	admindb	1653283839	1653283839
+f	2023	4	10	18	4	18102023	admindb	admindb	1653283839	1653283839
+f	2023	4	10	19	5	19102023	admindb	admindb	1653283839	1653283839
+f	2023	4	10	20	6	20102023	admindb	admindb	1653283839	1653283839
+f	2023	4	10	21	7	21102023	admindb	admindb	1653283839	1653283839
+f	2023	4	10	22	1	22102023	admindb	admindb	1653283839	1653283839
+f	2023	4	10	23	2	23102023	admindb	admindb	1653283839	1653283839
+f	2023	4	10	24	3	24102023	admindb	admindb	1653283839	1653283839
+f	2023	4	10	25	4	25102023	admindb	admindb	1653283839	1653283839
+f	2023	4	10	26	5	26102023	admindb	admindb	1653283839	1653283839
+f	2023	4	10	27	6	27102023	admindb	admindb	1653283839	1653283839
+f	2023	4	10	28	7	28102023	admindb	admindb	1653283839	1653283839
+f	2023	4	10	29	1	29102023	admindb	admindb	1653283839	1653283839
+f	2023	4	10	30	2	30102023	admindb	admindb	1653283839	1653283839
+f	2023	4	10	31	3	31102023	admindb	admindb	1653283839	1653283839
+f	2023	4	11	1	4	01112023	admindb	admindb	1653283839	1653283839
+f	2023	4	11	2	5	02112023	admindb	admindb	1653283839	1653283839
+f	2023	4	11	3	6	03112023	admindb	admindb	1653283839	1653283839
+f	2023	4	11	4	7	04112023	admindb	admindb	1653283839	1653283839
+f	2023	4	11	5	1	05112023	admindb	admindb	1653283839	1653283839
+f	2023	4	11	6	2	06112023	admindb	admindb	1653283839	1653283839
+f	2023	4	11	7	3	07112023	admindb	admindb	1653283839	1653283839
+f	2023	4	11	8	4	08112023	admindb	admindb	1653283839	1653283839
+f	2023	4	11	9	5	09112023	admindb	admindb	1653283839	1653283839
+f	2023	4	11	10	6	10112023	admindb	admindb	1653283839	1653283839
+f	2023	4	11	11	7	11112023	admindb	admindb	1653283839	1653283839
+f	2023	4	11	12	1	12112023	admindb	admindb	1653283839	1653283839
+f	2023	4	11	13	2	13112023	admindb	admindb	1653283839	1653283839
+f	2023	4	11	14	3	14112023	admindb	admindb	1653283839	1653283839
+f	2023	4	11	15	4	15112023	admindb	admindb	1653283839	1653283839
+f	2023	4	11	16	5	16112023	admindb	admindb	1653283839	1653283839
+f	2023	4	11	17	6	17112023	admindb	admindb	1653283839	1653283839
+f	2023	4	11	18	7	18112023	admindb	admindb	1653283839	1653283839
+f	2023	4	11	19	1	19112023	admindb	admindb	1653283839	1653283839
+f	2023	4	11	20	2	20112023	admindb	admindb	1653283839	1653283839
+f	2023	4	11	21	3	21112023	admindb	admindb	1653283839	1653283839
+f	2023	4	11	22	4	22112023	admindb	admindb	1653283839	1653283839
+f	2023	4	11	23	5	23112023	admindb	admindb	1653283839	1653283839
+f	2023	4	11	24	6	24112023	admindb	admindb	1653283839	1653283839
+f	2023	4	11	25	7	25112023	admindb	admindb	1653283839	1653283839
+f	2023	4	11	26	1	26112023	admindb	admindb	1653283839	1653283839
+f	2023	4	11	27	2	27112023	admindb	admindb	1653283839	1653283839
+f	2023	4	11	28	3	28112023	admindb	admindb	1653283839	1653283839
+f	2023	4	11	29	4	29112023	admindb	admindb	1653283839	1653283839
+f	2023	4	11	30	5	30112023	admindb	admindb	1653283839	1653283839
+f	2023	4	12	1	6	01122023	admindb	admindb	1653283839	1653283839
+f	2023	4	12	2	7	02122023	admindb	admindb	1653283839	1653283839
+f	2023	4	12	3	1	03122023	admindb	admindb	1653283839	1653283839
+f	2023	4	12	4	2	04122023	admindb	admindb	1653283839	1653283839
+f	2023	4	12	5	3	05122023	admindb	admindb	1653283839	1653283839
+f	2023	4	12	6	4	06122023	admindb	admindb	1653283839	1653283839
+f	2023	4	12	7	5	07122023	admindb	admindb	1653283839	1653283839
+f	2023	4	12	8	6	08122023	admindb	admindb	1653283839	1653283839
+f	2023	4	12	9	7	09122023	admindb	admindb	1653283839	1653283839
+f	2023	4	12	10	1	10122023	admindb	admindb	1653283839	1653283839
+f	2023	4	12	11	2	11122023	admindb	admindb	1653283839	1653283839
+f	2023	4	12	12	3	12122023	admindb	admindb	1653283839	1653283839
+f	2023	4	12	13	4	13122023	admindb	admindb	1653283839	1653283839
+f	2023	4	12	14	5	14122023	admindb	admindb	1653283839	1653283839
+f	2023	4	12	15	6	15122023	admindb	admindb	1653283839	1653283839
+f	2023	4	12	16	7	16122023	admindb	admindb	1653283839	1653283839
+f	2023	4	12	17	1	17122023	admindb	admindb	1653283839	1653283839
+f	2023	4	12	18	2	18122023	admindb	admindb	1653283839	1653283839
+f	2023	4	12	19	3	19122023	admindb	admindb	1653283839	1653283839
+f	2023	4	12	20	4	20122023	admindb	admindb	1653283839	1653283839
+f	2023	4	12	21	5	21122023	admindb	admindb	1653283839	1653283839
+f	2023	4	12	22	6	22122023	admindb	admindb	1653283839	1653283839
+f	2023	4	12	23	7	23122023	admindb	admindb	1653283839	1653283839
+f	2023	4	12	24	1	24122023	admindb	admindb	1653283839	1653283839
+f	2023	4	12	25	2	25122023	admindb	admindb	1653283839	1653283839
+f	2023	4	12	26	3	26122023	admindb	admindb	1653283839	1653283839
+f	2023	4	12	27	4	27122023	admindb	admindb	1653283839	1653283839
+f	2023	4	12	28	5	28122023	admindb	admindb	1653283839	1653283839
+f	2023	4	12	29	6	29122023	admindb	admindb	1653283839	1653283839
+f	2023	4	12	30	7	30122023	admindb	admindb	1653283839	1653283839
+f	2023	4	12	31	1	31122023	admindb	admindb	1653283839	1653283839
 \.
 
 
