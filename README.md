@@ -1,4 +1,5 @@
 # Open Source ERP
+
 with:
 
 - customer management (crm)
@@ -14,4 +15,5 @@ with:
 - mail archiving
 - customizable
 - HOAI
+
 
