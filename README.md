@@ -16,5 +16,5 @@ with:
 - customizable
 - HOAI
 
-[Open Source ERP](https://nelson-it.ch/erp).
+[Nelson - technisch Informatik](https://nelson-it.ch/erp)
 
