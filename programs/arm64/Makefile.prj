@@ -3,10 +3,10 @@
          WITH_PTHREADS := TRUE
 
    TARGETS  := $(SHLIB_PRE)mnebase.$(SHLIB) $(SHLIB_PRE)mnemail.$(SHLIB)  $(SHLIB_PRE)mnexml.$(SHLIB) $(SHLIB_PRE)mnehttp.$(SHLIB) \
-               $(SHLIB_PRE)mnehttpxml.$(SHLIB) $(SHLIB_PRE)mnedb.$(SHLIB) $(SHLIB_PRE)mnedbhttp.$(SHLIB) $(SHLIB_PRE)mnedbhttpmail.$(SHLIB)\
+               $(SHLIB_PRE)mnehttpxml.$(SHLIB) $(SHLIB_PRE)mnedb.$(SHLIB) $(SHLIB_PRE)mnedbhttp.$(SHLIB) $(SHLIB_PRE)mnedbhttpreport.$(SHLIB) $(SHLIB_PRE)mnedbhttpmail.$(SHLIB)\
                server
                
 server.WITH_GD       := FALSE
 server.WITH_POSTGRES := TRUE
-server.LIBS          := mnebase mnexml mnemail mnehttp mnehttpxml mnedb mnedbhttp mnedbhttpmail
+server.LIBS          := mnebase mnexml mnemail mnehttp mnehttpxml mnedb mnedbhttp mnedbhttpreport mnedbhttpmail
 server.SOURCES       := ../server.cpp
