@@ -14,5 +14,5 @@ PhpPath: /usr/bin/php-cgi -d include_path=.:/home/manny/projects/web/allg/php:/u
 EmbedwebHttpIndex:      erp
 EmbedwebHttpServerpath: erp/web:web/app:web/extern
 EmbedwebHttpDataroot:   data
-EmbedwebHttpDatapath:   repository@data/repository
+EmbedwebHttpDatapath:   repository@repository
 RepRoot:                tex/report
