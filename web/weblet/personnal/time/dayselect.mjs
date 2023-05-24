@@ -41,6 +41,9 @@ class MneErpPersonnalTimeDayselect extends MneDbView
     
     var date = new Date();
     this.obj.run.day = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    this.obj.defvalues.vfullday = MneText.addNull(date.getDate(),2) + MneText.addNull(date.getMonth() + 1,2) + MneText.addNull(date.getFullYear(),4);
+    this.obj.defvalues.personid = MneConfig.personid;
+    this.obj.defvalues.fullname = MneConfig.fullname;
     
     this.obj.run.title.add = this.config.label;
     this.obj.run.title.mod = this.config.label;
@@ -76,6 +79,7 @@ class MneErpPersonnalTimeDayselect extends MneDbView
   {
     var val = this.obj.outputs.vfullday.getValue();
     this.obj.outputs.vfullday.modClear();
+    this.obj.defvalues.vfullday = val;
     this.obj.run.day = new Date(val.substr(4), parseInt(val.substr(2,2)) - 1, val.substr(0,2));
     this.newvalues = true;
   }
@@ -85,6 +89,12 @@ class MneErpPersonnalTimeDayselect extends MneDbView
     this.obj.outputs.vfullday.modValue(day);
   }
   
+  async add(data = {})
+  {
+    super.add(data);
+    this.obj.run.values.personid = MneConfig.personid;
+  }
+
   async values()
   {
     await super.values();
