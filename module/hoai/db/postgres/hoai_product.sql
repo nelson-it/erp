@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 14.7 (Ubuntu 14.7-0ubuntu0.22.04.1)
--- Dumped by pg_dump version 14.7 (Ubuntu 14.7-0ubuntu0.22.04.1)
+-- Dumped from database version 14.8 (Ubuntu 14.8-0ubuntu0.22.04.1)
+-- Dumped by pg_dump version 14.8 (Ubuntu 14.8-0ubuntu0.22.04.1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -213,8 +213,8 @@ ALTER TABLE mne_crm.product ENABLE TRIGGER ALL;
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 14.7 (Ubuntu 14.7-0ubuntu0.22.04.1)
--- Dumped by pg_dump version 14.7 (Ubuntu 14.7-0ubuntu0.22.04.1)
+-- Dumped from database version 14.8 (Ubuntu 14.8-0ubuntu0.22.04.1)
+-- Dumped by pg_dump version 14.8 (Ubuntu 14.8-0ubuntu0.22.04.1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -459,8 +459,8 @@ ALTER TABLE mne_crm.producttree ENABLE TRIGGER ALL;
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 14.7 (Ubuntu 14.7-0ubuntu0.22.04.1)
--- Dumped by pg_dump version 14.7 (Ubuntu 14.7-0ubuntu0.22.04.1)
+-- Dumped from database version 14.8 (Ubuntu 14.8-0ubuntu0.22.04.1)
+-- Dumped by pg_dump version 14.8 (Ubuntu 14.8-0ubuntu0.22.04.1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -654,8 +654,8 @@ INSERT INTO mne_crm.productprice (createdate, createuser, currencyid, modifydate
 INSERT INTO mne_crm.productprice (createdate, createuser, currencyid, modifydate, modifyuser, productid, unit, unitprice, vat, unitcost) VALUES (1386583466, 'admindb', '4379ed230002', 1429715373, 'admindb', '52a593920000', '%', 380, NULL, 365);
 INSERT INTO mne_crm.productprice (createdate, createuser, currencyid, modifydate, modifyuser, productid, unit, unitprice, vat, unitcost) VALUES (1386314851, 'admindb', '4379ed230002', 1550579229, 'admindb', '52a172ac0000', '%', 400, NULL, 330);
 INSERT INTO mne_crm.productprice (createdate, createuser, currencyid, modifydate, modifyuser, productid, unit, unitprice, vat, unitcost) VALUES (1386314694, 'admindb', '4379ed230002', 1550579244, 'admindb', '52a172a50000', '%', 400, NULL, 330);
-INSERT INTO mne_crm.productprice (createdate, createuser, currencyid, modifydate, modifyuser, productid, unit, unitprice, vat, unitcost) VALUES (1647250435, 'admindb', '4dd51ece0000', 1649248765, 'admindb', '622f0bfa8000', '', 2000.8, NULL, 1500);
-INSERT INTO mne_crm.productprice (createdate, createuser, currencyid, modifydate, modifyuser, productid, unit, unitprice, vat, unitcost) VALUES (1610531691, 'admindb', '4dd51ece0000', 1671619872, 'admindb', '5ffdbc9b8000', '', 2000.99, NULL, 1366.6666666666667);
+INSERT INTO mne_crm.productprice (createdate, createuser, currencyid, modifydate, modifyuser, productid, unit, unitprice, vat, unitcost) VALUES (1610531691, 'admindb', '4dd51ece0000', 1687272131, 'admindb', '5ffdbc9b8000', '', 2000.99, NULL, 1366.6666666666667);
+INSERT INTO mne_crm.productprice (createdate, createuser, currencyid, modifydate, modifyuser, productid, unit, unitprice, vat, unitcost) VALUES (1647250435, 'admindb', '4dd51ece0000', 1687273107, 'admindb', '622f0bfa8000', '', 2340, NULL, 1500);
 
 
 ALTER TABLE mne_crm.productprice ENABLE TRIGGER ALL;
@@ -668,8 +668,8 @@ ALTER TABLE mne_crm.productprice ENABLE TRIGGER ALL;
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 14.7 (Ubuntu 14.7-0ubuntu0.22.04.1)
--- Dumped by pg_dump version 14.7 (Ubuntu 14.7-0ubuntu0.22.04.1)
+-- Dumped from database version 14.8 (Ubuntu 14.8-0ubuntu0.22.04.1)
+-- Dumped by pg_dump version 14.8 (Ubuntu 14.8-0ubuntu0.22.04.1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -706,8 +706,8 @@ ALTER TABLE mne_warehouse.productpart ENABLE TRIGGER ALL;
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 14.7 (Ubuntu 14.7-0ubuntu0.22.04.1)
--- Dumped by pg_dump version 14.7 (Ubuntu 14.7-0ubuntu0.22.04.1)
+-- Dumped from database version 14.8 (Ubuntu 14.8-0ubuntu0.22.04.1)
+-- Dumped by pg_dump version 14.8 (Ubuntu 14.8-0ubuntu0.22.04.1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -745,8 +745,8 @@ ALTER TABLE mne_personnal.skill ENABLE TRIGGER ALL;
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 14.7 (Ubuntu 14.7-0ubuntu0.22.04.1)
--- Dumped by pg_dump version 14.7 (Ubuntu 14.7-0ubuntu0.22.04.1)
+-- Dumped from database version 14.8 (Ubuntu 14.8-0ubuntu0.22.04.1)
+-- Dumped by pg_dump version 14.8 (Ubuntu 14.8-0ubuntu0.22.04.1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -1827,8 +1827,8 @@ ALTER TABLE mne_personnal.producttime ENABLE TRIGGER ALL;
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 14.7 (Ubuntu 14.7-0ubuntu0.22.04.1)
--- Dumped by pg_dump version 14.7 (Ubuntu 14.7-0ubuntu0.22.04.1)
+-- Dumped from database version 14.8 (Ubuntu 14.8-0ubuntu0.22.04.1)
+-- Dumped by pg_dump version 14.8 (Ubuntu 14.8-0ubuntu0.22.04.1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
