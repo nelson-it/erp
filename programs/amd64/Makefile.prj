@@ -6,7 +6,7 @@
                $(SHLIB_PRE)mnehttpxml.$(SHLIB) $(SHLIB_PRE)mnedb.$(SHLIB) $(SHLIB_PRE)mnedbhttp.$(SHLIB) $(SHLIB_PRE)mnedbhttpreport.$(SHLIB) $(SHLIB_PRE)mnedbhttpmail.$(SHLIB)\
                server
                
-ifeq "$(UNAME)" "CYGWIN_NT-10.0"
+ifeq "$(UNAME)" "CYGWIN_NT-10.0-22621"
   LIB_ADD := -lnetapi32
   TARGETS := $(TARGETS) winservice
 endif
