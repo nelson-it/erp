@@ -11,15 +11,14 @@ export IMAGE_TAG=latest
 #docker image prune -a
 docker compose -f ../../docker/erp/compose.yaml --profile push build 
 
-docker tag  puran2/database:latest puran2/database:erp-latest
-docker tag  puran2/database:latest puran2/database:erp-$VERSION
 docker tag  puran2/apache:latest puran2/apache:erp-$VERSION
 
+docker tag  puran2/erp-database:latest puran2/database:erp-$VERSION
 docker tag  puran2/erp-init:latest puran2/erp-init:$VERSION
 docker tag  puran2/erp-server:latest puran2/erp-server:$VERSION
 
-docker push --all-tags puran2/database
 docker push --all-tags puran2/apache
+docker push --all-tags puran2/erp-database
 docker push --all-tags puran2/erp-init
 docker push --all-tags puran2/erp-server
 
