@@ -15,7 +15,7 @@ if [ "$prefix" = "" ]; then
     prefix=default
 fi
 
-export TEXINPUTS=.:$PWD/../../entwicklung/tex/$prefix////:$PWD/../../entwicklung/tex/default////:$PWD/../../tex///:
+export TEXINPUTS=.:$PWD/../../local/tex/$prefix////:$PWD/../../local/tex/default////:$PWD/../../tex///:
 export TEXMFVAR=$PWD/.texmf-var
 export PATH=/opt/Tex/bin:/usr/texbin:/usr/bin:$PATH
 
